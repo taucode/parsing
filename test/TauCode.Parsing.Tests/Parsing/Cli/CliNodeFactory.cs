@@ -71,7 +71,7 @@ namespace TauCode.Parsing.Tests.Parsing.Cli
                 return node;
             }
 
-            if (!(node is ActionNode ))
+            if (!(node is ActionNode))
             {
                 throw new CliException("ActionNode was expected to be created.");
             }

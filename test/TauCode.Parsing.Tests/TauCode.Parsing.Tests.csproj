@@ -1,22 +1,9 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netcoreapp3.1</TargetFramework>
-
+    <TargetFramework>net6.0</TargetFramework>
     <IsPackable>false</IsPackable>
   </PropertyGroup>
-
-  <ItemGroup>
-    <None Remove="Resources\cli-grammar.lisp" />
-    <None Remove="Resources\sql-grammar-expected.lisp" />
-    <None Remove="Resources\sql-grammar.lisp" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <EmbeddedResource Include="Resources\cli-grammar.lisp" />
-    <EmbeddedResource Include="Resources\sql-grammar-expected.lisp" />
-    <EmbeddedResource Include="Resources\sql-grammar.lisp" />
-  </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="nunit" Version="3.13.3" />

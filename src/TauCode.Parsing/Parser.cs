@@ -1,141 +1,140 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using TauCode.Parsing.Exceptions;
-using TauCode.Parsing.Nodes;
+using Serilog;
+using TauCode.Parsing.ParsingNodes;
 
 namespace TauCode.Parsing
 {
+    // todo regions, clean
     public class Parser : IParser
     {
-        public bool WantsOnlyOneResult { get; set; }
+        private readonly Dictionary<IParsingNode, HashSet<IParsingNode>> _routes;
+        private IParsingNode _root;
 
-        public INode Root { get; set; }
-
-        public object[] Parse(IEnumerable<IToken> tokens)
+        public Parser()
         {
-            var root = this.Root;
+            _routes = new Dictionary<IParsingNode, HashSet<IParsingNode>>();
+        }
 
-            if (root == null)
+        public ILogger Logger { get; set; }
+
+        public IParsingNode Root
+        {
+            get => _root;
+            set
             {
-                throw new NullReferenceException($"Property '{nameof(Root)}' not set.");
+                _routes.Clear();
+                _root = value;
             }
+        }
 
-            if (tokens == null)
-            {
-                throw new ArgumentNullException(nameof(tokens));
-            }
+        public void Parse(IReadOnlyList<ILexicalToken> tokens, IParsingResult parsingResult)
+        {
+            // todo: skip empty tokens (and ut)
 
-            var stream = new TokenStream(tokens);
-            IParsingContext context = new ParsingContext(stream);
-            var initialNodes = ParsingHelper.GetNonIdleNodes(new[] { root });
+            var context = new ParsingContext(tokens);
+            var currentNodes = new HashSet<IParsingNode>(new[] { this.Root });
 
-            context.SetNodes(initialNodes);
+            //IParsingNode endNode = null;
 
             while (true)
             {
-                var nodes = context.GetNodes();
-                if (stream.IsEndOfStream())
+                if (context.Position == tokens.Count)
                 {
-                    if (nodes.Contains(EndNode.Instance))
+                    if (currentNodes.Contains(EndNode.Instance))
                     {
-                        // met end of stream, but that is acceptable
-                        return context.ResultAccumulator.ToArray();
+                        // we can accept end
+                        break;
                     }
                     else
                     {
-                        throw new UnexpectedEndOfClauseException(context.ResultAccumulator.ToArray());
+                        throw new NotImplementedException(); // unexpected end
                     }
                 }
 
-                var token = stream.CurrentToken;
-                if (token is IEmptyToken)
-                {
-                    stream.AdvanceStreamPosition();
-                    continue;
-                }
+                var currentToken = context.Tokens[context.Position];
 
-                INode winner = null;
-                FallbackNode fallbackNode = null;
-                var gotEnd = false;
+                IParsingNode realWinner = null; // 'real' means it is not an EndNode
+                //endNode = null;
 
-                foreach (var node in nodes)
+                foreach (var currentNode in currentNodes)
                 {
-                    if (node is EndNode)
+                    if (currentNode is EndNode)
                     {
-                        gotEnd = true;
+                        // not our guy since we've got current token
                         continue;
                     }
 
-                    var acceptsToken = node.AcceptsToken(token, context.ResultAccumulator);
-
-                    if (acceptsToken)
+                    var accepts = currentNode.AcceptsToken(currentToken, parsingResult);
+                    if (accepts)
                     {
-                        if (node is FallbackNode anotherFallbackNode)
+                        if (realWinner == null)
                         {
-                            if (fallbackNode != null)
-                            {
-                                throw new NodeConcurrencyException(
-                                    token,
-                                    new INode[] { fallbackNode, anotherFallbackNode },
-                                    context.ResultAccumulator.ToArray());
-                            }
-
-                            fallbackNode = anotherFallbackNode;
+                            // we've got winner
+                            realWinner = currentNode;
                         }
                         else
                         {
-                            if (winner != null)
-                            {
-                                throw new NodeConcurrencyException(
-                                    token,
-                                    new[] { winner, node },
-                                    context.ResultAccumulator.ToArray());
-                            }
-
-                            winner = node;
+                            // we've got concurrency
+                            throw new NotImplementedException();
                         }
                     }
                 }
 
-                if (winner == null)
+                if (realWinner == null)
                 {
-                    if (gotEnd)
-                    {
-                        if (this.WantsOnlyOneResult)
-                        {
-                            // error. stream has more tokens, but we won't want'em.
-                            throw new UnexpectedTokenException(token, context.ResultAccumulator.ToArray());
-                        }
+                    // unexpected token
+                    throw new NotImplementedException();
+                }
 
-                        // fine, got to end, start over.
-                        context.SetNodes(initialNodes);
-                    }
-                    else if (fallbackNode != null)
-                    {
-                        fallbackNode.Act(token, context.ResultAccumulator); // will throw, and that's what we want.
-                    }
-                    else
-                    {
-                        throw new UnexpectedTokenException(token, context.ResultAccumulator.ToArray());
-                    }
+                realWinner.Act(currentToken, parsingResult);
+
+                context.Position++;
+
+                currentNodes = GetRoutes(realWinner);
+                if (currentNodes.Count == 0)
+                {
+                    throw new NotImplementedException(); // wtf
+                }
+            }
+        }
+
+        private HashSet<IParsingNode> GetRoutes(IParsingNode node)
+        {
+            var contains = _routes.TryGetValue(node, out var list);
+            if (contains)
+            {
+                return list;
+            }
+
+            var hashSet = new HashSet<IParsingNode>();
+            AddNextNodesOf(node, hashSet);
+
+            list = hashSet;
+
+            _routes.Add(node, list);
+
+            return list;
+        }
+
+        private static void AddNextNodesOf(IParsingNode node, HashSet<IParsingNode> hashSet)
+        {
+            var nextNodes = node
+                .OutgoingEdges
+                .Select(x => x.Head)
+                .Cast<IParsingNode>()
+                .ToList(); // todo temp only for debug; later remove this 'ToList()'
+
+            foreach (var nextNode in nextNodes)
+            {
+                if (nextNode is IdleNode)
+                {
+                    AddNextNodesOf(nextNode, hashSet); // todo: if some 'hacker' creates IdleNode pointing to itself, we've get a stack overflow here
                 }
                 else
                 {
-                    var oldVersion = context.ResultAccumulator.Version;
-                    winner.Act(token, context.ResultAccumulator);
-                    if (oldVersion + 1 != context.ResultAccumulator.Version)
-                    {
-                        throw new InternalParsingLogicException("Internal error. Non sequential result accumulator versions.");
-                    }
-
-                    // skip
-                    context.TokenStream.AdvanceStreamPosition();
-                    var successors = winner.ResolveLinks();
-                    var nonIdleSuccessors = ParsingHelper.GetNonIdleNodes(successors);
-
-                    // next nodes
-                    context.SetNodes(nonIdleSuccessors);
+                    hashSet.Add(nextNode);
                 }
             }
         }

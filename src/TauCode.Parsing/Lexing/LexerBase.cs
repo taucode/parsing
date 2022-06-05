@@ -17,7 +17,7 @@ namespace TauCode.Parsing.Lexing
 
         protected bool IgnoreEmptyTokens { get; }
 
-        protected List<ITokenProducer> Producers => _producers ?? (_producers = this.CreateProducers().ToList());
+        protected List<ITokenProducer> Producers => _producers ??= this.CreateProducers().ToList();
 
         public IList<IToken> Lexize(string input)
         {

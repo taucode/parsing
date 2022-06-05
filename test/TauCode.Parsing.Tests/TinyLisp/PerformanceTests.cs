@@ -32,6 +32,8 @@ namespace TauCode.Parsing.Tests.TinyLisp
             var perSecond = num / seconds;
             var msPerCall = seconds / num * 1000;
 
+            Assert.Pass($"Per second: {perSecond}; ms per call: {msPerCall}");
+
             //var k = 3;
         }
 

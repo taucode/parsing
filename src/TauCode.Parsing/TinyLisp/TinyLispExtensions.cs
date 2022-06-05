@@ -39,7 +39,7 @@ namespace TauCode.Parsing.TinyLisp
 
             var wantedKeyword = Symbol.Create(argumentName);
             int wantedIndex;
-            var index = list.FindFirstIndexOf(wantedKeyword);
+            var index = list.FindFirstIndex(wantedKeyword);
 
             if (index < 0)
             {
@@ -120,7 +120,7 @@ namespace TauCode.Parsing.TinyLisp
             }
 
             var wantedKeyword = Symbol.Create(argumentName);
-            var index = list.FindFirstIndexOf(wantedKeyword);
+            var index = list.FindFirstIndex(wantedKeyword);
 
             if (index == -1)
             {

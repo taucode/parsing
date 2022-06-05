@@ -1,19 +1,24 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netcoreapp3.1</TargetFramework>
-
+    <TargetFramework>net6.0</TargetFramework>
     <IsPackable>false</IsPackable>
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="Resources\cli-grammar-native.lisp" />
     <None Remove="Resources\cli-grammar.lisp" />
+    <None Remove="Resources\expected-sd-graph.txt" />
     <None Remove="Resources\sql-grammar-expected.lisp" />
+    <None Remove="Resources\sql-grammar-smart.lisp" />
     <None Remove="Resources\sql-grammar.lisp" />
   </ItemGroup>
 
   <ItemGroup>
+    <EmbeddedResource Include="Resources\expected-sd-graph.txt" />
+    <EmbeddedResource Include="Resources\cli-grammar-native.lisp" />
     <EmbeddedResource Include="Resources\cli-grammar.lisp" />
+    <EmbeddedResource Include="Resources\sql-grammar-smart.lisp" />
     <EmbeddedResource Include="Resources\sql-grammar-expected.lisp" />
     <EmbeddedResource Include="Resources\sql-grammar.lisp" />
   </ItemGroup>
@@ -25,6 +30,7 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.2.0" />
+    <PackageReference Include="Serilog.Sinks.TextWriter" Version="2.1.0" />
   </ItemGroup>
 
   <ItemGroup>

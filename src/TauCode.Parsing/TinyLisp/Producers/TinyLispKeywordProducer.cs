@@ -1,27 +1,22 @@
 ﻿using TauCode.Parsing.Exceptions;
-using TauCode.Parsing.Lexing;
 using TauCode.Parsing.TinyLisp.Tokens;
 
 namespace TauCode.Parsing.TinyLisp.Producers
 {
-    public class TinyLispKeywordProducer : ITokenProducer
+    public class TinyLispKeywordProducer : ILexicalTokenProducer
     {
-        public LexingContext Context { get; set; }
-
-        public IToken Produce()
+        public ILexicalToken Produce(LexingContext context)
         {
-            var context = this.Context;
-            var text = context.Text;
-            var length = context.Length;
+            var text = context.Input.Span;
+            var length = text.Length;
 
-            var c = text[context.Index];
+            var c = text[context.Position];
 
             if (c == ':')
             {
                 var nameCharsCount = 0;
-                var initialIndex = context.Index;
+                var initialIndex = context.Position;
                 var index = initialIndex + 1;
-                var column = context.Column + 1;
 
                 while (true)
                 {
@@ -34,7 +29,7 @@ namespace TauCode.Parsing.TinyLisp.Producers
 
                     if (c == ':')
                     {
-                        ThrowBadKeywordException(context.Line, context.Column);
+                        ThrowBadKeywordException(initialIndex);
                     }
 
                     if (!TinyLispHelper.IsAcceptableSymbolNameChar(c))
@@ -44,21 +39,21 @@ namespace TauCode.Parsing.TinyLisp.Producers
 
                     nameCharsCount++;
                     index++;
-                    column++;
                 }
 
                 if (nameCharsCount == 0)
                 {
-                    ThrowBadKeywordException(context.Line, context.Column);
+                    ThrowBadKeywordException(initialIndex);
                 }
 
                 var delta = index - initialIndex;
-                var keywordName = text.Substring(initialIndex, delta);
+                var keywordNameSpan = text.Slice(initialIndex, delta);
                 var token = new KeywordToken(
-                    keywordName,
-                    new Position(context.Line, context.Column), 
-                    delta);
-                context.Advance(delta, 0, column);
+                    initialIndex,
+                    delta,
+                    keywordNameSpan.ToString());
+
+                context.Position += delta;
                 return token;
             }
             else
@@ -67,9 +62,9 @@ namespace TauCode.Parsing.TinyLisp.Producers
             }
         }
 
-        private static void ThrowBadKeywordException(int line, int column)
+        private static void ThrowBadKeywordException(int? index)
         {
-            throw new LexingException("Bad keyword.", new Position(line, column));
+            throw Helper.CreateException(ParsingErrorTag.TinyLispBadKeyword, index);
         }
     }
 }

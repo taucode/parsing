@@ -1,73 +1,57 @@
-﻿using TauCode.Parsing.Lexing;
-using TauCode.Parsing.TextClasses;
-using TauCode.Parsing.TextDecorations;
-using TauCode.Parsing.Tokens;
+﻿using TauCode.Parsing.LexicalTokens;
 
 namespace TauCode.Parsing.TinyLisp.Producers
 {
-    public class TinyLispStringProducer : ITokenProducer
+    public class TinyLispStringProducer : ILexicalTokenProducer
     {
-        public LexingContext Context { get; set; }
-
-        public IToken Produce()
+        public ILexicalToken Produce(LexingContext context)
         {
-            var context = this.Context;
-            var text = context.Text;
-            var length = context.Length;
+            var text = context.Input.Span;
+            var length = text.Length;
 
-            var c = text[context.Index];
+            var c = text[context.Position];
 
             if (c == '"')
             {
-                var initialIndex = context.Index;
-                var initialLine = context.Line;
+                var initialIndex = context.Position;
 
                 var index = initialIndex + 1; // skip '"'
-                var lineShift = 0;
-                var column = context.Column + 1; // skip '"'
 
                 while (true)
                 {
                     if (index == length)
                     {
-                        throw LexingHelper.CreateUnclosedStringException(new Position(initialLine + lineShift, column));
+                        throw Helper.CreateException(ParsingErrorTag.UnclosedString, index);
                     }
 
                     c = text[index];
 
                     switch (c)
                     {
-                        case LexingHelper.CR:
+                        case '\r':
                             index++;
-                            lineShift++;
-                            column = 0;
 
                             if (index < length)
                             {
                                 var nextChar = text[index];
-                                if (nextChar == LexingHelper.LF)
+                                if (nextChar == '\n')
                                 {
                                     index++;
                                 }
                             }
                             else
                             {
-                                throw LexingHelper.CreateUnclosedStringException(new Position(
-                                    context.Line + lineShift,
-                                    column));
+                                throw Helper.CreateException(ParsingErrorTag.UnclosedString, index);
                             }
 
                             continue;
 
-                        case LexingHelper.LF:
+                        case '\n':
                             index++;
-                            lineShift++;
-                            column = 0;
                             continue;
                     }
 
                     index++;
-                    column++;
 
                     if (c == '"')
                     {
@@ -76,16 +60,15 @@ namespace TauCode.Parsing.TinyLisp.Producers
                 }
 
                 var delta = index - initialIndex;
-                var str = text.Substring(initialIndex + 1, delta - 2);
+                var str = text.Slice(initialIndex + 1, delta - 2);
 
-                var token = new TextToken(
-                    StringTextClass.Instance,
-                    DoubleQuoteTextDecoration.Instance,
-                    str,
-                    new Position(context.Line, context.Column),
-                    delta);
+                var token = new StringToken(
+                    initialIndex,
+                    delta,
+                    str.ToString(),
+                    "TinyLisp");
 
-                context.Advance(delta, lineShift, column);
+                context.Position += delta;
                 return token;
             }
 

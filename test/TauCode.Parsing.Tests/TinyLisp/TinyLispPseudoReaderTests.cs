@@ -3,9 +3,8 @@ using System;
 using System.Linq;
 using TauCode.Extensions;
 using TauCode.Parsing.Exceptions;
-using TauCode.Parsing.Lexing;
+using TauCode.Parsing.LexicalTokens;
 using TauCode.Parsing.TinyLisp;
-using TauCode.Parsing.Tokens;
 
 namespace TauCode.Parsing.Tests.TinyLisp
 {
@@ -27,7 +26,7 @@ namespace TauCode.Parsing.Tests.TinyLisp
             var input = this.GetType().Assembly.GetResourceText("sql-grammar.lisp", true);
             
 
-            var tokens = _lexer.Lexize(input);
+            var tokens = _lexer.Tokenize(input.AsMemory());
 
             var reader = new TinyLispPseudoReader();
 
@@ -73,14 +72,15 @@ namespace TauCode.Parsing.Tests.TinyLisp
             // Arrange
             var form = "(un-closed (a (bit))";
             
-            var tokens = _lexer.Lexize(form);
+            var tokens = _lexer.Tokenize(form.AsMemory());
             var reader = new TinyLispPseudoReader();
 
             // Act
-            var ex = Assert.Throws<TinyLispException>(() => reader.Read(tokens));
+            var ex = Assert.Throws<ParsingException>(() => reader.Read(tokens));
 
             // Assert
-            Assert.That(ex.Message, Is.EqualTo("Unclosed form."));
+            Assert.That(ex.Message, Does.StartWith("TinyLisp: unclosed form."));
+            Assert.That(ex.Index, Is.EqualTo(20));
         }
 
         [Test]
@@ -89,14 +89,15 @@ namespace TauCode.Parsing.Tests.TinyLisp
             // Arrange
             var form = "(closed too much))";
             
-            var tokens = _lexer.Lexize(form);
+            var tokens = _lexer.Tokenize(form.AsMemory());
             var reader = new TinyLispPseudoReader();
 
             // Act
-            var ex = Assert.Throws<TinyLispException>(() => reader.Read(tokens));
+            var ex = Assert.Throws<ParsingException>(() => reader.Read(tokens));
 
             // Assert
-            Assert.That(ex.Message, Is.EqualTo("Unexpected ')'."));
+            Assert.That(ex.Message, Does.StartWith("TinyLisp: unexpected ')'."));
+            Assert.That(ex.Index, Is.EqualTo(17));
         }
 
         [Test]
@@ -105,17 +106,18 @@ namespace TauCode.Parsing.Tests.TinyLisp
             // Arrange
             var form = "(some good form)";
             
-            var tokens = _lexer.Lexize(form);
+            var tokens = _lexer.Tokenize(form.AsMemory());
+            var list = tokens.ToList();
 
-            var badToken = new EnumToken<int>(1488, Position.Zero, 4);
-            tokens.Insert(1, badToken);
+            var badToken = new EnumToken<int>(0, 4, 1488);
+            list.Insert(1, badToken);
             var reader = new TinyLispPseudoReader();
 
             // Act
-            var ex = Assert.Throws<TinyLispException>(() => reader.Read(tokens));
+            var ex = Assert.Throws<ParsingException>(() => reader.Read(list));
 
             // Assert
-            Assert.That(ex.Message, Is.EqualTo($"Could not read token of type '{badToken.GetType().FullName}'."));
+            Assert.That(ex.Message, Does.StartWith("TinyLisp: cannot read token."));
         }
     }
 }

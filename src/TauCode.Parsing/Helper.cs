@@ -54,10 +54,19 @@ namespace TauCode.Parsing
         {
             return errorTag switch
             {
+                // Lexing
                 ParsingErrorTag.UnclosedString => "Unclosed string.",
                 ParsingErrorTag.NewLineInString => "Newline in string.",
                 ParsingErrorTag.BadEscape => "Bad escape sequence.",
                 ParsingErrorTag.CannotTokenize => "Cannot tokenize.",
+
+                // Tiny Lisp
+                ParsingErrorTag.TinyLispBadKeyword => "todo",
+                ParsingErrorTag.TinyLispBadSymbolName => "Bad symbol name.",
+                ParsingErrorTag.TinyLispUnclosedForm => "todo",
+                ParsingErrorTag.TinyLispUnexpectedRightParenthesis => "todo",
+                ParsingErrorTag.TinyLispCannotReadToken => "todo",
+
                 _ => "Unknown error"
             };
         }

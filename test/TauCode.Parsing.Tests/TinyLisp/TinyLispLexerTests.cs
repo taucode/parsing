@@ -57,22 +57,22 @@ namespace TauCode.Parsing.Tests.TinyLisp
 
             var punctuationToken = (LispPunctuationToken)tokens[0];
             Assert.That(punctuationToken.Value, Is.EqualTo(Punctuation.LeftParenthesis));
-            Assert.That(punctuationToken.Position, Is.EqualTo(1599));
+            Assert.That(punctuationToken.Position, Is.EqualTo(0));
             Assert.That(punctuationToken.ConsumedLength, Is.EqualTo(1));
 
             punctuationToken = (LispPunctuationToken)tokens[1];
             Assert.That(punctuationToken.Value, Is.EqualTo(Punctuation.RightParenthesis));
-            Assert.That(punctuationToken.Position, Is.EqualTo(1599));
+            Assert.That(punctuationToken.Position, Is.EqualTo(1));
             Assert.That(punctuationToken.ConsumedLength, Is.EqualTo(1));
 
             var integerToken = (IntegerToken)tokens[2];
-            Assert.That(integerToken.Value, Is.EqualTo("-1599"));
-            Assert.That(integerToken.Position, Is.EqualTo(1599));
+            Assert.That(integerToken.Value, Is.EqualTo(-1599));
+            Assert.That(integerToken.Position, Is.EqualTo(8));
             Assert.That(integerToken.ConsumedLength, Is.EqualTo(5));
 
             var symbolToken = (LispSymbolToken)tokens[3];
             Assert.That(symbolToken.SymbolName, Is.EqualTo("-1599-"));
-            Assert.That(symbolToken.Position, Is.EqualTo(1599));
+            Assert.That(symbolToken.Position, Is.EqualTo(14));
             Assert.That(symbolToken.ConsumedLength, Is.EqualTo(6));
         }
 
@@ -98,118 +98,115 @@ namespace TauCode.Parsing.Tests.TinyLisp
             //  0: (
             var punctuationToken = (LispPunctuationToken)tokens[0];
             Assert.That(punctuationToken.Value, Is.EqualTo(Punctuation.LeftParenthesis));
-            Assert.That(punctuationToken.Position, Is.EqualTo(1599));
+            Assert.That(punctuationToken.Position, Is.EqualTo(12));
             Assert.That(punctuationToken.ConsumedLength, Is.EqualTo(1));
 
             //  1: :defblock
             var keywordToken = (KeywordToken)tokens[1];
             Assert.That(keywordToken.Keyword, Is.EqualTo(":defblock"));
-            Assert.That(keywordToken.Position, Is.EqualTo(1599));
+            Assert.That(keywordToken.Position, Is.EqualTo(13));
             Assert.That(keywordToken.ConsumedLength, Is.EqualTo(9));
 
             //  2: create
             var symbolToken = (LispSymbolToken)tokens[2];
             Assert.That(symbolToken.SymbolName, Is.EqualTo("create"));
-            Assert.That(symbolToken.Position, Is.EqualTo(1599));
+            Assert.That(symbolToken.Position, Is.EqualTo(23));
             Assert.That(symbolToken.ConsumedLength, Is.EqualTo(6));
 
             //  3: (
             punctuationToken = (LispPunctuationToken)tokens[3];
             Assert.That(punctuationToken.Value, Is.EqualTo(Punctuation.LeftParenthesis));
-            Assert.That(punctuationToken.Position, Is.EqualTo(1599));
+            Assert.That(punctuationToken.Position, Is.EqualTo(35));
             Assert.That(punctuationToken.ConsumedLength, Is.EqualTo(1));
 
             //  4: :word
             keywordToken = (KeywordToken)tokens[4];
             Assert.That(keywordToken.Keyword, Is.EqualTo(":word"));
-            Assert.That(keywordToken.Position, Is.EqualTo(1599));
+            Assert.That(keywordToken.Position, Is.EqualTo(36));
             Assert.That(keywordToken.ConsumedLength, Is.EqualTo(5));
 
             //  5: "CREATE"
-            throw new NotImplementedException();
-            //var textToken = (TextToken)tokens[5];
-            //Assert.That(textToken.Text, Is.EqualTo("CREATE"));
-            //Assert.That(textToken.Class, Is.SameAs(StringTextClass.Instance));
-            //Assert.That(textToken.Decoration, Is.SameAs(DoubleQuoteTextDecoration.Instance));
-            //Assert.That(textToken.Position, Is.EqualTo(new Position(3, 11)));
-            //Assert.That(textToken.ConsumedLength, Is.EqualTo(8));
+            var stringToken = (StringToken)tokens[5];
+            Assert.That(stringToken.Text, Is.EqualTo("CREATE"));
+            Assert.That(stringToken.Position, Is.EqualTo(42));
+            Assert.That(stringToken.ConsumedLength, Is.EqualTo(8));
 
             //  6: )
             punctuationToken = (LispPunctuationToken)tokens[6];
             Assert.That(punctuationToken.Value, Is.EqualTo(Punctuation.RightParenthesis));
-            Assert.That(punctuationToken.Position, Is.EqualTo(1599));
+            Assert.That(punctuationToken.Position, Is.EqualTo(50));
             Assert.That(punctuationToken.ConsumedLength, Is.EqualTo(1));
 
             //  7: (
             punctuationToken = (LispPunctuationToken)tokens[7];
             Assert.That(punctuationToken.Value, Is.EqualTo(Punctuation.LeftParenthesis));
-            Assert.That(punctuationToken.Position, Is.EqualTo(1599));
+            Assert.That(punctuationToken.Position, Is.EqualTo(57));
             Assert.That(punctuationToken.ConsumedLength, Is.EqualTo(1));
 
             //  8: :alt
             keywordToken = (KeywordToken)tokens[8];
             Assert.That(keywordToken.Keyword, Is.EqualTo(":alt"));
-            Assert.That(keywordToken.Position, Is.EqualTo(1599));
+            Assert.That(keywordToken.Position, Is.EqualTo(58));
             Assert.That(keywordToken.ConsumedLength, Is.EqualTo(4));
 
             //  9: (
             punctuationToken = (LispPunctuationToken)tokens[9];
             Assert.That(punctuationToken.Value, Is.EqualTo(Punctuation.LeftParenthesis));
-            Assert.That(punctuationToken.Position, Is.EqualTo(1599));
+            Assert.That(punctuationToken.Position, Is.EqualTo(63));
             Assert.That(punctuationToken.ConsumedLength, Is.EqualTo(1));
 
             // 10: :block
             keywordToken = (KeywordToken)tokens[10];
             Assert.That(keywordToken.Keyword, Is.EqualTo(":block"));
-            Assert.That(keywordToken.Position, Is.EqualTo(1599));
+            Assert.That(keywordToken.Position, Is.EqualTo(64));
             Assert.That(keywordToken.ConsumedLength, Is.EqualTo(6));
 
             // 11: create-table
             symbolToken = (LispSymbolToken)tokens[11];
             Assert.That(symbolToken.SymbolName, Is.EqualTo("create-table"));
-            Assert.That(symbolToken.Position, Is.EqualTo(1599));
+            Assert.That(symbolToken.Position, Is.EqualTo(71));
             Assert.That(symbolToken.ConsumedLength, Is.EqualTo(12));
 
             // 12: )
             punctuationToken = (LispPunctuationToken)tokens[12];
             Assert.That(punctuationToken.Value, Is.EqualTo(Punctuation.RightParenthesis));
-            Assert.That(punctuationToken.Position, Is.EqualTo(1599));
+            Assert.That(punctuationToken.Position, Is.EqualTo(83));
             Assert.That(punctuationToken.ConsumedLength, Is.EqualTo(1));
 
             // 13: (
             punctuationToken = (LispPunctuationToken)tokens[13];
             Assert.That(punctuationToken.Value, Is.EqualTo(Punctuation.LeftParenthesis));
-            Assert.That(punctuationToken.Position, Is.EqualTo(1599));
+            Assert.That(punctuationToken.Position, Is.EqualTo(85));
             Assert.That(punctuationToken.ConsumedLength, Is.EqualTo(1));
 
             // 14: :block
             keywordToken = (KeywordToken)tokens[14];
             Assert.That(keywordToken.Keyword, Is.EqualTo(":block"));
-            Assert.That(keywordToken.Position, Is.EqualTo(1599));
+            Assert.That(keywordToken.Position, Is.EqualTo(86));
             Assert.That(keywordToken.ConsumedLength, Is.EqualTo(6));
 
             // 15: create-index
             symbolToken = (LispSymbolToken)tokens[15];
             Assert.That(symbolToken.SymbolName, Is.EqualTo("create-index"));
-            Assert.That(symbolToken.Position, Is.EqualTo(1599));
+            Assert.That(symbolToken.Position, Is.EqualTo(93));
             Assert.That(symbolToken.ConsumedLength, Is.EqualTo(12));
 
             // 16: )
             punctuationToken = (LispPunctuationToken)tokens[16];
             Assert.That(punctuationToken.Value, Is.EqualTo(Punctuation.RightParenthesis));
-            Assert.That(punctuationToken.Position, Is.EqualTo(1599));
+            Assert.That(punctuationToken.Position, Is.EqualTo(105));
             Assert.That(punctuationToken.ConsumedLength, Is.EqualTo(1));
 
             // 17: )
             punctuationToken = (LispPunctuationToken)tokens[17];
             Assert.That(punctuationToken.Value, Is.EqualTo(Punctuation.RightParenthesis));
-            Assert.That(punctuationToken.Position, Is.EqualTo(1599));
+            Assert.That(punctuationToken.Position, Is.EqualTo(106));
             Assert.That(punctuationToken.ConsumedLength, Is.EqualTo(1));
 
             // 18: )
             punctuationToken = (LispPunctuationToken)tokens[18];
             Assert.That(punctuationToken.Value, Is.EqualTo(Punctuation.RightParenthesis));
-            Assert.That(punctuationToken.Position, Is.EqualTo(1599));
+            Assert.That(punctuationToken.Position, Is.EqualTo(109));
             Assert.That(punctuationToken.ConsumedLength, Is.EqualTo(1));
         }
 
@@ -323,11 +320,11 @@ namespace TauCode.Parsing.Tests.TinyLisp
             var token8 = _lexer.Tokenize(input8.AsMemory()).Single();
 
             // Assert
-            Assert.That(token1 as IntegerToken, Has.Property("Value").EqualTo("1"));
-            Assert.That(token2 as IntegerToken, Has.Property("Value").EqualTo("1"));
-            Assert.That(token3 as IntegerToken, Has.Property("Value").EqualTo("-1"));
-            Assert.That(token4 as IntegerToken, Has.Property("Value").EqualTo("-133"));
-            Assert.That(token5 as IntegerToken, Has.Property("Value").EqualTo("391"));
+            Assert.That(token1 as IntegerToken, Has.Property("Value").EqualTo(1));
+            Assert.That(token2 as IntegerToken, Has.Property("Value").EqualTo(1));
+            Assert.That(token3 as IntegerToken, Has.Property("Value").EqualTo(-1));
+            Assert.That(token4 as IntegerToken, Has.Property("Value").EqualTo(-133));
+            Assert.That(token5 as IntegerToken, Has.Property("Value").EqualTo(391));
             Assert.That(token6 as LispSymbolToken, Has.Property("SymbolName").EqualTo("+"));
             Assert.That(token7 as LispSymbolToken, Has.Property("SymbolName").EqualTo("-"));
             Assert.That(token8 as LispSymbolToken, Has.Property("SymbolName").EqualTo("1-"));
@@ -424,12 +421,10 @@ namespace TauCode.Parsing.Tests.TinyLisp
 
             // Assert
             Assert.That(tokens, Has.Count.EqualTo(1));
-            var textToken = (TextToken)tokens.Single();
+            var stringToken = (StringToken)tokens.Single();
 
-            throw new NotImplementedException();
-            //Assert.That(textToken.Class, Is.EqualTo(StringTextClass.Instance));
-            //Assert.That(textToken.Decoration, Is.EqualTo(DoubleQuoteTextDecoration.Instance));
-            //Assert.That(textToken.Text, Is.EqualTo($"line0{CR}line1{CRLF}line2{LF}"));
+            Assert.That(stringToken.Text, Is.EqualTo($"line0{CR}line1{CRLF}line2{LF}"));
+            Assert.That(stringToken.Kind, Is.EqualTo("TinyLisp"));
         }
 
         [Test]
@@ -442,8 +437,8 @@ namespace TauCode.Parsing.Tests.TinyLisp
             var ex = Assert.Throws<ParsingException>(() => _lexer.Tokenize(input.AsMemory()));
             
             // Assert
-            Assert.That(ex.Message, Is.EqualTo("Unclosed string."));
-            Assert.That(ex.Index, Is.EqualTo(1599));
+            Assert.That(ex.Message, Does.StartWith("Unclosed string."));
+            Assert.That(ex.Index, Is.EqualTo(13));
         }
 
         [Test]
@@ -472,8 +467,8 @@ namespace TauCode.Parsing.Tests.TinyLisp
             var ex = Assert.Throws<ParsingException>(() => _lexer.Tokenize(input.AsMemory()));
 
             // Assert
-            Assert.That(ex.Message, Is.EqualTo("Bad symbol name."));
-            Assert.That(ex.Index, Is.EqualTo(1599));
+            Assert.That(ex.Message, Does.StartWith("Bad symbol name."));
+            Assert.That(ex.Index, Is.EqualTo(6));
         }
 
         [Test]

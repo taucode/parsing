@@ -34,7 +34,26 @@ namespace TauCode.Parsing.LexicalTokenProducers
 
                 var c = input[pos];
 
-                if (c.IsDecimalDigit())
+                if (c == '-' || c == '+')
+                {
+                    if (pos == 0)
+                    {
+                        // ok
+                    }
+                    else
+                    {
+                        if (this.TerminatingPredicate(c))
+                        {
+                            // '+' and '-' can be terminating char, e.g. in c#: '-12+10' means '-12 + 10'
+                            break;
+                        }
+                        else
+                        {
+                            return null;
+                        }
+                    }
+                }
+                else if (c.IsDecimalDigit())
                 {
                     // ok
                 }

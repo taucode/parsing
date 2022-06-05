@@ -23,7 +23,7 @@ namespace TauCode.Parsing.LexicalTokenProducers
                 if (pos == length)
                 {
                     context.Position += pos - start;
-                    return null; // todo: wrong? in a case of string of spaces, what the result would be?
+                    return EmptyToken.Instance;
                 }
 
                 c = input[pos];

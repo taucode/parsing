@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using TauCode.Parsing.Exceptions;
 
 // todo regions
 namespace TauCode.Parsing
@@ -37,6 +38,13 @@ namespace TauCode.Parsing
                     var token = producer.Produce(context);
                     if (token == null)
                     {
+                        if (positionBeforeProduce != context.Position)
+                        {
+                            throw new ParsingException(
+                                "Internal error: token producer returned 'null', but context position has advanced.", 
+                                positionBeforeProduce);
+                        }
+
                         // do nothing
                     }
                     else

@@ -29,7 +29,7 @@ namespace TauCode.Parsing.TinyLisp.Producers
 
                     if (c == ':')
                     {
-                        ThrowBadKeywordException(index);
+                        ThrowBadKeywordException(initialIndex);
                     }
 
                     if (!TinyLispHelper.IsAcceptableSymbolNameChar(c))
@@ -43,7 +43,7 @@ namespace TauCode.Parsing.TinyLisp.Producers
 
                 if (nameCharsCount == 0)
                 {
-                    ThrowBadKeywordException(index);
+                    ThrowBadKeywordException(initialIndex);
                 }
 
                 var delta = index - initialIndex;

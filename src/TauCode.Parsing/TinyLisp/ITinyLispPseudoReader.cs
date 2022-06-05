@@ -5,6 +5,6 @@ namespace TauCode.Parsing.TinyLisp
 {
     public interface ITinyLispPseudoReader
     {
-        PseudoList Read(IList<ILexicalToken> tokens);
+        PseudoList Read(IReadOnlyList<ILexicalToken> tokens);
     }
 }

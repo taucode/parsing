@@ -111,14 +111,14 @@ namespace TauCode.Parsing.Tests.TinyLisp
             
             var tokens = _lexer.Tokenize(formText.AsMemory());
             var reader = new TinyLispPseudoReader();
-            throw new NotImplementedException();
-            //var pseudoList = reader.Read(tokens);
 
-            //// Act
-            //var notFound = pseudoList.GetSingleKeywordArgument(":non-existing-key", true);
+            var pseudoList = reader.Read(tokens);
 
-            //// Assert
-            //Assert.That(notFound, Is.Null);
+            // Act
+            var notFound = pseudoList.GetSingleKeywordArgument(":non-existing-key", true);
+
+            // Assert
+            Assert.That(notFound, Is.Null);
         }
 
         [Test]
@@ -130,14 +130,15 @@ namespace TauCode.Parsing.Tests.TinyLisp
             var tokens = _lexer.Tokenize(formText.AsMemory());
             var reader = new TinyLispPseudoReader();
 
-            throw new NotImplementedException();
-            //var pseudoList = reader.Read(tokens).Single().AsPseudoList();
+            var pseudoList = reader.Read(tokens).Single().AsPseudoList();
 
-            //// Act
-            //var ex = Assert.Throws<TinyLispException>(() => pseudoList.GetSingleKeywordArgument(":non-existing-key"));
+            // Act
+            var ex = Assert.Throws<ParsingException>(() => pseudoList.GetSingleKeywordArgument(":non-existing-key"));
 
-            //// Assert
-            //Assert.That(ex.Message, Is.EqualTo("No argument for keyword ':non-existing-key'."));
+            // Assert
+            Assert.That(
+                ex.Message,
+                Does.StartWith("TinyLisp: no argument for keyword ':non-existing-key'."));
         }
 
         [Test]
@@ -152,16 +153,16 @@ namespace TauCode.Parsing.Tests.TinyLisp
             var tokens = _lexer.Tokenize(formText.AsMemory());
             var reader = new TinyLispPseudoReader();
 
-            throw new NotImplementedException();
-            //var pseudoList = reader.Read(tokens).Single().AsPseudoList();
+            var pseudoList = reader.Read(tokens).Single().AsPseudoList();
 
-            //// Act
-            //var ex = Assert.Throws<TinyLispException>(() =>
-            //    pseudoList.GetSingleKeywordArgument(":your-key", absenceIsAllowed));
+            // Act
+            var ex = Assert.Throws<ParsingException>(() =>
+                pseudoList.GetSingleKeywordArgument(":your-key", absenceIsAllowed));
 
-            //// Assert
-            //Assert.That(ex.Message,
-            //    Is.EqualTo("Keyword ':your-key' was found, but next element is a keyword too."));
+            // Assert
+            Assert.That(
+                ex.Message,
+                Does.StartWith("TinyLisp: keyword ':your-key' was found, but next element is a keyword too."));
         }
 
         [Test]
@@ -175,15 +176,17 @@ namespace TauCode.Parsing.Tests.TinyLisp
             
             var tokens = _lexer.Tokenize(formText.AsMemory());
             var reader = new TinyLispPseudoReader();
-            throw new NotImplementedException();
-            //var pseudoList = reader.Read(tokens).Single().AsPseudoList();
 
-            //// Act
-            //var ex = Assert.Throws<TinyLispException>(() =>
-            //    pseudoList.GetSingleKeywordArgument(":your-key", absenceIsAllowed));
+            var pseudoList = reader.Read(tokens).Single().AsPseudoList();
 
-            //// Assert
-            //Assert.That(ex.Message, Is.EqualTo("Keyword ':your-key' was found, but at the end of the list."));
+            // Act
+            var ex = Assert.Throws<ParsingException>(() =>
+                pseudoList.GetSingleKeywordArgument(":your-key", absenceIsAllowed));
+
+            // Assert
+            Assert.That(
+                ex.Message,
+                Does.StartWith("TinyLisp: keyword ':your-key' was found, but at the end of the list."));
         }
 
         [Test]
@@ -197,15 +200,16 @@ namespace TauCode.Parsing.Tests.TinyLisp
             var tokens = _lexer.Tokenize(formText.AsMemory());
             var reader = new TinyLispPseudoReader();
 
-            throw new NotImplementedException();
-            //var pseudoList = reader.Read(tokens).Single().AsPseudoList();
+            var pseudoList = reader.Read(tokens).Single().AsPseudoList();
 
-            //// Act
-            //var ex = Assert.Throws<TinyLispException>(() =>
-            //    pseudoList.GetSingleKeywordArgument<Symbol>(":your-key", absenceIsAllowed));
+            // Act
+            var ex = Assert.Throws<ParsingException>(() =>
+                pseudoList.GetSingleKeywordArgument<Symbol>(":your-key", absenceIsAllowed));
 
-            //// Assert
-            //Assert.That(ex.Message, Is.EqualTo("Argument for ':your-key' was found, but it appears to be of type 'TauCode.Parsing.TinyLisp.Data.StringAtom' instead of expected type 'TauCode.Parsing.TinyLisp.Data.Symbol'."));
+            // Assert
+            Assert.That(
+                ex.Message,
+                Does.StartWith("TinyLisp: argument for ':your-key' was found, but it appears to be of type 'TauCode.Parsing.TinyLisp.Data.StringAtom' instead of expected type 'TauCode.Parsing.TinyLisp.Data.Symbol'."));
         }
 
         [Test]
@@ -216,21 +220,21 @@ namespace TauCode.Parsing.Tests.TinyLisp
             
             var tokens = _lexer.Tokenize(formText.AsMemory());
             var reader = new TinyLispPseudoReader();
-            throw new NotImplementedException();
-            //var pseudoList = reader.Read(tokens).Single().AsPseudoList();
 
-            //// Act
-            //var args = pseudoList.GetAllKeywordArguments(":key");
+            var pseudoList = reader.Read(tokens).Single().AsPseudoList();
 
-            //// Assert
-            //CollectionAssert.AreEqual(
-            //    new Element[]
-            //    {
-            //        Symbol.Create("one"),
-            //        Symbol.Create("two"),
-            //        new StringAtom("three"),
-            //    },
-            //    args);
+            // Act
+            var args = pseudoList.GetAllKeywordArguments(":key");
+
+            // Assert
+            CollectionAssert.AreEqual(
+                new Element[]
+                {
+                    Symbol.Create("one"),
+                    Symbol.Create("two"),
+                    new StringAtom("three"),
+                },
+                args);
         }
 
         [Test]
@@ -242,14 +246,13 @@ namespace TauCode.Parsing.Tests.TinyLisp
             var tokens = _lexer.Tokenize(formText.AsMemory());
             var reader = new TinyLispPseudoReader();
 
-            throw new NotImplementedException();
-            //var pseudoList = reader.Read(tokens).Single().AsPseudoList();
+            var pseudoList = reader.Read(tokens).Single().AsPseudoList();
 
-            //// Act
-            //var args = pseudoList.GetAllKeywordArguments(":non-existing-key", true);
+            // Act
+            var args = pseudoList.GetAllKeywordArguments(":non-existing-key", true);
 
-            //// Assert
-            //Assert.That(args, Is.Empty);
+            // Assert
+            Assert.That(args, Is.Empty);
         }
 
         [Test]
@@ -261,15 +264,14 @@ namespace TauCode.Parsing.Tests.TinyLisp
             var tokens = _lexer.Tokenize(formText.AsMemory());
             var reader = new TinyLispPseudoReader();
 
-            throw new NotImplementedException();
-            //var pseudoList = reader.Read(tokens).Single().AsPseudoList();
+            var pseudoList = reader.Read(tokens).Single().AsPseudoList();
 
-            //// Act
-            //var ex = Assert.Throws<TinyLispException>(() =>
-            //    pseudoList.GetAllKeywordArguments(":non-existing-key", false));
+            // Act
+            var ex = Assert.Throws<ParsingException>(() =>
+                pseudoList.GetAllKeywordArguments(":non-existing-key", false));
 
-            //// Assert
-            //Assert.That(ex.Message, Is.EqualTo("No argument for keyword ':non-existing-key'."));
+            // Assert
+            Assert.That(ex.Message, Does.StartWith("TinyLisp: no argument for keyword ':non-existing-key'."));
         }
 
         [Test]
@@ -283,14 +285,13 @@ namespace TauCode.Parsing.Tests.TinyLisp
             var tokens = _lexer.Tokenize(formText.AsMemory());
             var reader = new TinyLispPseudoReader();
 
-            throw new NotImplementedException();
-            //var pseudoList = reader.Read(tokens).Single().AsPseudoList();
+            var pseudoList = reader.Read(tokens).Single().AsPseudoList();
 
-            //// Act
-            //var args = pseudoList.GetAllKeywordArguments(":your-key");
+            // Act
+            var args = pseudoList.GetAllKeywordArguments(":your-key");
 
-            //// Assert
-            //Assert.That(args, Is.Empty);
+            // Assert
+            Assert.That(args, Is.Empty);
         }
 
         [Test]
@@ -303,14 +304,14 @@ namespace TauCode.Parsing.Tests.TinyLisp
             
             var tokens = _lexer.Tokenize(formText.AsMemory());
             var reader = new TinyLispPseudoReader();
-            throw new NotImplementedException();
-            //var pseudoList = reader.Read(tokens).Single().AsPseudoList();
 
-            //// Act
-            //var args = pseudoList.GetAllKeywordArguments(":your-key-at-end");
+            var pseudoList = reader.Read(tokens).Single().AsPseudoList();
 
-            //// Assert
-            //Assert.That(args, Is.Empty);
+            // Act
+            var args = pseudoList.GetAllKeywordArguments(":your-key-at-end");
+
+            // Assert
+            Assert.That(args, Is.Empty);
         }
 
         [Test]
@@ -350,14 +351,13 @@ namespace TauCode.Parsing.Tests.TinyLisp
             var tokens = _lexer.Tokenize(formText.AsMemory());
             var reader = new TinyLispPseudoReader();
 
-            throw new NotImplementedException();
-            //var pseudoList = reader.Read(tokens).Single().AsPseudoList();
+            var pseudoList = reader.Read(tokens).Single().AsPseudoList();
 
-            //// Act
-            //var ex = Assert.Throws<ArgumentNullException>(() => pseudoList.GetAllKeywordArguments(null));
+            // Act
+            var ex = Assert.Throws<ArgumentNullException>(() => pseudoList.GetAllKeywordArguments(null));
 
-            //// Assert
-            //Assert.That(ex.ParamName, Is.EqualTo("argumentName"));
+            // Assert
+            Assert.That(ex.ParamName, Is.EqualTo("argumentName"));
         }
 
         [Test]
@@ -370,16 +370,15 @@ namespace TauCode.Parsing.Tests.TinyLisp
             
             var tokens = _lexer.Tokenize(formText.AsMemory());
             var reader = new TinyLispPseudoReader();
-            throw new NotImplementedException();
-            //var pseudoList = reader.Read(tokens).Single().AsPseudoList();
 
+            var pseudoList = reader.Read(tokens).Single().AsPseudoList();
 
-            //// Act
-            //var ex = Assert.Throws<ArgumentException>(() => pseudoList.GetAllKeywordArguments(badKeywordName));
+            // Act
+            var ex = Assert.Throws<ArgumentException>(() => pseudoList.GetAllKeywordArguments(badKeywordName));
 
-            //// Assert
-            //Assert.That(ex.Message, Does.StartWith($"'{badKeywordName}' is not a valid keyword."));
-            //Assert.That(ex.ParamName, Is.EqualTo("argumentName"));
+            // Assert
+            Assert.That(ex.Message, Does.StartWith($"'{badKeywordName}' is not a valid keyword."));
+            Assert.That(ex.ParamName, Is.EqualTo("argumentName"));
         }
 
         [Test]
@@ -390,14 +389,14 @@ namespace TauCode.Parsing.Tests.TinyLisp
             
             var tokens = _lexer.Tokenize(formText.AsMemory());
             var reader = new TinyLispPseudoReader();
-            throw new NotImplementedException();
-            //var pseudoList = reader.Read(tokens).Single().AsPseudoList();
 
-            //// Act
-            //var res = pseudoList.GetSingleArgumentAsBool(":non-existing-key");
+            var pseudoList = reader.Read(tokens).Single().AsPseudoList();
 
-            //// Assert
-            //Assert.That(res, Is.Null);
+            // Act
+            var res = pseudoList.GetSingleArgumentAsBool(":non-existing-key");
+
+            // Assert
+            Assert.That(res, Is.Null);
         }
 
         [Test]
@@ -409,14 +408,13 @@ namespace TauCode.Parsing.Tests.TinyLisp
             var tokens = _lexer.Tokenize(formText.AsMemory());
             var reader = new TinyLispPseudoReader();
 
-            throw new NotImplementedException();
-            //var pseudoList = reader.Read(tokens).Single().AsPseudoList();
+            var pseudoList = reader.Read(tokens).Single().AsPseudoList();
 
-            //// Act
-            //var res = pseudoList.GetSingleArgumentAsBool(":key");
+            // Act
+            var res = pseudoList.GetSingleArgumentAsBool(":key");
 
-            //// Assert
-            //Assert.That(res, Is.False);
+            // Assert
+            Assert.That(res, Is.False);
         }
 
         [Test]
@@ -428,14 +426,13 @@ namespace TauCode.Parsing.Tests.TinyLisp
             var tokens = _lexer.Tokenize(formText.AsMemory());
             var reader = new TinyLispPseudoReader();
 
-            throw new NotImplementedException();
-            //var pseudoList = reader.Read(tokens).Single().AsPseudoList();
+            var pseudoList = reader.Read(tokens).Single().AsPseudoList();
 
-            //// Act
-            //var res = pseudoList.GetSingleArgumentAsBool(":key");
+            // Act
+            var res = pseudoList.GetSingleArgumentAsBool(":key");
 
-            //// Assert
-            //Assert.That(res, Is.True);
+            // Assert
+            Assert.That(res, Is.True);
         }
 
         [Test]
@@ -446,17 +443,18 @@ namespace TauCode.Parsing.Tests.TinyLisp
             // Arrange
             var formText = $"(foo one two :key {badItem} one two \"three\" :your-key \"some string\")";
 
-            throw new NotImplementedException();
-            //var tokens = _lexer.Tokenize(formText.AsMemory());
-            //var reader = new TinyLispPseudoReader();
-            //var pseudoList = reader.Read(tokens).Single().AsPseudoList();
+            var tokens = _lexer.Tokenize(formText.AsMemory());
+            var reader = new TinyLispPseudoReader();
+            var pseudoList = reader.Read(tokens).Single().AsPseudoList();
 
-            //// Act
-            //var ex = Assert.Throws<TinyLispException>(() => pseudoList.GetSingleArgumentAsBool(":key"));
+            // Act
+            var ex = Assert.Throws<ParsingException>(() => pseudoList.GetSingleArgumentAsBool(":key"));
 
-            //// Assert
-            //var wrongItem = reader.Read(_lexer.Tokenize(badItem)).Single().ToString();
-            //Assert.That(ex.Message, Is.EqualTo($"Keyword ':key' was found, but it appeared to be '{wrongItem}' instead of NIL or T."));
+            // Assert
+            var wrongItem = reader.Read(_lexer.Tokenize(badItem.AsMemory())).Single().ToString();
+            Assert.That(
+                ex.Message,
+                Does.StartWith($"TinyLisp: keyword ':key' was found, but it appeared to be '{wrongItem}' instead of NIL or T."));
         }
 
         [Test]
@@ -470,14 +468,13 @@ namespace TauCode.Parsing.Tests.TinyLisp
             var tokens = _lexer.Tokenize(form.AsMemory());
             var reader = new TinyLispPseudoReader();
 
-            throw new NotImplementedException();
-            //var pseudoList = reader.Read(tokens).Single().AsPseudoList();
+            var pseudoList = reader.Read(tokens).Single().AsPseudoList();
 
-            //// Act
-            //var car = pseudoList.GetCarSymbolName();
+            // Act
+            var car = pseudoList.GetCarSymbolName();
 
-            //// Assert
-            //Assert.That(car, Is.EqualTo(expectedCar));
+            // Assert
+            Assert.That(car, Is.EqualTo(expectedCar));
         }
 
         [Test]
@@ -545,15 +542,15 @@ namespace TauCode.Parsing.Tests.TinyLisp
             
             var tokens = _lexer.Tokenize(form.AsMemory());
             var reader = new TinyLispPseudoReader();
-            throw new NotImplementedException();
-            //var pseudoList = reader.Read(tokens).Single().AsPseudoList();
 
-            //// Act
-            //var list = pseudoList.GetMultipleFreeArgumentSets();
-            //var listToPseudoList = new PseudoList(list);
+            var pseudoList = reader.Read(tokens).Single().AsPseudoList();
 
-            //// Assert
-            //Assert.That(listToPseudoList.ToString(), Is.EqualTo(expectedRepresentation).IgnoreCase);
+            // Act
+            var list = pseudoList.GetMultipleFreeArgumentSets();
+            var listToPseudoList = new PseudoList(list);
+
+            // Assert
+            Assert.That(listToPseudoList.ToString(), Is.EqualTo(expectedRepresentation).IgnoreCase);
         }
 
         [Test]
@@ -593,14 +590,13 @@ namespace TauCode.Parsing.Tests.TinyLisp
             var tokens = _lexer.Tokenize(form.AsMemory());
             var reader = new TinyLispPseudoReader();
 
-            throw new NotImplementedException();
-            //var pseudoList = reader.Read(tokens).Single().AsPseudoList();
+            var pseudoList = reader.Read(tokens).Single().AsPseudoList();
 
-            //// Act
-            //var argsPseudoList = pseudoList.GetFreeArguments();
+            // Act
+            var argsPseudoList = pseudoList.GetFreeArguments();
 
-            //// Assert
-            //Assert.That(argsPseudoList.ToString(), Is.EqualTo(expectedRepresentation).IgnoreCase);
+            // Assert
+            Assert.That(argsPseudoList.ToString(), Is.EqualTo(expectedRepresentation).IgnoreCase);
         }
 
         [Test]
@@ -613,14 +609,13 @@ namespace TauCode.Parsing.Tests.TinyLisp
             var tokens = _lexer.Tokenize(form.AsMemory());
             var reader = new TinyLispPseudoReader();
 
-            throw new NotImplementedException();
-            //var pseudoList = reader.Read(tokens).Single().AsPseudoList();
+            var pseudoList = reader.Read(tokens).Single().AsPseudoList();
 
-            //// Act
-            //var ex = Assert.Throws<TinyLispException>(() => pseudoList.GetFreeArguments());
+            // Act
+            var ex = Assert.Throws<ParsingException>(() => pseudoList.GetFreeArguments());
 
-            //// Assert
-            //Assert.That(ex.Message, Is.EqualTo("Free arguments not found."));
+            // Assert
+            Assert.That(ex.Message, Does.StartWith("TinyLisp: free arguments not found."));
         }
 
         [Test]
@@ -633,14 +628,13 @@ namespace TauCode.Parsing.Tests.TinyLisp
             var tokens = _lexer.Tokenize(form.AsMemory());
             var reader = new TinyLispPseudoReader();
 
-            throw new NotImplementedException();
-            //var pseudoList = reader.Read(tokens).Single().AsPseudoList();
+            var pseudoList = reader.Read(tokens).Single().AsPseudoList();
 
-            //// Act
-            //var ex = Assert.Throws<TinyLispException>(() => pseudoList.GetFreeArguments());
+            // Act
+            var ex = Assert.Throws<ParsingException>(() => pseudoList.GetFreeArguments());
 
-            //// Assert
-            //Assert.That(ex.Message, Is.EqualTo("More than one set of free arguments was found."));
+            // Assert
+            Assert.That(ex.Message, Does.StartWith("TinyLisp: more than one set of free arguments was found."));
         }
     }
 }

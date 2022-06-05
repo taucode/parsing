@@ -9,7 +9,7 @@ namespace TauCode.Parsing.TinyLisp
 {
     public class TinyLispPseudoReader : ITinyLispPseudoReader
     {
-        public PseudoList Read(IList<ILexicalToken> tokens)
+        public PseudoList Read(IReadOnlyList<ILexicalToken> tokens)
         {
             var list = new PseudoList();
             var index = 0;
@@ -18,7 +18,7 @@ namespace TauCode.Parsing.TinyLisp
             return list;
         }
 
-        private void ReadPseudoListContent(PseudoList list, IList<ILexicalToken> tokens, ref int index, int depth)
+        private void ReadPseudoListContent(PseudoList list, IReadOnlyList<ILexicalToken> tokens, ref int index, int depth)
         {
             while (true)
             {
@@ -26,7 +26,9 @@ namespace TauCode.Parsing.TinyLisp
                 {
                     if (depth > 0)
                     {
-                        throw Helper.CreateException(ParsingErrorTag.TinyLispUnclosedForm, index);
+                        throw Helper.CreateException(
+                            ParsingErrorTag.TinyLispUnclosedForm,
+                            tokens[^1].Position + tokens[^1].ConsumedLength);
                     }
                     else
                     {
@@ -42,7 +44,9 @@ namespace TauCode.Parsing.TinyLisp
                         case Punctuation.RightParenthesis:
                             if (depth == 0)
                             {
-                                throw Helper.CreateException(ParsingErrorTag.TinyLispUnexpectedRightParenthesis, index);
+                                throw Helper.CreateException(
+                                    ParsingErrorTag.TinyLispUnexpectedRightParenthesis,
+                                    punctuationToken.Position);
                             }
                             else
                             {
@@ -83,7 +87,7 @@ namespace TauCode.Parsing.TinyLisp
                 {
                     throw Helper.CreateException(
                         ParsingErrorTag.TinyLispCannotReadToken,
-                        index,
+                        null,
                         token.GetType().FullName);
                 }
             }

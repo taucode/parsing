@@ -252,8 +252,8 @@ namespace TauCode.Parsing.Tests.TinyLisp
             var ex = Assert.Throws<ParsingException>(() => _lexer.Tokenize(input.AsMemory()));
 
             // Assert
-            Assert.That(ex.Message, Is.EqualTo("Unclosed string."));
-            Assert.That(ex.Index, Is.EqualTo(1599));
+            Assert.That(ex.Message, Does.StartWith("Unclosed string."));
+            Assert.That(ex.Index, Is.EqualTo(22));
         }
 
         [Test]
@@ -269,20 +269,18 @@ namespace TauCode.Parsing.Tests.TinyLisp
 
             // Act
             var tokens = _lexer.Tokenize(input.AsMemory());
-            var token = (TextToken)tokens.Single();
+            var token = (StringToken)tokens.Single();
 
             // Assert
-            throw new NotImplementedException();
-            //Assert.That(token.Class, Is.SameAs(StringTextClass.Instance));
-            //Assert.That(token.Decoration, Is.SameAs(DoubleQuoteTextDecoration.Instance));
-            //Assert.That(token.Text, Is.EqualTo(expectedExtractedString));
+            Assert.That(token.Kind, Is.EqualTo("TinyLisp"));
+            Assert.That(token.Text, Is.EqualTo(expectedExtractedString));
         }
 
         [Test]
         [TestCase("symbol at end", typeof(LispSymbolToken))]
         [TestCase("keyword at :end", typeof(KeywordToken))]
         [TestCase("integer at end 1488", typeof(IntegerToken))]
-        [TestCase("string at \"end\"", typeof(TextToken))]
+        [TestCase("string at \"end\"", typeof(StringToken))]
         [TestCase("( punctuation at end )", typeof(LispPunctuationToken))]
         [TestCase("comment :somma ;end", typeof(KeywordToken))]
         public void Tokenize_TokenAtEnd_TokenizedCorrectly(string input, Type lastTokenExpectedType)
@@ -378,36 +376,31 @@ namespace TauCode.Parsing.Tests.TinyLisp
             Assert.That(tokens.Count, Is.EqualTo(4));
             Assert.That(tokens.All(x => x is TextToken), Is.True);
 
-            var textTokens = tokens.Select(x => (TextToken)x).ToList();
+            var stringTokens = tokens.Select(x => (StringToken)x).ToList();
 
-            var textToken = textTokens[0];
-            throw new NotImplementedException();
-            //Assert.That(textToken.Class, Is.SameAs(StringTextClass.Instance));
-            //Assert.That(textToken.Decoration, Is.SameAs(DoubleQuoteTextDecoration.Instance));
-            //Assert.That(textToken.Text, Is.EqualTo("abc\n def"));
-            //Assert.That(textToken.Position, Is.EqualTo(new Position(1, 0)));
-            //Assert.That(textToken.ConsumedLength, Is.EqualTo(10));
+            var stringToken = stringTokens[0];
+            Assert.That(stringToken.Kind, Is.EqualTo("TinyLisp"));
+            Assert.That(stringToken.Text, Is.EqualTo("abc\n def"));
+            Assert.That(stringToken.Position, Is.EqualTo(2));
+            Assert.That(stringToken.ConsumedLength, Is.EqualTo(10));
 
-            //textToken = textTokens[1];
-            //Assert.That(textToken.Class, Is.SameAs(StringTextClass.Instance));
-            //Assert.That(textToken.Decoration, Is.SameAs(DoubleQuoteTextDecoration.Instance));
-            //Assert.That(textToken.Text, Is.EqualTo("mno \r\n "));
-            //Assert.That(textToken.Position, Is.EqualTo(new Position(2, 6)));
-            //Assert.That(textToken.ConsumedLength, Is.EqualTo(9));
+            stringToken = stringTokens[1];
+            Assert.That(stringToken.Kind, Is.EqualTo("TinyLisp"));
+            Assert.That(stringToken.Text, Is.EqualTo("mno \r\n "));
+            Assert.That(stringToken.Position, Is.EqualTo(13));
+            Assert.That(stringToken.ConsumedLength, Is.EqualTo(9));
 
-            //textToken = textTokens[2];
-            //Assert.That(textToken.Class, Is.SameAs(StringTextClass.Instance));
-            //Assert.That(textToken.Decoration, Is.SameAs(DoubleQuoteTextDecoration.Instance));
-            //Assert.That(textToken.Text, Is.EqualTo("lek\r guk"));
-            //Assert.That(textToken.Position, Is.EqualTo(new Position(3, 4)));
-            //Assert.That(textToken.ConsumedLength, Is.EqualTo(10));
+            stringToken = stringTokens[2];
+            Assert.That(stringToken.Kind, Is.EqualTo("TinyLisp"));
+            Assert.That(stringToken.Text, Is.EqualTo("lek\r guk"));
+            Assert.That(stringToken.Position, Is.EqualTo(24));
+            Assert.That(stringToken.ConsumedLength, Is.EqualTo(10));
 
-            //textToken = textTokens[3];
-            //Assert.That(textToken.Class, Is.SameAs(StringTextClass.Instance));
-            //Assert.That(textToken.Decoration, Is.SameAs(DoubleQuoteTextDecoration.Instance));
-            //Assert.That(textToken.Text, Is.EqualTo("zz"));
-            //Assert.That(textToken.Position, Is.EqualTo(new Position(4, 6)));
-            //Assert.That(textToken.ConsumedLength, Is.EqualTo(4));
+            stringToken = stringTokens[3];
+            Assert.That(stringToken.Kind, Is.EqualTo("TinyLisp"));
+            Assert.That(stringToken.Text, Is.EqualTo("zz"));
+            Assert.That(stringToken.Position, Is.EqualTo(35));
+            Assert.That(stringToken.ConsumedLength, Is.EqualTo(4));
         }
 
         [Test]
@@ -442,10 +435,10 @@ namespace TauCode.Parsing.Tests.TinyLisp
         }
 
         [Test]
-        [TestCase("\n(:)")]
-        [TestCase("\r\n(:part1:part2)")]
-        [TestCase("\r :)")]
-        public void Tokenize_SingleColumn_ThrowsParsingException(string input)
+        [TestCase("\n(:)", 2)]
+        [TestCase("\r\n(:part1:part2)", 3)]
+        [TestCase("\r :)", 2)]
+        public void Tokenize_SingleColumn_ThrowsParsingException(string input, int expectedIndex)
         {
             // Arrange
             
@@ -453,8 +446,8 @@ namespace TauCode.Parsing.Tests.TinyLisp
             var ex = Assert.Throws<ParsingException>(() => _lexer.Tokenize(input.AsMemory()));
 
             // Assert
-            Assert.That(ex.Message, Is.EqualTo("Bad keyword."));
-            Assert.That(ex.Index, Is.EqualTo(1599));
+            Assert.That(ex.Message, Does.StartWith("TinyLisp: bad keyword."));
+            Assert.That(ex.Index, Is.EqualTo(expectedIndex));
         }
 
         [Test]
@@ -467,7 +460,7 @@ namespace TauCode.Parsing.Tests.TinyLisp
             var ex = Assert.Throws<ParsingException>(() => _lexer.Tokenize(input.AsMemory()));
 
             // Assert
-            Assert.That(ex.Message, Does.StartWith("Bad symbol name."));
+            Assert.That(ex.Message, Does.StartWith("TinyLisp: bad symbol name."));
             Assert.That(ex.Index, Is.EqualTo(6));
         }
 
@@ -483,8 +476,8 @@ namespace TauCode.Parsing.Tests.TinyLisp
             var ex = Assert.Throws<ParsingException>(() => _lexer.Tokenize(input.AsMemory()));
 
             // Assert
-            Assert.That(ex.Message, Is.EqualTo("Symbol producer delivered an integer."));
-            Assert.That(ex.Index, Is.EqualTo(1599));
+            Assert.That(ex.Message, Does.StartWith("TinyLisp: symbol producer delivered an integer."));
+            Assert.That(ex.Index, Is.EqualTo(0));
         }
 
     }

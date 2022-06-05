@@ -61,11 +61,11 @@ namespace TauCode.Parsing
                 ParsingErrorTag.CannotTokenize => "Cannot tokenize.",
 
                 // Tiny Lisp
-                ParsingErrorTag.TinyLispBadKeyword => "todo",
-                ParsingErrorTag.TinyLispBadSymbolName => "Bad symbol name.",
-                ParsingErrorTag.TinyLispUnclosedForm => "todo",
-                ParsingErrorTag.TinyLispUnexpectedRightParenthesis => "todo",
-                ParsingErrorTag.TinyLispCannotReadToken => "todo",
+                ParsingErrorTag.TinyLispBadKeyword => "TinyLisp: bad keyword.",
+                ParsingErrorTag.TinyLispBadSymbolName => "TinyLisp: bad symbol name.",
+                ParsingErrorTag.TinyLispUnclosedForm => "TinyLisp: unclosed form.",
+                ParsingErrorTag.TinyLispUnexpectedRightParenthesis => "TinyLisp: unexpected ')'.",
+                ParsingErrorTag.TinyLispCannotReadToken => "TinyLisp: cannot read token.",
 
                 _ => "Unknown error"
             };

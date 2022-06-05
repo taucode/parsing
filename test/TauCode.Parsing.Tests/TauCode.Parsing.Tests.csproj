@@ -6,6 +6,18 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="Resources\cli-grammar.lisp" />
+    <None Remove="Resources\sql-grammar-expected.lisp" />
+    <None Remove="Resources\sql-grammar.lisp" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\cli-grammar.lisp" />
+    <EmbeddedResource Include="Resources\sql-grammar-expected.lisp" />
+    <EmbeddedResource Include="Resources\sql-grammar.lisp" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="nunit" Version="3.13.3" />
     <PackageReference Include="NUnit3TestAdapter" Version="4.2.1">
       <PrivateAssets>all</PrivateAssets>

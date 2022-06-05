@@ -31,40 +31,39 @@ namespace TauCode.Parsing.Tests.TinyLisp
             var reader = new TinyLispPseudoReader();
 
             // Act
-            throw new NotImplementedException();
-            //var list = reader.Read(tokens);
+            var list = reader.Read(tokens);
 
-            //// Assert
-            //Assert.That(list, Has.Count.EqualTo(10));
+            // Assert
+            Assert.That(list, Has.Count.EqualTo(10));
 
-            //var expectedTexts = this.GetType().Assembly
-            //    .GetResourceText("sql-grammar-expected.lisp", true)
-            //    .Split(";;; splitting comment", StringSplitOptions.RemoveEmptyEntries)
-            //    .Select(x => x.Trim())
-            //    .ToList();
+            var expectedTexts = this.GetType().Assembly
+                .GetResourceText("sql-grammar-expected.lisp", true)
+                .Split(";;; splitting comment", StringSplitOptions.RemoveEmptyEntries)
+                .Select(x => x.Trim())
+                .ToList();
 
-            //Assert.That(expectedTexts, Has.Count.EqualTo(list.Count()));
+            Assert.That(expectedTexts, Has.Count.EqualTo(list.Count()));
 
-            //for (int i = 0; i < list.Count; i++)
-            //{
-            //    var actual = list[i].ToString();
+            for (int i = 0; i < list.Count; i++)
+            {
+                var actual = list[i].ToString();
 
-            //    var alteredActual = actual
-            //        .Replace(" )", ")")
-            //        .Replace(" )", ")")
-            //        .Replace(" (", "(")
-            //        .Replace(" (", "(");
+                var alteredActual = actual
+                    .Replace(" )", ")")
+                    .Replace(" )", ")")
+                    .Replace(" (", "(")
+                    .Replace(" (", "(");
 
-            //    var expected = expectedTexts[i]
-            //        .Replace(Environment.NewLine, " ")
-            //        .Replace("\t", "")
-            //        .Replace(" )", ")")
-            //        .Replace(" )", ")")
-            //        .Replace(" (", "(")
-            //        .Replace(" (", "(");
+                var expected = expectedTexts[i]
+                    .Replace(Environment.NewLine, " ")
+                    .Replace("\t", "")
+                    .Replace(" )", ")")
+                    .Replace(" )", ")")
+                    .Replace(" (", "(")
+                    .Replace(" (", "(");
 
-            //    Assert.That(alteredActual, Is.EqualTo(expected).IgnoreCase);
-            //}
+                Assert.That(alteredActual, Is.EqualTo(expected).IgnoreCase);
+            }
         }
 
         [Test]
@@ -77,11 +76,11 @@ namespace TauCode.Parsing.Tests.TinyLisp
             var reader = new TinyLispPseudoReader();
 
             // Act
-            throw new NotImplementedException();
-            //var ex = Assert.Throws<TinyLispException>(() => reader.Read(tokens));
+            var ex = Assert.Throws<ParsingException>(() => reader.Read(tokens));
 
-            //// Assert
-            //Assert.That(ex.Message, Is.EqualTo("Unclosed form."));
+            // Assert
+            Assert.That(ex.Message, Does.StartWith("TinyLisp: unclosed form."));
+            Assert.That(ex.Index, Is.EqualTo(20));
         }
 
         [Test]
@@ -94,11 +93,11 @@ namespace TauCode.Parsing.Tests.TinyLisp
             var reader = new TinyLispPseudoReader();
 
             // Act
-            throw new NotImplementedException();
-            //var ex = Assert.Throws<TinyLispException>(() => reader.Read(tokens));
+            var ex = Assert.Throws<ParsingException>(() => reader.Read(tokens));
 
-            //// Assert
-            //Assert.That(ex.Message, Is.EqualTo("Unexpected ')'."));
+            // Assert
+            Assert.That(ex.Message, Does.StartWith("TinyLisp: unexpected ')'."));
+            Assert.That(ex.Index, Is.EqualTo(17));
         }
 
         [Test]
@@ -108,17 +107,17 @@ namespace TauCode.Parsing.Tests.TinyLisp
             var form = "(some good form)";
             
             var tokens = _lexer.Tokenize(form.AsMemory());
+            var list = tokens.ToList();
 
-            throw new NotImplementedException();
-            //var badToken = new EnumToken<int>(1488, Position.Zero, 4);
-            //tokens.Insert(1, badToken);
-            //var reader = new TinyLispPseudoReader();
+            var badToken = new EnumToken<int>(0, 4, 1488);
+            list.Insert(1, badToken);
+            var reader = new TinyLispPseudoReader();
 
-            //// Act
-            //var ex = Assert.Throws<TinyLispException>(() => reader.Read(tokens));
+            // Act
+            var ex = Assert.Throws<ParsingException>(() => reader.Read(list));
 
-            //// Assert
-            //Assert.That(ex.Message, Is.EqualTo($"Could not read token of type '{badToken.GetType().FullName}'."));
+            // Assert
+            Assert.That(ex.Message, Does.StartWith("TinyLisp: cannot read token."));
         }
     }
 }

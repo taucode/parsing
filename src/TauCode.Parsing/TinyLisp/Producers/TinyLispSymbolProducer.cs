@@ -65,7 +65,7 @@ namespace TauCode.Parsing.TinyLisp.Producers
 
                 if (couldBeInt)
                 {
-                    throw new ParsingException("TinyLisp: symbol producer delivered and integer.", initialIndex);
+                    throw new ParsingException("TinyLisp: symbol producer delivered an integer.", initialIndex);
                 }
 
                 var delta = index - initialIndex;

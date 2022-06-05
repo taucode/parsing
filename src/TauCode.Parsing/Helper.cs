@@ -32,9 +32,15 @@ namespace TauCode.Parsing
 
         internal static bool IsInlineWhiteSpaceOrCaretControl(this char c) => IsInlineWhiteSpace(c) || IsCaretControl(c);
 
-        internal static ParsingException CreateException(ParsingErrorTag errorTag, int? index)
+        internal static ParsingException CreateException(ParsingErrorTag errorTag, int? index, params object[] formattingParams)
         {
             var message = Helper.GetErrorMessage(errorTag);
+
+            if (formattingParams.Length > 0)
+            {
+                message = string.Format(message, formattingParams);
+            }
+
             if (index.HasValue)
             {
                 message += $"{Environment.NewLine}Index in text: {index.Value}.";

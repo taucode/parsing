@@ -6,6 +6,14 @@
         UnclosedString = 1000,
         NewLineInString,
         BadEscape,
-        CannotTokenize
+        CannotTokenize,
+
+        // Tiny Lisp
+        TinyLispBadKeyword = 2000,
+        TinyLispBadSymbolName,
+        TinyLispSymbolProducerDeliveredInteger,
+        TinyLispUnclosedForm,
+        TinyLispUnexpectedRightParenthesis,
+        TinyLispCannotReadToken
     }
 }

@@ -1,10 +1,24 @@
-﻿using System.Globalization;
+﻿using System;
+using System.Globalization;
 using TauCode.Parsing.LexicalTokens;
 
 namespace TauCode.Parsing.LexicalTokenProducers
 {
     public class IntegerProducer : ILexicalTokenProducer
     {
+        public IntegerProducer(Func<char, bool> terminatingPredicate = null)
+        {
+            this.TerminatingPredicate = terminatingPredicate ?? DefaultTerminatingPredicate;
+        }
+
+        public Func<char, bool> TerminatingPredicate { get; }
+
+        private static bool DefaultTerminatingPredicate(char c)
+        {
+            return c.IsInlineWhiteSpaceOrCaretControl();
+        }
+
+
         public ILexicalToken Produce(LexingContext context)
         {
             var start = context.Position;
@@ -24,8 +38,9 @@ namespace TauCode.Parsing.LexicalTokenProducers
                 {
                     // ok
                 }
-                else if (c.IsInlineWhiteSpaceOrCaretControl())
+                else if (this.TerminatingPredicate(c))
                 {
+                    // terminate
                     break;
                 }
                 else

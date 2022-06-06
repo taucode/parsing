@@ -121,7 +121,7 @@ namespace TauCode.Parsing
         private static void AddNextNodesOf(IParsingNode node, HashSet<IParsingNode> hashSet)
         {
             var nextNodes = node
-                .OutgoingEdges
+                .OutgoingArcs
                 .Select(x => x.Head)
                 .Cast<IParsingNode>()
                 .ToList(); // todo temp only for debug; later remove this 'ToList()'

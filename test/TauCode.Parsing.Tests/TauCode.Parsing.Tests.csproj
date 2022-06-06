@@ -6,12 +6,16 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="Resources\cli-grammar-native.lisp" />
     <None Remove="Resources\cli-grammar.lisp" />
+    <None Remove="Resources\expected-sd-graph.txt" />
     <None Remove="Resources\sql-grammar-expected.lisp" />
     <None Remove="Resources\sql-grammar.lisp" />
   </ItemGroup>
 
   <ItemGroup>
+    <EmbeddedResource Include="Resources\expected-sd-graph.txt" />
+    <EmbeddedResource Include="Resources\cli-grammar-native.lisp" />
     <EmbeddedResource Include="Resources\cli-grammar.lisp" />
     <EmbeddedResource Include="Resources\sql-grammar-expected.lisp" />
     <EmbeddedResource Include="Resources\sql-grammar.lisp" />

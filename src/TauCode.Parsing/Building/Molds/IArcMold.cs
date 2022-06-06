@@ -1,10 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace TauCode.Parsing.Building
+﻿namespace TauCode.Parsing.Building.Molds
 {
-    public interface IEdgeMold : IGraphPartMold
+    public interface IArcMold : IGraphPartMold
     {
         IVertexMold Tail { get; set; }
         string TailFullName { get; set; }

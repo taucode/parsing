@@ -4,12 +4,13 @@ namespace TauCode.Parsing
 {
     public static class ParsingExtensions
     {
-        public static IEdge AddLink(this IParsingNode nodeFrom, IParsingNode nodeTo)
+        // todo: might be a part of TauCode.Data
+        public static IArc AddLink(this IParsingNode nodeFrom, IParsingNode nodeTo)
         {
-            var edge = new Edge();
-            edge.Connect(nodeFrom, nodeTo);
+            var arc = new Arc();
+            arc.Connect(nodeFrom, nodeTo);
 
-            return edge;
+            return arc;
         }
     }
 }

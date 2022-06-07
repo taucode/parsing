@@ -1,12 +1,10 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 using TauCode.Parsing.Graphs.Molds;
 using TauCode.Parsing.Graphs.Molds.Impl;
 using TauCode.Parsing.TinyLisp;
 using TauCode.Parsing.TinyLisp.Data;
 
-namespace TauCode.Parsing.Graphs.Reading.ElementReaders
+namespace TauCode.Parsing.Graphs.Reading.Impl
 {
     public class GroupElementReader : ElementReaderBase
     {

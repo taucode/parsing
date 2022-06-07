@@ -1,6 +1,7 @@
-﻿(sequence :name "top-seq"
+﻿(sequence 
+    ;:name "top-seq"
     (vertex
-        :name "sd"
+        :name "root"
         :type "term"
         :@term "sd"
     )
@@ -13,54 +14,63 @@
 
         (sequence :name "connection-route"
             (vertex
+                :name "connection-key"
                 :type "key"
                 :@keys (
                     "-c"
                     "--connection"
                 )
                 :@alias "connection"
+                :@is-unique t
             )
             (vertex
+                :name "connection-value"
                 :type "key-value"
                 :@alias "connection"
                 :links-to (
-                    "../idle"
+                    "../switches"
                 )
             )
         )
 
         (sequence :name "provider-route"
             (vertex
+                :name "provider-key"
                 :type "key"
                 :@keys (
                     "-p"
                     "--provider"
                 )
                 :@alias "provider"
+                :@is-unique t
             )
             (vertex
+                :name "provider-value"
                 :type "key-value"
                 :@alias "provider"
                 :links-to (
-                    "../idle"
+                    "../switches"
                 )                    
             )
         )
 
         (sequence :name "file-route"
             (vertex
+                :name "file-key"
                 :type "key"
                 :@keys (
                     "-f"
                     "--file"
                 )
                 :@alias "file"
+                :@is-unique t
             )
             (vertex
+                :name "file-value"
                 :type "key-value"
                 :@alias "file"
                 :links-to (
-                    "../idle"
+                    "../switches"
                 )
             )
         )

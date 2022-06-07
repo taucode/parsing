@@ -1,10 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 using TauCode.Parsing.Graphs.Molds;
+using TauCode.Parsing.Graphs.Molds.Impl;
 using TauCode.Parsing.TinyLisp.Data;
 
-namespace TauCode.Parsing.Graphs.Reading.ElementReaders
+namespace TauCode.Parsing.Graphs.Reading.Impl
 {
     public class SequenceElementReader : GroupElementReader
     {
@@ -15,7 +14,7 @@ namespace TauCode.Parsing.Graphs.Reading.ElementReaders
 
         protected override void ValidateResult(Element element, IPartMold partMold)
         {
-            var groupMold = (IGroupMold)partMold;
+            var groupMold = (GroupMold)partMold;
 
             if (groupMold.Content.Count == 0)
             {
@@ -36,6 +35,11 @@ namespace TauCode.Parsing.Graphs.Reading.ElementReaders
                     throw new NotImplementedException();
                 }
 
+                if (i == 0)
+                {
+                    groupMold.Entrance = innerPart.Entrance;
+                }
+
                 if (i < groupMold.Content.Count - 1)
                 {
                     if (innerPart.Exit == null)
@@ -50,6 +54,11 @@ namespace TauCode.Parsing.Graphs.Reading.ElementReaders
                     }
 
                     innerPart.Exit.AddLinkTo(nextInnerPart.Entrance);
+                }
+
+                if (i == groupMold.Content.Count - 1)
+                {
+                    groupMold.Exit = innerPart.Exit;
                 }
             }
         }

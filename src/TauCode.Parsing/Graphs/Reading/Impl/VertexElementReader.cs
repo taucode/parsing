@@ -1,11 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 using TauCode.Parsing.Graphs.Molds;
 using TauCode.Parsing.Graphs.Molds.Impl;
 using TauCode.Parsing.TinyLisp.Data;
 
-namespace TauCode.Parsing.Graphs.Reading.ElementReaders
+namespace TauCode.Parsing.Graphs.Reading.Impl
 {
     public class VertexElementReader : ElementReaderBase
     {
@@ -16,6 +14,11 @@ namespace TauCode.Parsing.Graphs.Reading.ElementReaders
 
         protected override IPartMold CreatePartMold(IGroupMold owner)
         {
+            if (owner == null)
+            {
+                throw new NotImplementedException(); // todo: owner of vertex cannot be null
+            }
+
             return new VertexMold(owner);
         }
 

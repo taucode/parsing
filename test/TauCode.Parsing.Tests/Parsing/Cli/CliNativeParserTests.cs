@@ -67,7 +67,7 @@ namespace TauCode.Parsing.Tests.Parsing.Cli
         {
             // Arrange
             var nodes = BuildTree().FetchAllVertices();
-            var graph = new Graph();
+            IGraph graph = new Graph();
 
             foreach (var node in nodes)
             {
@@ -91,7 +91,7 @@ namespace TauCode.Parsing.Tests.Parsing.Cli
 
             var idleNode = new IdleNode
             {
-                Name = "idle",
+                Name = "switches",
             };
 
             // connection route

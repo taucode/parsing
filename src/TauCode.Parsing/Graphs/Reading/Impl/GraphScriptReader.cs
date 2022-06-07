@@ -2,13 +2,12 @@
 using System.Collections.Generic;
 using System.Linq;
 using TauCode.Parsing.Graphs.Molds;
-using TauCode.Parsing.Graphs.Molds.Impl;
-using TauCode.Parsing.Graphs.Reading.ElementReaders;
 using TauCode.Parsing.TinyLisp;
 using TauCode.Parsing.TinyLisp.Data;
 
-namespace TauCode.Parsing.Graphs.Reading
+namespace TauCode.Parsing.Graphs.Reading.Impl
 {
+    // todo clean
     public class GraphScriptReader : IGraphScriptReader
     {
         #region Constants & Invariants
@@ -87,7 +86,8 @@ namespace TauCode.Parsing.Graphs.Reading
             // todo: can throw
             var groupElement = scriptElement.Single();
 
-            var groupReader = this.ResolveElementReader(groupElement.GetCar().AsElement<Atom>());
+            var groupReader = this.ResolveElementReader(groupElement.GetCar().AsElement<Atom>()); // todo: can throw
+            // todo: check that groupReader is really group reader
             var group = groupReader.Read(null, groupElement);
 
             if (group is IGroupMold realGroup)

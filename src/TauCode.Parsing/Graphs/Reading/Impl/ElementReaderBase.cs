@@ -5,7 +5,7 @@ using TauCode.Parsing.Graphs.Molds;
 using TauCode.Parsing.TinyLisp;
 using TauCode.Parsing.TinyLisp.Data;
 
-namespace TauCode.Parsing.Graphs.Reading
+namespace TauCode.Parsing.Graphs.Reading.Impl
 {
     public abstract class ElementReaderBase : IElementReader
     {
@@ -47,6 +47,10 @@ namespace TauCode.Parsing.Graphs.Reading
             if (keywordValue is StringAtom stringAtom)
             {
                 dictionaryValue = stringAtom.Value;
+            }
+            else if (keywordValue is True || keywordValue is Nil)
+            {
+                dictionaryValue = keywordValue.ToBool();
             }
             else if (keywordValue is PseudoList pseudoList)
             {
@@ -101,6 +105,11 @@ namespace TauCode.Parsing.Graphs.Reading
             switch (keywordName)
             {
                 case ":NAME":
+                    if (partMold.Owner == null)
+                    {
+                        throw new NotImplementedException(); // top group has name '/'
+                    }
+
                     if (keywordValue is StringAtom stringAtom)
                     {
                         partMold.Name = stringAtom.Value;
@@ -113,6 +122,10 @@ namespace TauCode.Parsing.Graphs.Reading
 
                 case ":IS-ENTRANCE":
                     partMold.IsEntrance = keywordValue.ToBool();
+                    break;
+
+                case ":IS-EXIT":
+                    partMold.IsExit = keywordValue.ToBool();
                     break;
 
                 default:

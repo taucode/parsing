@@ -8,6 +8,7 @@ namespace TauCode.Parsing.Graphs.Reading
 {
     public interface IElementReader
     {
-        IPartMold Read(IPartMold owner, Element element);
+        IGraphScriptReader ScriptReader { get; }
+        IPartMold Read(IGroupMold owner, Element element);
     }
 }

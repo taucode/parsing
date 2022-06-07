@@ -4,16 +4,15 @@ namespace TauCode.Parsing.Graphs.Molds
 {
     public interface IVertexMold : IPartMold
     {
-        string Name { get; set; }
         string Type { get; set; }
 
         string FullPath { get; }
 
         IArcMold AddLinkTo(IVertexMold head);
-        IArcMold AddLinkTo(string headFullPath);
+        IArcMold AddLinkTo(string headPath);
 
         IArcMold AddLinkFrom(IVertexMold tail);
-        IArcMold AddLinkFrom(string tailFullPath);
+        IArcMold AddLinkFrom(string tailPath);
 
         IReadOnlyList<IArcMold> OutgoingArcs { get; }
         IReadOnlyList<IArcMold> IncomingArcs { get; }

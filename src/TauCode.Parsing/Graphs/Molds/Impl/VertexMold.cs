@@ -6,6 +6,13 @@ namespace TauCode.Parsing.Graphs.Molds.Impl
     // todo: internal?
     public class VertexMold : PartMoldBase, IVertexMold
     {
+        #region Fields
+
+        private readonly List<IArcMold> _outgoingArcs;
+        private readonly List<IArcMold> _incomingArcs;
+
+        #endregion
+
         #region ctor
 
         public VertexMold(IGroupMold owner)
@@ -15,6 +22,9 @@ namespace TauCode.Parsing.Graphs.Molds.Impl
             {
                 throw new NotImplementedException();
             }
+
+            _outgoingArcs = new List<IArcMold>();
+            _incomingArcs = new List<IArcMold>();
         }
 
         #endregion
@@ -28,17 +38,27 @@ namespace TauCode.Parsing.Graphs.Molds.Impl
 
         #region IVertexMold Members
 
-        public string Name { get; set; }
         public string Type { get; set; }
         public string FullPath => throw new NotImplementedException();
+
         public IArcMold AddLinkTo(IVertexMold head)
         {
             throw new System.NotImplementedException();
         }
 
-        public IArcMold AddLinkTo(string headFullPath)
+        public IArcMold AddLinkTo(string headPath)
         {
-            throw new System.NotImplementedException();
+            // todo checks
+
+            var arcMold = new ArcMold
+            {
+                Tail = this,
+                HeadPath = headPath
+            };
+
+            _outgoingArcs.Add(arcMold);
+
+            return arcMold;
         }
 
         public IArcMold AddLinkFrom(IVertexMold tail)
@@ -46,13 +66,13 @@ namespace TauCode.Parsing.Graphs.Molds.Impl
             throw new System.NotImplementedException();
         }
 
-        public IArcMold AddLinkFrom(string tailFullPath)
+        public IArcMold AddLinkFrom(string tailPath)
         {
             throw new System.NotImplementedException();
         }
 
-        public IReadOnlyList<IArcMold> OutgoingArcs => throw new NotImplementedException();
-        public IReadOnlyList<IArcMold> IncomingArcs => throw new NotImplementedException();
+        public IReadOnlyList<IArcMold> OutgoingArcs => _outgoingArcs;
+        public IReadOnlyList<IArcMold> IncomingArcs => _incomingArcs;
 
         #endregion
     }

@@ -11,7 +11,47 @@ namespace TauCode.Parsing.TinyLisp
         public static IList<Tuple<int, Keyword, Element>> GetAllKeywordArguments(
             this Element shouldBePseudoList)
         {
-            throw new NotImplementedException();
+            if (shouldBePseudoList == null)
+            {
+                throw new ArgumentNullException(nameof(shouldBePseudoList));
+            }
+
+            var list = shouldBePseudoList as PseudoList;
+
+            if (list == null)
+            {
+                // todo copy-pasted a lot
+                throw new ArgumentException(
+                    $"Argument is not of type '{typeof(PseudoList).FullName}'.",
+                    nameof(shouldBePseudoList));
+            }
+
+            var tuples = new List<Tuple<int, Keyword, Element>>();
+
+            for (var i = 0; i < list.Count; i++)
+            {
+                var listElement = list[i];
+                if (listElement is Keyword keyword)
+                {
+                    if (i == list.Count - 1)
+                    {
+                        throw new NotImplementedException(); // keyword at end of list
+                    }
+
+                    var nextElement = list[i + 1];
+                    if (nextElement is Keyword nextKeyword)
+                    {
+                        throw new NotImplementedException(); // two keywords in a row
+                    }
+
+                    var tuple = Tuple.Create(i, keyword, nextElement);
+                    tuples.Add(tuple);
+
+                    i++; // sic. skip keyword's argument and move on.
+                }
+            }
+
+            return tuples;
         }
 
         public static Element GetSingleKeywordArgument(
@@ -28,6 +68,7 @@ namespace TauCode.Parsing.TinyLisp
 
             if (list == null)
             {
+                // todo copy-pasted a lot
                 throw new ArgumentException(
                     $"Argument is not of type '{typeof(PseudoList).FullName}'.",
                     nameof(shouldBePseudoList));
@@ -405,9 +446,25 @@ namespace TauCode.Parsing.TinyLisp
                 return wantedElement;
             }
 
+            // todo wrong exception message. PseudoList has nothing to do with this method.
             throw new ArgumentException(
                 $"Argument is expected to be of type '{typeof(PseudoList).FullName}', but was of type '{element.GetType().FullName}'.",
                 nameof(element));
+        }
+
+        public static bool ToBool(this Element element)
+        {
+            // todo checks
+            if (element is True)
+            {
+                return true;
+            }
+            else if (element is Nil)
+            {
+                return false;
+            }
+
+            throw new NotImplementedException();
         }
     }
 }

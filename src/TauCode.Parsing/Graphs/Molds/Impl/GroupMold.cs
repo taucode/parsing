@@ -23,7 +23,6 @@ namespace TauCode.Parsing.Graphs.Molds.Impl
 
         #region IGroupMold Members
 
-        public string Name { get; set; }
         public string FullPath => throw new NotImplementedException();
         public IReadOnlyList<IPartMold> Content => _parts;
         public void Add(IPartMold part)
@@ -33,5 +32,8 @@ namespace TauCode.Parsing.Graphs.Molds.Impl
         }
 
         #endregion
+
+        public override IVertexMold Entrance => throw new NotImplementedException();
+        public override IVertexMold Exit => throw new NotImplementedException();
     }
 }

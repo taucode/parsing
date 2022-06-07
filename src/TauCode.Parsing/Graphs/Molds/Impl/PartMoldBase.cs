@@ -17,9 +17,12 @@ namespace TauCode.Parsing.Graphs.Molds.Impl
         #region IGraphPartMold Members
 
         public IGroupMold Owner { get; }
+        public string Name { get; set; }
         public IDictionary<string, object> Properties { get; } = new Dictionary<string, object>();
-        public virtual IVertexMold Entrance => throw new NotImplementedException();
-        public virtual IVertexMold Exit => throw new NotImplementedException();
+        public bool IsEntrance { get; set; }
+        public bool IsExit { get; set; }
+        public abstract IVertexMold Entrance { get; }
+        public abstract IVertexMold Exit { get; }
 
         #endregion
     }

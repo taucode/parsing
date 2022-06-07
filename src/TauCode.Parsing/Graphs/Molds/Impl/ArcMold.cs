@@ -4,56 +4,73 @@ namespace TauCode.Parsing.Graphs.Molds.Impl
 {
     public class ArcMold : IArcMold
     {
+        #region Fields
+
+        private IVertexMold _tail;
+        private string _tailPath;
+
+        private IVertexMold _head;
+        private string _headPath;
+
+        #endregion
+
         #region IArcMold Members
 
         public IVertexMold Tail
         {
-            get
-            {
-                throw new NotImplementedException();
-            }
+            get => _tail;
             set
             {
-                throw new NotImplementedException();
+                if (_tailPath != null)
+                {
+                    throw new NotImplementedException();
+                }
+
+                _tail = value;
             }
         }
 
         public string TailPath
         {
-            get
-            {
-                throw new NotImplementedException();
-            }
+            get => _tailPath;
             set
             {
-                throw new NotImplementedException();
+                if (_tail != null)
+                {
+                    throw new NotImplementedException();
+                }
+
+                _tailPath = value;
             }
         }
 
         public IVertexMold Head
         {
-            get
-            {
-                throw new NotImplementedException();
-            }
+            get => _head;
             set
             {
-                throw new NotImplementedException();
+                if (_headPath != null)
+                {
+                    throw new NotImplementedException();
+                }
+
+                _head = value;
             }
         }
 
         public string HeadPath
         {
-            get
-            {
-                throw new NotImplementedException();
-            }
+            get => _headPath;
             set
             {
-                throw new NotImplementedException();
+                if (_head != null)
+                {
+                    throw new NotImplementedException();
+                }
+
+                _headPath = value;
             }
         }
-
 
         #endregion
     }

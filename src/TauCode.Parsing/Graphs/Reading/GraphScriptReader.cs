@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using TauCode.Parsing.Graphs.Molds;
 using TauCode.Parsing.Graphs.Molds.Impl;
+using TauCode.Parsing.Graphs.Reading.ElementReaders;
 using TauCode.Parsing.TinyLisp;
 using TauCode.Parsing.TinyLisp.Data;
 
@@ -25,6 +26,10 @@ namespace TauCode.Parsing.Graphs.Reading
         private readonly ILexer _lexer;
         private readonly ITinyLispPseudoReader _lispReader;
 
+        private readonly IElementReader _sequenceReader;
+        private readonly IElementReader _splitterReader;
+        private readonly IElementReader _vertexReader;
+
         #endregion
 
         #region ctor
@@ -33,13 +38,48 @@ namespace TauCode.Parsing.Graphs.Reading
         {
             _lexer = new TinyLispLexer();
             _lispReader = new TinyLispPseudoReader();
+
+            _sequenceReader = new SequenceElementReader(this);
+            _splitterReader = new SplitterElementReader(this);
+            _vertexReader = new VertexElementReader(this);
         }
+
+        #endregion
+
+        #region Protected
+
+
 
         #endregion
 
         #region IGraphScriptReader Members
 
-        public IGroupMold ReadScript(ReadOnlyMemory<char> script)
+        public virtual IElementReader ResolveElementReader(Atom car)
+        {
+            if (car is Symbol symbol)
+            {
+                switch (symbol.Name)
+                {
+                    case "SEQUENCE":
+                        return _sequenceReader;
+
+                    case "SPLITTER":
+                        return _splitterReader;
+
+                    case "VERTEX":
+                        return _vertexReader;
+
+                    default:
+                        throw new NotImplementedException();
+                }
+            }
+            else
+            {
+                throw new NotImplementedException();
+            }
+        }
+
+        public virtual IGroupMold ReadScript(ReadOnlyMemory<char> script)
         {
             var tokens = _lexer.Tokenize(script);
             var scriptElement = _lispReader.Read(tokens);
@@ -47,138 +87,152 @@ namespace TauCode.Parsing.Graphs.Reading
             // todo: can throw
             var groupElement = scriptElement.Single();
 
-            var group = this.ReadGroup(null, groupElement);
-            return group;
+            var groupReader = this.ResolveElementReader(groupElement.GetCar().AsElement<Atom>());
+            var group = groupReader.Read(null, groupElement);
+
+            if (group is IGroupMold realGroup)
+            {
+                return realGroup;
+            }
+
+            throw new NotImplementedException();
+
+
+
+            //var group = this.ReadGroup(null, groupElement);
+            //return group;
         }
 
         #endregion
 
-        private IGroupMold ReadGroup(IGroupMold owner, Element groupElement)
-        {
-            var carElement = groupElement.GetCar();
 
-            if (carElement is Symbol symbol)
-            {
-                switch (symbol.Name.ToLowerInvariant())
-                {
-                    case "sequence":
-                        return this.ReadSequence(owner, groupElement);
 
-                    default:
-                        throw new NotImplementedException();
-                }
-            }
-            else
-            {
-                throw new NotImplementedException();
-            }
+        //private IGroupMold ReadGroup(IGroupMold owner, Element groupElement)
+        //{
+        //    var carElement = groupElement.GetCar();
 
-            throw new NotImplementedException();
-        }
+        //    if (carElement is Symbol symbol)
+        //    {
+        //        switch (symbol.Name.ToLowerInvariant())
+        //        {
+        //            case "sequence":
+        //                return this.ReadSequence(owner, groupElement);
 
-        private SequenceMold ReadSequence(IGroupMold owner, Element groupElement)
-        {
-            var sequenceMold = new SequenceMold(owner);
+        //            default:
+        //                throw new NotImplementedException();
+        //        }
+        //    }
+        //    else
+        //    {
+        //        throw new NotImplementedException();
+        //    }
 
-            var name = groupElement.GetSingleKeywordArgument<StringAtom>(":name", true)?.Value;
-            sequenceMold.Name = name;
+        //    throw new NotImplementedException();
+        //}
 
-            var content = groupElement.GetFreeArguments();
+        //private SequenceMold ReadSequence(IGroupMold owner, Element groupElement)
+        //{
+        //    var sequenceMold = new SequenceMold(owner);
 
-            foreach (var element in content)
-            {
-                var part = this.ReadPart(sequenceMold, element);
-                sequenceMold.Add(part);
-            }
+        //    var name = groupElement.GetSingleKeywordArgument<StringAtom>(":name", true)?.Value;
+        //    sequenceMold.Name = name;
 
-            return sequenceMold;
-        }
+        //    var content = groupElement.GetFreeArguments();
 
-        private IPartMold ReadPart(IGroupMold owner, Element element)
-        {
-            var carElement = element.GetCar();
+        //    foreach (var element in content)
+        //    {
+        //        var part = this.ReadPart(sequenceMold, element);
+        //        sequenceMold.Add(part);
+        //    }
 
-            if (carElement is Symbol symbol)
-            {
-                switch (symbol.Name)
-                {
-                    case "VERTEX":
-                        return this.ReadVertex(owner, element);
+        //    return sequenceMold;
+        //}
 
-                    case "SPLITTER":
-                        return this.ReadSplitter(owner, element);
+        //private IPartMold ReadPart(IGroupMold owner, Element element)
+        //{
+        //    var carElement = element.GetCar();
 
-                    default:
-                        throw new NotImplementedException();
-                }
-            }
-            else
-            {
-                throw new NotImplementedException();
-            }
+        //    if (carElement is Symbol symbol)
+        //    {
+        //        switch (symbol.Name)
+        //        {
+        //            case "VERTEX":
+        //                return this.ReadVertex(owner, element);
 
-            throw new NotImplementedException();
-        }
+        //            case "SPLITTER":
+        //                return this.ReadSplitter(owner, element);
 
-        private IVertexMold ReadVertex(IGroupMold owner, Element vertexElement)
-        {
-            var pseudoList = (PseudoList)vertexElement; // todo can throw?
-            var vertexMold = new VertexMold(owner);
+        //            default:
+        //                throw new NotImplementedException();
+        //        }
+        //    }
+        //    else
+        //    {
+        //        throw new NotImplementedException();
+        //    }
 
-            var name = vertexElement.GetSingleKeywordArgument<StringAtom>(":name", true)?.Value;
-            var type = vertexElement.GetSingleKeywordArgument<StringAtom>(":type", true)?.Value;
+        //    throw new NotImplementedException();
+        //}
 
-            vertexMold.Name = name;
-            vertexMold.Type = type;
+        //private IVertexMold ReadVertex(IGroupMold owner, Element vertexElement)
+        //{
+        //    var pseudoList = (PseudoList)vertexElement; // todo can throw?
+        //    var vertexMold = new VertexMold(owner);
 
-            var keywords = pseudoList
-                .Where(x => x is Keyword)
-                .Cast<Keyword>()
-                .ToList();
+        //    var name = vertexElement.GetSingleKeywordArgument<StringAtom>(":name", true)?.Value;
+        //    var type = vertexElement.GetSingleKeywordArgument<StringAtom>(":type", true)?.Value;
 
-            foreach (var keyword in keywords)
-            {
-                var keywordName = keyword.Name;
+        //    vertexMold.Name = name;
+        //    vertexMold.Type = type;
 
-                if (keywordName.StartsWith(":@"))
-                {
-                    var keyValueElement = pseudoList.GetSingleKeywordArgument(keywordName);
-                    this.AddProperty(vertexMold, keywordName, keyValueElement);
-                }
-                else
-                {
-                    if (VertexKeywords.Contains(keywordName))
-                    {
-                        // ok
-                    }
-                    else
-                    {
-                        throw new NotImplementedException();
-                    }
-                }
-            }
+        //    var keywords = pseudoList
+        //        .Where(x => x is Keyword)
+        //        .Cast<Keyword>()
+        //        .ToList();
 
-            return vertexMold;
-        }
+        //    foreach (var keyword in keywords)
+        //    {
+        //        var keywordName = keyword.Name;
 
-        private void AddProperty(IPartMold part, string keywordName, Element keyValueElement)
-        {
-            var name = keywordName[2..].ToLowerInvariant(); // todo: keyword ':@' (which is valid) will fail
-            var value = this.TransformPropertyValue(keyValueElement);
+        //        if (keywordName.StartsWith(":@"))
+        //        {
+        //            var keyValueElement = pseudoList.GetSingleKeywordArgument(keywordName);
+        //            this.AddProperty(vertexMold, keywordName, keyValueElement);
+        //        }
+        //        else
+        //        {
+        //            if (VertexKeywords.Contains(keywordName))
+        //            {
+        //                // ok
+        //            }
+        //            else
+        //            {
+        //                throw new NotImplementedException();
+        //            }
+        //        }
+        //    }
 
-            part.Properties.Add(name, value);
-        }
+        //    return vertexMold;
+        //}
 
-        private object TransformPropertyValue(Element keyValueElement)
-        {
-            if (keyValueElement is StringAtom stringAtom)
-            {
-                return stringAtom.Value;
-            }
-            else
-            {
-                throw new NotImplementedException();
-            }
-        }
+        //private void AddProperty(IPartMold part, string keywordName, Element keyValueElement)
+        //{
+        //    var name = keywordName[2..].ToLowerInvariant(); // todo: keyword ':@' (which is valid) will fail
+        //    var value = this.TransformPropertyValue(keyValueElement);
+
+        //    part.Properties.Add(name, value);
+        //}
+
+        //private object TransformPropertyValue(Element keyValueElement)
+        //{
+        //    if (keyValueElement is StringAtom stringAtom)
+        //    {
+        //        return stringAtom.Value;
+        //    }
+        //    else
+        //    {
+        //        throw new NotImplementedException();
+        //    }
+        //}
     }
 }

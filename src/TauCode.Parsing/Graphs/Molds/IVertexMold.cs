@@ -2,9 +2,10 @@
 
 namespace TauCode.Parsing.Graphs.Molds
 {
-    public interface IVertexMold : IInsertableMold
+    public interface IVertexMold : IPartMold
     {
         string Name { get; set; }
+        string Type { get; set; }
 
         string FullPath { get; }
 

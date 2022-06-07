@@ -8,6 +8,12 @@ namespace TauCode.Parsing.TinyLisp
 {
     public static class TinyLispExtensions
     {
+        public static IList<Tuple<int, Keyword, Element>> GetAllKeywordArguments(
+            this Element shouldBePseudoList)
+        {
+            throw new NotImplementedException();
+        }
+
         public static Element GetSingleKeywordArgument(
             this Element shouldBePseudoList,
             string argumentName,
@@ -289,7 +295,7 @@ namespace TauCode.Parsing.TinyLisp
                             (delta == 1 && startedWithKeyword)
                             )
                         {
-                            // won't consider if free.
+                            // won't consider it free.
                             // reset the entire procedure.
                             startedWithKeyword = true;
                             startIndex = -1;
@@ -342,6 +348,15 @@ namespace TauCode.Parsing.TinyLisp
             return result;
         }
 
+        public static Element GetCar(this Element shouldBePseudoList)
+        {
+            // todo checks
+            var pseudoList = shouldBePseudoList as PseudoList;
+
+            // todo checks
+            return pseudoList[0];
+        }
+
         public static string GetCarSymbolName(this Element shouldBePseudoList)
         {
             if (shouldBePseudoList == null)
@@ -353,7 +368,7 @@ namespace TauCode.Parsing.TinyLisp
             if (pseudoList == null)
             {
                 throw new ArgumentException(
-                    $"Argument is not of type '{typeof(PseudoList).FullName}'.",
+                    $"Argument is not of type '{typeof(PseudoList).FullName}'.", // todo copy-paste
                     nameof(shouldBePseudoList));
             }
 

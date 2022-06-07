@@ -1,75 +1,73 @@
-﻿(group :name top
-    (sequence :name "top-seq"
+﻿(sequence :name "top-seq"
+    (vertex
+        :name "sd"
+        :type "term"
+        :@term "sd"
+    )
+    (splitter :name "switches"
         (vertex
-            :name "sd"
-            :type "term"
-            :@term "sd"
+            :type "idle"
+            :name "switches"
+            :is-entrance t
         )
-        (splitter :name "switches"
+
+        (sequence :name "connection-route"
             (vertex
-                :type "idle"
-                :name "switches"
-                :is-entrance t
+                :type "key"
+                :@keys (
+                    "-c"
+                    "--connection"
+                )
+                :@alias "connection"
             )
-
-            (sequence :name "connection-route"
-                (vertex
-                    :type "key"
-                    :@keys (
-                        "-c"
-                        "--connection"
-                    )
-                    :@alias "connection"
-                )
-                (vertex
-                    :type "key-value"
-                    :@alias "connection"
-                    :links-to (
-                        "../idle"
-                    )
-                )
-            )
-
-            (sequence :name "provider-route"
-                (vertex
-                    :type "key"
-                    :@keys (
-                        "-p"
-                        "--provider"
-                    )
-                    :@alias "provider"
-                )
-                (vertex
-                    :type "key-value"
-                    :@alias "provider"
-                    :links-to (
-                        "../idle"
-                    )                    
-                )
-            )
-
-            (sequence :name "file-route"
-                (vertex
-                    :type "key"
-                    :@keys (
-                        "-f"
-                        "--file"
-                    )
-                    :@alias "file"
-                )
-                (vertex
-                    :type "key-value"
-                    :@alias "file"
-                    :links-to (
-                        "../idle"
-                    )
-                )
-            )
-
             (vertex
-                :type "end"
-                :is-exit t
+                :type "key-value"
+                :@alias "connection"
+                :links-to (
+                    "../idle"
+                )
             )
+        )
+
+        (sequence :name "provider-route"
+            (vertex
+                :type "key"
+                :@keys (
+                    "-p"
+                    "--provider"
+                )
+                :@alias "provider"
+            )
+            (vertex
+                :type "key-value"
+                :@alias "provider"
+                :links-to (
+                    "../idle"
+                )                    
+            )
+        )
+
+        (sequence :name "file-route"
+            (vertex
+                :type "key"
+                :@keys (
+                    "-f"
+                    "--file"
+                )
+                :@alias "file"
+            )
+            (vertex
+                :type "key-value"
+                :@alias "file"
+                :links-to (
+                    "../idle"
+                )
+            )
+        )
+
+        (vertex
+            :type "end"
+            :is-exit t
         )
     )
 )

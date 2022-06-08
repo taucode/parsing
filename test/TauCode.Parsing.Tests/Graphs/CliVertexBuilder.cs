@@ -34,35 +34,42 @@ public class CliVertexBuilder : IVertexBuilder
     public IVertex Build(IVertexMold vertexMold)
     {
         string alias;
+        IParsingNode result;
 
         switch (vertexMold.Type)
         {
             case "term":
                 var term = (string)vertexMold.Properties["TERM"];
-                var termNode = new TermNode(term);
-                return termNode;
+                result = new TermNode(term);
+                break;
+                
 
             case "key":
                 var keyValues = (List<string>)vertexMold.Properties["KEYS"];
                 alias = (string)vertexMold.Properties["ALIAS"];
                 var isUnique = (bool)vertexMold.Properties["IS-UNIQUE"];
-                var keyNode = new KeyNode(keyValues, alias, isUnique);
-                return keyNode;
+                result = new KeyNode(keyValues, alias, isUnique);
+                break;
 
             case "key-value":
                 alias = (string)vertexMold.Properties["ALIAS"];
-                var keyValueNode = new KeyValueNode(alias);
-                return keyValueNode;
+                result = new KeyValueNode(alias);
+                break;
 
             case "idle":
-                var idleNode = new IdleNode();
-                return idleNode;
+                result = new IdleNode();
+                break;
 
             case "end":
-                return EndNode.Instance;
+                result =  new EndNode();
+                break;
 
             default:
                 throw new NotImplementedException();
         }
+
+        result.Name = vertexMold.Name; // todo: check (in caller) that created node's name is equal to mold's name
+
+        return result;
     }
 }

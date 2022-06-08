@@ -1,24 +1,24 @@
 ﻿--- Vertices ---
 connection-key
 connection-value
+end
 file-key
 file-value
 idle
 provider-key
 provider-value
 root
-TauCode.Parsing.ParsingNodes.EndNode
 --- Arcs ---
 connection-key -> connection-value
+connection-value -> end
 connection-value -> idle
-connection-value -> TauCode.Parsing.ParsingNodes.EndNode
 file-key -> file-value
+file-value -> end
 file-value -> idle
-file-value -> TauCode.Parsing.ParsingNodes.EndNode
 idle -> connection-key
 idle -> file-key
 idle -> provider-key
 provider-key -> provider-value
+provider-value -> end
 provider-value -> idle
-provider-value -> TauCode.Parsing.ParsingNodes.EndNode
 root -> idle

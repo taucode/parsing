@@ -13,8 +13,6 @@ public class KeyNode : ActionNode
         this.KeyValues = new HashSet<string>(keyValues);
         this.Alias = alias;
         this.IsUnique = isUnique;
-
-        this.Name = this.Alias; // todo temp for debugger visualizer
     }
 
     public HashSet<string> KeyValues { get; }

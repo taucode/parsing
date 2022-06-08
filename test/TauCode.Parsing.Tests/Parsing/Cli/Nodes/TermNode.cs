@@ -11,7 +11,6 @@ namespace TauCode.Parsing.Tests.Parsing.Cli.Nodes
             : base(AcceptsMethod, ActMethod)
         {
             this.Term = term;
-            this.Name = this.Term; // todo temp?
         }
 
         public string Term { get; }

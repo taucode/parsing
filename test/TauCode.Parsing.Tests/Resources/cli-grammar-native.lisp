@@ -1,5 +1,4 @@
 ﻿(sequence 
-    ;:name "top-seq"
     (vertex
         :name "root"
         :type "term"
@@ -8,7 +7,7 @@
     (splitter :name "switches"
         (vertex
             :type "idle"
-            :name "switches"
+            :name "idle"
             :is-entrance t
         )
 
@@ -28,7 +27,7 @@
                 :type "key-value"
                 :@alias "connection"
                 :links-to (
-                    "../switches"
+                    "../idle"
                 )
             )
         )
@@ -49,7 +48,7 @@
                 :type "key-value"
                 :@alias "provider"
                 :links-to (
-                    "../switches"
+                    "../idle"
                 )                    
             )
         )
@@ -70,13 +69,14 @@
                 :type "key-value"
                 :@alias "file"
                 :links-to (
-                    "../switches"
+                    "../idle"
                 )
             )
         )
 
         (vertex
             :type "end"
+            :name "end"
             :is-exit t
         )
     )

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Xml.XPath;
 using Serilog;
 using TauCode.Parsing.ParsingNodes;
 
@@ -32,6 +33,7 @@ namespace TauCode.Parsing
         public void Parse(IReadOnlyList<ILexicalToken> tokens, IParsingResult parsingResult)
         {
             // todo: skip empty tokens (and ut)
+            // todo: parse multi-result script
 
             var context = new ParsingContext(tokens);
             var currentNodes = new HashSet<IParsingNode>(new[] { this.Root });
@@ -42,7 +44,7 @@ namespace TauCode.Parsing
             {
                 if (context.Position == tokens.Count)
                 {
-                    if (currentNodes.Contains(EndNode.Instance))
+                    if (currentNodes.Any(x => x is EndNode)) // todo: performance
                     {
                         // we can accept end
                         break;

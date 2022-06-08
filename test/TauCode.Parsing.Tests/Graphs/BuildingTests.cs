@@ -9,34 +9,32 @@ using TauCode.Parsing.Graphs.Building;
 using TauCode.Parsing.Graphs.Building.Impl;
 using TauCode.Parsing.Graphs.Reading.Impl;
 
-namespace TauCode.Parsing.Tests.Graphs
+namespace TauCode.Parsing.Tests.Graphs;
+
+[TestFixture]
+public class BuildingTests
 {
-    [TestFixture]
-    public class BuildingTests
+    [Test]
+    public void Build_ValidInput_BuildsGraph()
     {
-        [Test]
-        public void Build_ValidInput_BuildsGraph()
+        // Arrange
+        var script = this.GetType().Assembly.GetResourceText("cli-grammar-native.lisp", true);
+        var reader = new GraphScriptReader();
+        var groupMold = reader.ReadScript(script.AsMemory());
+        var builder = new GraphBuilder
         {
-            // Arrange
-            var script = this.GetType().Assembly.GetResourceText("cli-grammar-native.lisp", true);
-            var reader = new GraphScriptReader();
-            var groupMold = reader.ReadScript(script.AsMemory());
-            var builder = new GraphBuilder
+            CustomVertexBuilders = new List<IVertexBuilder>()
             {
-                CustomVertexBuilders = new List<IVertexBuilder>()
-                {
-                    new CliVertexBuilder(),
-                },
-            };
+                new CliVertexBuilder(),
+            },
+        };
 
+        // Act
+        var graph = builder.Build(groupMold);
+        var rep = graph.PrintGraph();
 
-            // Act
-            var graph = builder.Build(groupMold);
-            var rep = graph.PrintGraph();
-
-            // Assert
-            var expectedRep = this.GetType().Assembly.GetResourceText(".expected-sd-graph.txt", true);
-            Assert.That(rep, Is.EqualTo(expectedRep));
-        }
+        // Assert
+        var expectedRep = this.GetType().Assembly.GetResourceText(".expected-sd-graph.txt", true);
+        Assert.That(rep, Is.EqualTo(expectedRep));
     }
 }

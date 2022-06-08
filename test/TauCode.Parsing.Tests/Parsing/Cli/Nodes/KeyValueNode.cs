@@ -11,8 +11,6 @@ public class KeyValueNode : ActionNode
         : base(AcceptsMethod, ActMethod)
     {
         this.Alias = alias;
-
-        this.Name = this.Alias; // todo temp for debugger visualizer
     }
 
     public string Alias { get; }

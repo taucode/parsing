@@ -94,12 +94,5 @@ namespace TauCode.Parsing.Tests
                 FetchAllVerticesPriv(linkFrom, vertices);
             }
         }
-
-        // todo: add this method to IGraph, along with Contains(), Remove(),
-        //internal static void Add(this IGraph graph, IVertex vertex)
-        //{
-        //    graph.Add(vertex);
-        //    graph.UnionWith(new[] { vertex });
-        //}
     }
 }

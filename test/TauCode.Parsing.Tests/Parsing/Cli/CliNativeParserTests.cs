@@ -1,5 +1,8 @@
 ﻿using System;
+using System.Diagnostics;
+using System.IO;
 using System.Linq;
+using System.Text;
 using NUnit.Framework;
 using TauCode.Data.Graphs;
 using TauCode.Extensions;
@@ -67,6 +70,7 @@ namespace TauCode.Parsing.Tests.Parsing.Cli
         {
             // Arrange
             var nodes = BuildTree().FetchAllVertices();
+            
             IGraph graph = new Graph();
 
             foreach (var node in nodes)
@@ -91,7 +95,7 @@ namespace TauCode.Parsing.Tests.Parsing.Cli
 
             var idleNode = new IdleNode
             {
-                Name = "switches",
+                Name = "idle",
             };
 
             // connection route
@@ -124,7 +128,10 @@ namespace TauCode.Parsing.Tests.Parsing.Cli
                 Name = "file-value",
             };
 
-            var endNode = EndNode.Instance;
+            var endNode = new EndNode
+            {
+                Name = "end",
+            };
 
             root.AddLink(idleNode);
 

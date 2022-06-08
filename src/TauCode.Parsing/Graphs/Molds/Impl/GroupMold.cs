@@ -9,8 +9,6 @@ namespace TauCode.Parsing.Graphs.Molds.Impl
         #region Fields
 
         private readonly List<IPartMold> _parts;
-        private string _name;
-        private string _fullPath;
 
         #endregion
 
@@ -30,33 +28,26 @@ namespace TauCode.Parsing.Graphs.Molds.Impl
         {
             get
             {
-                if (_fullPath == null)
+                if (this.Owner == null)
                 {
-                    _fullPath = this.BuildFullPath();
+                    if (this.Name == null)
+                    {
+                        return null;
+                    }
+                    else
+                    {
+                        return $"/{this.Name}/";
+                    }
                 }
 
-                return _fullPath;
+                var ownerFullPath = this.Owner.FullPath;
+                if (ownerFullPath == null)
+                {
+                    return null;
+                }
+
+                return $"{ownerFullPath}{this.Name}/";
             }
-        }
-
-        private string BuildFullPath()
-        {
-            if (this.Owner == null)
-            {
-                return this.Name;
-            }
-
-            if (_name == null)
-            {
-                throw new NotImplementedException();
-            }
-
-            var sb = new StringBuilder();
-            sb.Append(this.Owner.FullPath);
-            sb.Append(this.Name);
-            sb.Append("/");
-
-            return sb.ToString();
         }
 
         public IReadOnlyList<IPartMold> Content => _parts;
@@ -70,28 +61,5 @@ namespace TauCode.Parsing.Graphs.Molds.Impl
 
         public override IVertexMold Entrance { get; internal set; }
         public override IVertexMold Exit { get; internal set; }
-
-        public override string Name
-        {
-            get
-            {
-                if (this.Owner == null)
-                {
-                    return "/";
-                }
-
-                return _name;
-            }
-            set
-            {
-                if (this.Owner == null)
-                {
-                    throw new NotImplementedException();
-                }
-
-                _fullPath = null;
-                _name = value; // todo: check name is good
-            }
-        }
     }
 }

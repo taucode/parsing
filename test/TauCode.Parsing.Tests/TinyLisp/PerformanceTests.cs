@@ -8,7 +8,6 @@ namespace TauCode.Parsing.Tests.TinyLisp
     [TestFixture]
     public class PerformanceTests
     {
-
         [Test]
         [Ignore("Performance test")]
         public void PerformanceTestForTinyLispLexer()

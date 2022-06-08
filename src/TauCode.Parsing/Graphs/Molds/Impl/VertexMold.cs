@@ -11,9 +11,6 @@ namespace TauCode.Parsing.Graphs.Molds.Impl
 
         private readonly List<IArcMold> _outgoingArcs;
         private readonly List<IArcMold> _incomingArcs;
-        private string _name;
-        private string _fullPath;
-
 
         #endregion
 
@@ -57,27 +54,14 @@ namespace TauCode.Parsing.Graphs.Molds.Impl
         {
             get
             {
-                if (_fullPath == null)
+                var ownerFullPath = this.Owner.FullPath;
+                if (ownerFullPath == null)
                 {
-                    _fullPath = this.BuildFullPath();
+                    return null;
                 }
 
-                return _fullPath;
+                return $"{ownerFullPath}/{this.Name}";
             }
-        }
-
-        private string BuildFullPath()
-        {
-            if (_name == null)
-            {
-                throw new NotImplementedException();
-            }
-
-            var sb = new StringBuilder();
-            sb.Append(this.Owner.FullPath);
-            sb.Append(_name);
-
-            return sb.ToString();
         }
 
         public IArcMold AddLinkTo(IVertexMold head)
@@ -120,16 +104,6 @@ namespace TauCode.Parsing.Graphs.Molds.Impl
 
         public IReadOnlyList<IArcMold> OutgoingArcs => _outgoingArcs;
         public IReadOnlyList<IArcMold> IncomingArcs => _incomingArcs;
-
-        public override string Name
-        {
-            get => _name;
-            set
-            {
-                _name = value;
-                _fullPath = null;
-            }
-        }
 
         #endregion
     }

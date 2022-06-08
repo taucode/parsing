@@ -17,7 +17,7 @@ namespace TauCode.Parsing.Graphs.Molds.Impl
         #region IGraphPartMold Members
 
         public IGroupMold Owner { get; }
-        public abstract string Name { get; set; }
+        public string Name { get; set; }
         public IDictionary<string, object> Properties { get; } = new Dictionary<string, object>();
         public bool IsEntrance { get; set; }
         public bool IsExit { get; set; }

@@ -105,11 +105,6 @@ namespace TauCode.Parsing.Graphs.Reading.Impl
             switch (keywordName)
             {
                 case ":NAME":
-                    if (partMold.Owner == null)
-                    {
-                        throw new NotImplementedException(); // top group has name '/'
-                    }
-
                     if (keywordValue is StringAtom stringAtom)
                     {
                         partMold.Name = stringAtom.Value;

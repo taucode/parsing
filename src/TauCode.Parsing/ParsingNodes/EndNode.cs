@@ -4,11 +4,8 @@ namespace TauCode.Parsing.ParsingNodes
 {
     public sealed class EndNode : ParsingNodeBase
     {
-        public static EndNode Instance { get; } = new EndNode();
-
-        private EndNode()
-        {
-            this.Name = this.GetType().FullName;
+        public EndNode()
+        {   
         }
 
         protected override bool AcceptsTokenImpl(ILexicalToken token, IParsingResult parsingResult)

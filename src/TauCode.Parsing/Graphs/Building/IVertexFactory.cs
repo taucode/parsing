@@ -6,9 +6,10 @@ using TauCode.Parsing.Graphs.Molds;
 
 namespace TauCode.Parsing.Graphs.Building
 {
-    public interface IVertexBuilder
+    // todo clean
+    public interface IVertexFactory
     {
-        bool Accepts(IVertexMold vertexMold);
-        IVertex Build(IVertexMold vertexMold);
+        //bool Accepts(IVertexMold vertexMold);
+        IVertex Create(IVertexMold vertexMold);
     }
 }

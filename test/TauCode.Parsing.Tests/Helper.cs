@@ -94,5 +94,25 @@ namespace TauCode.Parsing.Tests
                 FetchAllVerticesPriv(linkFrom, vertices);
             }
         }
+
+        internal static bool IsLatinLetterInternal(this char c)
+        {
+            if (c >= 'a' && c <= 'z')
+            {
+                return true;
+            }
+
+            if (c >= 'A' && c <= 'Z')
+            {
+                return true;
+            }
+
+            return false;
+        }
+
+        internal static bool IsDecimalDigit(this char c)
+        {
+            return c >= '0' && c <= '9';
+        }
     }
 }

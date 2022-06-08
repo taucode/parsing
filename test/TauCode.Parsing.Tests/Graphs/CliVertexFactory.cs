@@ -12,26 +12,22 @@ using TauCode.Parsing.Tests.Parsing.Cli.Nodes;
 
 namespace TauCode.Parsing.Tests.Graphs;
 
-public class CliVertexBuilder : IVertexBuilder
+// todo clean
+public class CliVertexFactory : IVertexFactory
 {
-    public bool Accepts(IVertexMold vertexMold)
-    {
-        var accepts = vertexMold.Type.IsIn(
-            "term",
-            "idle",
-            "end",
-            "key",
-            "key-value");
+    //public bool Accepts(IVertexMold vertexMold)
+    //{
+    //    var accepts = vertexMold.Type.IsIn(
+    //        "term",
+    //        "idle",
+    //        "end",
+    //        "key",
+    //        "key-value");
 
-        if (!accepts)
-        {
-            throw new NotImplementedException();
-        }
+    //    return accepts;
+    //}
 
-        return accepts;
-    }
-
-    public IVertex Build(IVertexMold vertexMold)
+    public IVertex Create(IVertexMold vertexMold)
     {
         string alias;
         IParsingNode result;

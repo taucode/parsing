@@ -6,8 +6,6 @@ namespace TauCode.Parsing.Graphs.Building
 {
     public interface IGraphBuilder
     {
-        IEnumerable<IVertexBuilder> CustomVertexBuilders { get; set; }
-        IEnumerable<IArcBuilder> CustomArcBuilders { get; set; }
         IGraph Build(IGroupMold group);
     }
 }

@@ -1,4 +1,5 @@
-﻿using TauCode.Data;
+﻿using System;
+using TauCode.Data;
 
 namespace TauCode.Parsing.LexicalTokens
 {
@@ -11,7 +12,7 @@ namespace TauCode.Parsing.LexicalTokens
             : base(
                 position,
                 consumedLength,
-                emailAddress.ToString())
+                (emailAddress ?? throw new ArgumentNullException(nameof(emailAddress))).ToString())
         {
             this.EmailAddress = emailAddress;
         }

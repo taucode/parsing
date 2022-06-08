@@ -9,18 +9,14 @@ namespace TauCode.Parsing.Graphs.Building.Impl
     // todo regions, clean
     public class GraphBuilder : IGraphBuilder
     {
-        private readonly IVertexBuilder _defaultVertexBuilder;
-        private readonly IArcBuilder _defaultArcBuilder;
+        private readonly IVertexFactory _vertexFactory;
+        private readonly IArcFactory _arcFactory;
 
-        public GraphBuilder()
+        public GraphBuilder(IVertexFactory vertexFactory = null, IArcFactory arcFactory = null)
         {
-            _defaultVertexBuilder = new VertexBuilder();
-            _defaultArcBuilder = new ArcBuilder();
+            _vertexFactory = vertexFactory ?? new VertexFactory();
+            _arcFactory = arcFactory ?? new ArcFactory();
         }
-
-        public IEnumerable<IVertexBuilder> CustomVertexBuilders { get; set; }
-
-        public IEnumerable<IArcBuilder> CustomArcBuilders { get; set; }
 
         public IGraph Build(IGroupMold group)
         {
@@ -34,8 +30,7 @@ namespace TauCode.Parsing.Graphs.Building.Impl
 
             foreach (var vertexMold in vertexMolds)
             {
-                var vertexBuilder = this.ResolveVertexBuilder(vertexMold);
-                var vertex = vertexBuilder.Build(vertexMold);
+                var vertex = _vertexFactory.Create(vertexMold);
 
                 graph.Add(vertex);
                 vertexMappings.Add(vertexMold, vertex);
@@ -43,8 +38,7 @@ namespace TauCode.Parsing.Graphs.Building.Impl
 
             foreach (var arcMold in arcMolds)
             {
-                var arcBuilder = this.ResolveArcBuilder(arcMold);
-                var arc = arcBuilder.Build(arcMold);
+                var arc = _arcFactory.Create(arcMold);
 
                 IVertex tail;
                 IVertex head;
@@ -54,7 +48,7 @@ namespace TauCode.Parsing.Graphs.Building.Impl
                     tail = vertexMappings[arcMold.Tail];
                     head = vertexMappings[arcMold.Head];
                 }
-                else if (arcMold.TailPath != null && arcMold.HeadPath != null) 
+                else if (arcMold.TailPath != null && arcMold.HeadPath != null)
                 {
                     throw new NotImplementedException();
                 }
@@ -78,39 +72,7 @@ namespace TauCode.Parsing.Graphs.Building.Impl
 
             return graph;
         }
-
-        protected virtual IArcBuilder ResolveArcBuilder(IArcMold arcMold)
-        {
-            if (this.CustomArcBuilders != null)
-            {
-                foreach (var customArcBuilder in this.CustomArcBuilders)
-                {
-                    if (customArcBuilder.Accepts(arcMold))
-                    {
-                        return customArcBuilder;
-                    }
-                }
-            }
-
-            return _defaultArcBuilder;
-        }
-
-        protected virtual IVertexBuilder ResolveVertexBuilder(IVertexMold vertexMold)
-        {
-            if (this.CustomVertexBuilders != null)
-            {
-                foreach (var customVertexBuilder in this.CustomVertexBuilders)
-                {
-                    if (customVertexBuilder.Accepts(vertexMold))
-                    {
-                        return customVertexBuilder;
-                    }
-                }
-            }
-
-            return _defaultVertexBuilder;
-        }
-
+        
         protected virtual IGraph CreateGraph()
         {
             return new Graph();

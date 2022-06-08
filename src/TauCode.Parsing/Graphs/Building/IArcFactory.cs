@@ -6,9 +6,9 @@ using TauCode.Parsing.Graphs.Molds;
 
 namespace TauCode.Parsing.Graphs.Building
 {
-    public interface IArcBuilder
+    public interface IArcFactory
     {
         bool Accepts(IArcMold arcMold);
-        IArc Build(IArcMold arcMold);
+        IArc Create(IArcMold arcMold);
     }
 }

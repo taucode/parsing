@@ -3,13 +3,14 @@ using TauCode.Parsing.Graphs.Molds;
 
 namespace TauCode.Parsing.Graphs.Building.Impl
 {
-    public class VertexBuilder : IVertexBuilder
+    // todo clean
+    public class VertexFactory : IVertexFactory
     {
-        public IVertex Build(IVertexMold vertexMold)
+        public IVertex Create(IVertexMold vertexMold)
         {
             throw new System.NotImplementedException();
         }
 
-        public bool Accepts(IVertexMold vertexMold) => true;
+        //public bool Accepts(IVertexMold vertexMold) => true;
     }
 }

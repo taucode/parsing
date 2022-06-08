@@ -2,37 +2,36 @@
 using TauCode.Parsing.ParsingNodes;
 using TauCode.Parsing.Tests.Parsing.Cli.Result;
 
-namespace TauCode.Parsing.Tests.Parsing.Cli.Nodes
+namespace TauCode.Parsing.Tests.Parsing.Cli.Nodes;
+
+public class TermNode : ActionNode
 {
-    public class TermNode : ActionNode
+    public TermNode(
+        string term)
+        : base(AcceptsMethod, ActMethod)
     {
-        public TermNode(
-            string term)
-            : base(AcceptsMethod, ActMethod)
+        this.Term = term;
+    }
+
+    public string Term { get; }
+
+    private static bool AcceptsMethod(ActionNode node, ILexicalToken token, IParsingResult parsingResult)
+    {
+        var thisNode = (TermNode)node;
+
+        if (token is CliWordToken cliWordToken)
         {
-            this.Term = term;
+            return cliWordToken.Text == thisNode.Term;
         }
 
-        public string Term { get; }
+        return false;
+    }
 
-        private static bool AcceptsMethod(ActionNode node, ILexicalToken token, IParsingResult parsingResult)
-        {
-            var thisNode = (TermNode)node;
+    private static void ActMethod(ActionNode node, ILexicalToken token, IParsingResult parsingResult)
+    {
+        var cliResult = (CliParsingResult)parsingResult;
+        var thisNode = (TermNode)node;
 
-            if (token is CliWordToken cliWordToken)
-            {
-                return cliWordToken.Text == thisNode.Term;
-            }
-
-            return false;
-        }
-
-        private static void ActMethod(ActionNode node, ILexicalToken token, IParsingResult parsingResult)
-        {
-            var cliResult = (CliParsingResult)parsingResult;
-            var thisNode = (TermNode)node;
-
-            cliResult.SetCommand(thisNode.Term);
-        }
+        cliResult.SetCommand(thisNode.Term);
     }
 }

@@ -3,14 +3,14 @@ using TauCode.Parsing.Graphs.Molds;
 
 namespace TauCode.Parsing.Graphs.Building.Impl
 {
-    public class ArcBuilder : IArcBuilder
+    public class ArcFactory : IArcFactory
     {
         public bool Accepts(IArcMold arcMold)
         {
             throw new System.NotImplementedException();
         }
 
-        public IArc Build(IArcMold arcMold)
+        public IArc Create(IArcMold arcMold)
         {
             return new Arc();
         }

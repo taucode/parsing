@@ -35,13 +35,13 @@ namespace TauCode.Parsing.Graphs.Molds.Impl
         public override IVertexMold Entrance
         {
             get => this;
-            internal set => throw new NotImplementedException();
+            internal set => throw new InvalidOperationException();
         }
 
         public override IVertexMold Exit
         {
             get => this;
-            internal set => throw new NotImplementedException();
+            internal set => throw new InvalidOperationException();
         }
 
         #endregion

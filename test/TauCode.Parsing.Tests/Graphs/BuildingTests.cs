@@ -21,13 +21,7 @@ public class BuildingTests
         var script = this.GetType().Assembly.GetResourceText("cli-grammar-native.lisp", true);
         var reader = new GraphScriptReader();
         var groupMold = reader.ReadScript(script.AsMemory());
-        var builder = new GraphBuilder
-        {
-            CustomVertexBuilders = new List<IVertexBuilder>()
-            {
-                new CliVertexBuilder(),
-            },
-        };
+        var builder = new GraphBuilder(new CliVertexFactory());
 
         // Act
         var graph = builder.Build(groupMold);

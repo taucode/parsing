@@ -8,7 +8,7 @@ namespace TauCode.Parsing.Tests.Parsing.Cli.Nodes;
 public class KeyNode : ActionNode
 {
     public KeyNode(IEnumerable<string> keyValues, string alias, bool isUnique)
-        : base(AcceptsMethod, ActMethod)
+        : base(ActionImpl)
     {
         this.KeyValues = new HashSet<string>(keyValues);
         this.Alias = alias;
@@ -19,18 +19,17 @@ public class KeyNode : ActionNode
     public string Alias { get; }
     public bool IsUnique { get; }
 
-    private static bool AcceptsMethod(ActionNode node, ILexicalToken token, IParsingResult parsingResult)
+    protected override bool AcceptsTokenImpl(ILexicalToken token, IParsingResult parsingResult)
     {
-        var thisNode = (KeyNode)node;
         if (token is CliKeyToken cliKeyToken)
         {
-            return thisNode.KeyValues.Contains(cliKeyToken.Text);
+            return this.KeyValues.Contains(cliKeyToken.Text);
         }
 
         return false;
     }
 
-    private static void ActMethod(ActionNode node, ILexicalToken token, IParsingResult parsingResult)
+    private static void ActionImpl(ActionNode node, ILexicalToken token, IParsingResult parsingResult)
     {
         var thisNode = (KeyNode)node;
         var cliKeyToken = (CliKeyToken)token;

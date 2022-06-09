@@ -1,4 +1,5 @@
 ﻿using System;
+using TauCode.Extensions;
 using TauCode.Parsing.LexicalTokens;
 using TauCode.Parsing.ParsingNodes;
 using TauCode.Parsing.Tests.Parsing.Cli.Result;
@@ -8,31 +9,23 @@ namespace TauCode.Parsing.Tests.Parsing.Cli.Nodes;
 public class KeyValueNode : ActionNode
 {
     public KeyValueNode(string alias)
-        : base(AcceptsMethod, ActMethod)
+        : base(ActionImpl)
     {
         this.Alias = alias;
     }
 
     public string Alias { get; }
 
-    public Func<ActionNode, TextToken, IParsingResult, bool> AdditionalCheck { get; set; }
-
-    private static bool AcceptsMethod(ActionNode node, ILexicalToken token, IParsingResult parsingResult)
-    {
-        var thisNode = (KeyValueNode)node;
-        if (token is TextToken textToken)
-        {
-            return thisNode.AdditionalCheck?.Invoke(node, textToken, parsingResult) ?? true;
-        }
-
-        return false;
-    }
-
-    private static void ActMethod(ActionNode node, ILexicalToken token, IParsingResult parsingResult)
+    private static void ActionImpl(ActionNode node, ILexicalToken token, IParsingResult parsingResult)
     {
         var thisNode = (KeyValueNode)node;
         var cliParsingResult = (CliParsingResult)parsingResult;
 
         cliParsingResult.AddKeyValue(thisNode.Alias, token.ToString());
+    }
+
+    protected override bool AcceptsTokenImpl(ILexicalToken token, IParsingResult parsingResult)
+    {
+        return token is TextToken;
     }
 }

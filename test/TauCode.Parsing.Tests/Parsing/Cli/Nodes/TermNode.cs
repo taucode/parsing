@@ -8,26 +8,24 @@ public class TermNode : ActionNode
 {
     public TermNode(
         string term)
-        : base(AcceptsMethod, ActMethod)
+        : base(ActionImpl)
     {
         this.Term = term;
     }
 
     public string Term { get; }
 
-    private static bool AcceptsMethod(ActionNode node, ILexicalToken token, IParsingResult parsingResult)
+    protected override bool AcceptsTokenImpl(ILexicalToken token, IParsingResult parsingResult)
     {
-        var thisNode = (TermNode)node;
-
         if (token is CliWordToken cliWordToken)
         {
-            return cliWordToken.Text == thisNode.Term;
+            return cliWordToken.Text == this.Term;
         }
 
         return false;
     }
 
-    private static void ActMethod(ActionNode node, ILexicalToken token, IParsingResult parsingResult)
+    private static void ActionImpl(ActionNode node, ILexicalToken token, IParsingResult parsingResult)
     {
         var cliResult = (CliParsingResult)parsingResult;
         var thisNode = (TermNode)node;

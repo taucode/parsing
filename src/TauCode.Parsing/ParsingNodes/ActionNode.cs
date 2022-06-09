@@ -5,16 +5,16 @@ namespace TauCode.Parsing.ParsingNodes
     public abstract class ActionNode : ParsingNodeBase
     {
         protected ActionNode(
-            Action<ActionNode, ILexicalToken, IParsingResult> actCallback)
+            Action<ActionNode, ILexicalToken, IParsingResult> action)
         {
-            this.ActCallback = actCallback;
+            this.Action = action;
         }
 
-        public Action<ActionNode, ILexicalToken, IParsingResult> ActCallback { get; set; }
+        public Action<ActionNode, ILexicalToken, IParsingResult> Action { get; set; }
 
         protected override void ActImpl(ILexicalToken token, IParsingResult parsingResult)
         {
-            this.ActCallback(this, token, parsingResult);
+            this.Action(this, token, parsingResult);
         }
     }
 }

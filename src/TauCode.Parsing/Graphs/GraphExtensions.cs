@@ -12,7 +12,6 @@ namespace TauCode.Parsing.Graphs
         public static IPartMold ResolvePath(this IPartMold partMold, string path)
         {
             // todo checks
-
             if (path.StartsWith("/"))
             {
                 throw new NotImplementedException();

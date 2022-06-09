@@ -4,11 +4,54 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using TauCode.Data.Graphs;
+using TauCode.Extensions;
 
 namespace TauCode.Parsing.Tests
 {
     internal static class Helper
     {
+        private static readonly HashSet<char> StandardPunctuationChars;
+
+        static Helper()
+        {
+            var punctList = new List<char>();
+            punctList.AddRange(new[]
+            {
+                '~',
+                '?',
+                '!',
+                '@',
+                '#',
+                '$',
+                '%',
+                '^',
+                '&',
+                '=',
+                '*',
+                '|',
+                '/',
+                '+',
+                '-',
+                '[',
+                ']',
+                '(',
+                ')',
+                '{',
+                '}',
+                '\\',
+                '.',
+                ',',
+                '"',
+                '\'',
+                ':',
+                ';',
+                '`',
+            });
+            StandardPunctuationChars = new HashSet<char>(punctList);
+
+
+        }
+
         internal static string PrintGraph(this IGraph graph)
         {
             var sb = new StringBuilder();
@@ -114,5 +157,13 @@ namespace TauCode.Parsing.Tests
         {
             return c >= '0' && c <= '9';
         }
+
+        internal static bool IsInlineWhiteSpaceOrCaretControl(this char c) => IsInlineWhiteSpace(c) || IsCaretControl(c);
+
+        internal static bool IsStandardPunctuationChar(this char c) => StandardPunctuationChars.Contains(c);
+
+        internal static bool IsInlineWhiteSpace(this char c) => c.IsIn(' ', '\t');
+
+        internal static bool IsCaretControl(this char c) => c.IsIn('\r', '\n');
     }
 }

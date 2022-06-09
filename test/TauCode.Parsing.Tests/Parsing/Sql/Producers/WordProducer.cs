@@ -1,27 +1,20 @@
-﻿using TauCode.Parsing.Lexing;
-using TauCode.Parsing.TextClasses;
-using TauCode.Parsing.TextDecorations;
-using TauCode.Parsing.Tokens;
+﻿using TauCode.Parsing.LexicalTokens;
 
 namespace TauCode.Parsing.Tests.Parsing.Sql.Producers
 {
-    public class WordProducer : ITokenProducer
+    public class WordProducer : ILexicalTokenProducer
     {
-        public LexingContext Context { get; set; }
-
-        public IToken Produce()
+        public ILexicalToken Produce(LexingContext context)
         {
-            var context = this.Context;
-            var text = context.Text;
+            var text = context.Input.Span;
             var length = text.Length;
 
-            var c = text[context.Index];
+            var c = text[context.Position];
 
-            if (LexingHelper.IsLatinLetter(c) || c == '_')
+            if (c.IsLatinLetterInternal() || c == '_')
             {
-                var initialIndex = context.Index;
+                var initialIndex = context.Position;
                 var index = initialIndex + 1;
-                var column = context.Column + 1;
 
                 while (true)
                 {
@@ -33,16 +26,15 @@ namespace TauCode.Parsing.Tests.Parsing.Sql.Producers
                     c = text[index];
 
                     if (
-                        LexingHelper.IsInlineWhiteSpaceOrCaretControl(c) ||
-                        LexingHelper.IsStandardPunctuationChar(c))
+                        c.IsInlineWhiteSpaceOrCaretControl() ||
+                        c.IsStandardPunctuationChar())
                     {
                         break;
                     }
 
-                    if (c == '_' || LexingHelper.IsLatinLetter(c) || LexingHelper.IsDigit(c))
+                    if (c == '_' || c.IsLatinLetterInternal() || c.IsDecimalDigit())
                     {
                         index++;
-                        column++;
 
                         continue;
                     }
@@ -51,15 +43,14 @@ namespace TauCode.Parsing.Tests.Parsing.Sql.Producers
                 }
 
                 var delta = index - initialIndex;
-                var str = text.Substring(initialIndex, delta);
+                var str = text.Slice(initialIndex, delta).ToString();
 
-                context.Advance(delta, 0, column);
+                context.Position += delta;
 
-                return new TextToken(
-                    WordTextClass.Instance,
-                    NoneTextDecoration.Instance,
-                    str,
-                    new Position(context.Line, column), delta);
+                return new WordToken(
+                    initialIndex,
+                    delta,
+                    str);
             }
 
             return null;

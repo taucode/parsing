@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using TauCode.Parsing.Exceptions;
 using TauCode.Parsing.LexicalTokens;
-using TauCode.Parsing.Tests.Parsing.Sql.TextClasses;
 
 namespace TauCode.Parsing.Tests.Parsing.Sql.Producers
 {

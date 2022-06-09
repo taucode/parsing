@@ -3,22 +3,21 @@ using System.Collections.Generic;
 
 namespace TauCode.Parsing.Graphs.Molds.Impl
 {
-    public abstract class PartMoldBase : IPartMold
+    public abstract class PartMoldBase : ScriptElementMoldBase, IPartMold
     {
         #region ctor
 
         protected PartMoldBase(IGroupMold owner)
-        {
-            this.Owner = owner;
+            : base(owner)
+        {   
         }
 
         #endregion
 
         #region IGraphPartMold Members
 
-        public IGroupMold Owner { get; }
-        public string Name { get; set; }
-        public IDictionary<string, object> Properties { get; } = new Dictionary<string, object>();
+        public abstract string GetFullPath();
+
         public bool IsEntrance { get; set; }
         public bool IsExit { get; set; }
         public abstract IVertexMold Entrance { get; internal set; }

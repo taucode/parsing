@@ -25,9 +25,9 @@ namespace TauCode.Parsing.Graphs.Reading.Impl
         private readonly ILexer _lexer;
         private readonly ITinyLispPseudoReader _lispReader;
 
-        private readonly IElementReader _sequenceReader;
-        private readonly IElementReader _splitterReader;
-        private readonly IElementReader _vertexReader;
+        private readonly IScriptElementReader _sequenceReader;
+        private readonly IScriptElementReader _splitterReader;
+        private readonly IScriptElementReader _vertexReader;
 
         #endregion
 
@@ -53,7 +53,7 @@ namespace TauCode.Parsing.Graphs.Reading.Impl
 
         #region IGraphScriptReader Members
 
-        public virtual IElementReader ResolveElementReader(Atom car)
+        public virtual IScriptElementReader ResolveElementReader(Atom car)
         {
             if (car is Symbol symbol)
             {

@@ -8,7 +8,10 @@ namespace TauCode.Parsing.Graphs.Molds.Impl
     {
         #region Fields
 
-        private readonly List<IPartMold> _parts;
+        private readonly List<IScriptElementMold> _scriptElements;
+
+        private Lazy<IVertexMold> _entrance;
+        private Lazy<IVertexMold> _exit;
 
         #endregion
 
@@ -17,49 +20,51 @@ namespace TauCode.Parsing.Graphs.Molds.Impl
         public GroupMold(IGroupMold owner)
             : base(owner)
         {
-            _parts = new List<IPartMold>();
+            _scriptElements = new List<IScriptElementMold>();
         }
 
         #endregion
 
         #region IGroupMold Members
 
-        public string FullPath
-        {
-            get
-            {
-                if (this.Owner == null)
-                {
-                    if (this.Name == null)
-                    {
-                        return null;
-                    }
-                    else
-                    {
-                        return $"/{this.Name}/";
-                    }
-                }
-
-                var ownerFullPath = this.Owner.FullPath;
-                if (ownerFullPath == null)
-                {
-                    return null;
-                }
-
-                return $"{ownerFullPath}{this.Name}/";
-            }
-        }
-
-        public IReadOnlyList<IPartMold> Content => _parts;
-        public void Add(IPartMold part)
+        public IReadOnlyList<IScriptElementMold> Content => _scriptElements;
+        public void Add(IScriptElementMold scriptElement)
         {
             // todo checks
-            _parts.Add(part);
+            _scriptElements.Add(scriptElement);
         }
 
         #endregion
 
+        #region Overridden
+
+        public override string GetFullPath()
+        {
+            if (this.Owner == null)
+            {
+                if (this.Name == null)
+                {
+                    return null;
+                }
+                else
+                {
+                    return $"/{this.Name}/";
+                }
+            }
+
+            var ownerFullPath = this.Owner.GetFullPath();
+            if (ownerFullPath == null)
+            {
+                return null;
+            }
+
+            return $"{ownerFullPath}{this.Name}/";
+        }
+
         public override IVertexMold Entrance { get; internal set; }
+
         public override IVertexMold Exit { get; internal set; }
+
+        #endregion
     }
 }

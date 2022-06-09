@@ -4,10 +4,8 @@ namespace TauCode.Parsing.Graphs.Molds
 {
     public interface IGroupMold : IPartMold
     {
-        string FullPath { get; }
+        IReadOnlyList<IScriptElementMold> Content { get; }
 
-        IReadOnlyList<IPartMold> Content { get; }
-
-        void Add(IPartMold part);
+        void Add(IScriptElementMold scriptElementMold);
     }
 }

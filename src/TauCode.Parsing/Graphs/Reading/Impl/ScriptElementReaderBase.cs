@@ -7,20 +7,21 @@ using TauCode.Parsing.TinyLisp.Data;
 
 namespace TauCode.Parsing.Graphs.Reading.Impl
 {
-    public abstract class ElementReaderBase : IElementReader
+    // todo regions, clean
+    public abstract class ScriptElementReaderBase : IScriptElementReader
     {
-        protected ElementReaderBase(IGraphScriptReader scriptReader)
+        protected ScriptElementReaderBase(IGraphScriptReader scriptReader)
         {
             this.ScriptReader = scriptReader ?? throw new ArgumentNullException(nameof(scriptReader));
         }
 
-        protected abstract IPartMold CreatePartMold(IGroupMold owner);
+        protected abstract IScriptElementMold CreateScriptElementMold(IGroupMold owner);
 
-        protected abstract void ReadContent(Element element, IPartMold partMold);
+        protected abstract void ReadContent(Element element, IScriptElementMold scriptElementMold);
 
-        protected abstract void ValidateResult(Element element, IPartMold partMold);
+        protected abstract void ValidateResult(Element element, IScriptElementMold scriptElementMold);
 
-        protected virtual void ReadKeywordValues(Element element, IPartMold partMold)
+        protected virtual void ReadKeywordValues(Element element, IScriptElementMold scriptElementMold)
         {
             var keywordValues = element.GetAllKeywordArguments();
 
@@ -31,16 +32,16 @@ namespace TauCode.Parsing.Graphs.Reading.Impl
 
                 if (keyword.Name.StartsWith(":@"))
                 {
-                    this.AddProperty(partMold, keyword.Name, keywordValue);
+                    this.AddProperty(scriptElementMold, keyword.Name, keywordValue);
                 }
                 else
                 {
-                    this.ProcessBasicKeyword(partMold, keyword.Name, keywordValue);
+                    this.ProcessBasicKeyword(scriptElementMold, keyword.Name, keywordValue);
                 }
             }
         }
 
-        private void AddProperty(IPartMold partMold, string keywordName, Element keywordValue)
+        private void AddProperty(IScriptElementMold scriptElementMold, string keywordName, Element keywordValue)
         {
             var dictionaryKey = keywordName.Substring(2);
             object dictionaryValue;
@@ -81,7 +82,7 @@ namespace TauCode.Parsing.Graphs.Reading.Impl
                 throw new NotImplementedException();
             }
 
-            partMold.Properties.Add(dictionaryKey, dictionaryValue);
+            scriptElementMold.Properties.Add(dictionaryKey, dictionaryValue);
         }
 
         protected static List<string> PseudoListToStringList(Element element)
@@ -100,14 +101,17 @@ namespace TauCode.Parsing.Graphs.Reading.Impl
             throw new NotImplementedException();
         }
 
-        protected virtual void ProcessBasicKeyword(IPartMold partMold, string keywordName, Element keywordValue)
+        protected virtual void ProcessBasicKeyword(
+            IScriptElementMold scriptElementMold,
+            string keywordName,
+            Element keywordValue)
         {
             switch (keywordName)
             {
                 case ":NAME":
                     if (keywordValue is StringAtom stringAtom)
                     {
-                        partMold.Name = stringAtom.Value;
+                        scriptElementMold.Name = stringAtom.Value;
                     }
                     else
                     {
@@ -116,11 +120,27 @@ namespace TauCode.Parsing.Graphs.Reading.Impl
                     break;
 
                 case ":IS-ENTRANCE":
-                    partMold.IsEntrance = keywordValue.ToBool();
+                    if (scriptElementMold is IPartMold partMold1)
+                    {
+                        partMold1.IsEntrance = keywordValue.ToBool();
+                    }
+                    else
+                    {
+                        throw new NotImplementedException();
+                    }
+
                     break;
 
                 case ":IS-EXIT":
-                    partMold.IsExit = keywordValue.ToBool();
+                    if (scriptElementMold is IPartMold partMold2)
+                    {
+                        partMold2.IsExit = keywordValue.ToBool();
+                    }
+                    else
+                    {
+                        throw new NotImplementedException();
+                    }
+
                     break;
 
                 default:
@@ -130,15 +150,15 @@ namespace TauCode.Parsing.Graphs.Reading.Impl
 
         public IGraphScriptReader ScriptReader { get; }
 
-        public IPartMold Read(IGroupMold owner, Element element)
+        public IScriptElementMold Read(IGroupMold owner, Element element)
         {
-            var partMold = this.CreatePartMold(owner);
+            var scriptElementMold = this.CreateScriptElementMold(owner);
 
-            this.ReadKeywordValues(element, partMold);
-            this.ReadContent(element, partMold);
-            this.ValidateResult(element, partMold);
+            this.ReadKeywordValues(element, scriptElementMold);
+            this.ReadContent(element, scriptElementMold);
+            this.ValidateResult(element, scriptElementMold);
 
-            return partMold;
+            return scriptElementMold;
         }
     }
 }

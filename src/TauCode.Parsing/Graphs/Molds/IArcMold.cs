@@ -1,6 +1,8 @@
-﻿namespace TauCode.Parsing.Graphs.Molds
+﻿using System;
+
+namespace TauCode.Parsing.Graphs.Molds
 {
-    public interface IArcMold
+    public interface IArcMold : IScriptElementMold
     {
         IVertexMold Tail { get; set; }
         string TailPath { get; set; }

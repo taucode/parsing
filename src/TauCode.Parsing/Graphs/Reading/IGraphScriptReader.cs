@@ -6,7 +6,7 @@ namespace TauCode.Parsing.Graphs.Reading
 {
     public interface IGraphScriptReader
     {
-        IElementReader ResolveElementReader(Atom car);
+        IScriptElementReader ResolveElementReader(Atom car);
         IGroupMold ReadScript(ReadOnlyMemory<char> script);
     }
 }

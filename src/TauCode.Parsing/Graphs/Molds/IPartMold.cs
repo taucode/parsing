@@ -1,12 +1,11 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 namespace TauCode.Parsing.Graphs.Molds
 {
-    public interface IPartMold
+    public interface IPartMold : IScriptElementMold
     {
-        IGroupMold Owner { get; }
-        string Name { get; set; }
-        IDictionary<string, object> Properties { get; }
+        string GetFullPath();
 
         /// <summary>
         /// When true, this part is the entrance for its owner group.

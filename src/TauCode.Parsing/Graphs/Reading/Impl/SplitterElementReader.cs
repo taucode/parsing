@@ -1,10 +1,13 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using TauCode.Parsing.Graphs.Molds;
 using TauCode.Parsing.Graphs.Molds.Impl;
 using TauCode.Parsing.TinyLisp.Data;
 
 namespace TauCode.Parsing.Graphs.Reading.Impl
 {
+    // todo clean, regions
     public class SplitterElementReader : GroupElementReader
     {
         public SplitterElementReader(IGraphScriptReader scriptReader)
@@ -12,33 +15,39 @@ namespace TauCode.Parsing.Graphs.Reading.Impl
         {
         }
 
-        protected override void ValidateResult(Element element, IPartMold partMold)
+        protected override void ValidateResult(Element element, IScriptElementMold scriptElementMold)
         {
-            var groupMold = (GroupMold)partMold;
+            var groupMold = (GroupMold)scriptElementMold;
 
-            if (groupMold.Content.Count < 2)
+            var innerParts = groupMold
+                .Content
+                .Where(x => x is IPartMold)
+                .Cast<PartMoldBase>() // todo can throw
+                .ToList();
+
+            if (innerParts.Count < 2)
             {
-                throw new NotImplementedException(); // splitter must have at lease two nodes: root + some other
+                throw new NotImplementedException("error: splitter must have at lease two nodes: root + some other");
             }
 
-            if (!(groupMold.Content[0] is VertexMold splitterRoot))
+            if (!(innerParts[0] is VertexMold splitterRoot))
             {
-                throw new NotImplementedException();
+                throw new NotImplementedException("error: first element in splitter must be a vertex");
             }
 
             if (!splitterRoot.IsEntrance)
             {
-                throw new NotImplementedException();
+                throw new NotImplementedException("error: first element in splitter must be entrance.");
             }
 
-            var choiceCount = groupMold.Content.Count - 1; // emitting root
+            var choiceCount = innerParts.Count - 1; // emitting root
 
-            var last = groupMold.Content[^1];
+            var last = innerParts[^1];
             IVertexMold exitVertex = null;
 
             if (last.IsExit)
             {
-                if (groupMold.Content.Count < 3)
+                if (innerParts.Count < 3)
                 {
                     throw new NotImplementedException();
                 }
@@ -57,7 +66,7 @@ namespace TauCode.Parsing.Graphs.Reading.Impl
             for (var i = 0; i < choiceCount; i++)
             {
                 var index = i + 1;
-                var innerPart = groupMold.Content[index];
+                var innerPart = innerParts[index];
 
                 if (innerPart.IsEntrance)
                 {

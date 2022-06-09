@@ -2,7 +2,7 @@
 
 namespace TauCode.Parsing.Graphs.Molds.Impl
 {
-    public class ArcMold : IArcMold
+    public class ArcMold : ScriptElementMoldBase, IArcMold
     {
         #region Fields
 
@@ -11,6 +11,15 @@ namespace TauCode.Parsing.Graphs.Molds.Impl
 
         private IVertexMold _head;
         private string _headPath;
+
+        #endregion
+
+        #region ctor
+
+        public ArcMold(IGroupMold owner)
+            : base(owner)
+        {
+        }
 
         #endregion
 

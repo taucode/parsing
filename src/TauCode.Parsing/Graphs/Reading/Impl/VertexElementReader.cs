@@ -5,14 +5,14 @@ using TauCode.Parsing.TinyLisp.Data;
 
 namespace TauCode.Parsing.Graphs.Reading.Impl
 {
-    public class VertexElementReader : ElementReaderBase
+    public class VertexElementReader : ScriptElementReaderBase
     {
         public VertexElementReader(IGraphScriptReader scriptReader)
             : base(scriptReader)
         {
         }
 
-        protected override IPartMold CreatePartMold(IGroupMold owner)
+        protected override IScriptElementMold CreateScriptElementMold(IGroupMold owner)
         {
             if (owner == null)
             {
@@ -22,9 +22,12 @@ namespace TauCode.Parsing.Graphs.Reading.Impl
             return new VertexMold(owner);
         }
 
-        protected override void ProcessBasicKeyword(IPartMold partMold, string keywordName, Element keywordValue)
+        protected override void ProcessBasicKeyword(
+            IScriptElementMold scriptElementMold,
+            string keywordName,
+            Element keywordValue)
         {
-            var vertexMold = (VertexMold)partMold;
+            var vertexMold = (VertexMold)scriptElementMold;
 
             switch (keywordName)
             {
@@ -43,17 +46,17 @@ namespace TauCode.Parsing.Graphs.Reading.Impl
                     break;
 
                 default:
-                    base.ProcessBasicKeyword(partMold, keywordName, keywordValue);
+                    base.ProcessBasicKeyword(scriptElementMold, keywordName, keywordValue);
                     break;
             }
         }
 
-        protected override void ReadContent(Element element, IPartMold partMold)
+        protected override void ReadContent(Element element, IScriptElementMold scriptElementMold)
         {
             // idle: vertex does not have content.
         }
 
-        protected override void ValidateResult(Element element, IPartMold partMold)
+        protected override void ValidateResult(Element element, IScriptElementMold scriptElementMold)
         {
             // idle.
         }

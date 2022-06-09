@@ -6,25 +6,32 @@ using TauCode.Parsing.TinyLisp.Data;
 
 namespace TauCode.Parsing.Graphs.Reading.Impl
 {
-    public class GroupElementReader : ElementReaderBase
+    // todo clean, regions
+    public class GroupElementReader : ScriptElementReaderBase
     {
         public GroupElementReader(IGraphScriptReader scriptReader)
             : base(scriptReader)
         {
         }
 
-        protected override IPartMold CreatePartMold(IGroupMold owner)
+        protected override IScriptElementMold CreateScriptElementMold(IGroupMold owner)
         {
-            IPartMold result = new GroupMold(owner);
-            return result;
+            IScriptElementMold scriptElementMold = new GroupMold(owner);
+            return scriptElementMold;
         }
 
-        protected override void ReadContent(Element element, IPartMold partMold)
+        //protected override IPartMold CreatePartMold(IGroupMold owner)
+        //{
+        //    IPartMold result = new GroupMold(owner);
+        //    return result;
+        //}
+
+        protected override void ReadContent(Element element, IScriptElementMold scriptElementMold)
         {
             var pseudoList = (PseudoList)element; // todo: can throw?
 
             var content = pseudoList.GetFreeArguments();
-            var groupMold = (IGroupMold)partMold; // todo: can throw?
+            var groupMold = (IGroupMold)scriptElementMold; // todo: can throw?
 
             foreach (var contentElement in content)
             {
@@ -44,7 +51,7 @@ namespace TauCode.Parsing.Graphs.Reading.Impl
             }
         }
 
-        protected override void ValidateResult(Element element, IPartMold partMold)
+        protected override void ValidateResult(Element element, IScriptElementMold scriptElementMold)
         {
             // todo: idle?
         }

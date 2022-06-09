@@ -6,9 +6,9 @@ using TauCode.Parsing.TinyLisp.Data;
 
 namespace TauCode.Parsing.Graphs.Reading
 {
-    public interface IElementReader
+    public interface IScriptElementReader
     {
         IGraphScriptReader ScriptReader { get; }
-        IPartMold Read(IGroupMold owner, Element element);
+        IScriptElementMold Read(IGroupMold owner, Element element);
     }
 }

@@ -5,9 +5,13 @@ using System.Text;
 namespace TauCode.Parsing.Graphs.Molds.Impl
 {
     // todo: internal?
+    // todo clean, regions
     public class VertexMold : PartMoldBase, IVertexMold
     {
         #region Fields
+
+        //private readonly Lazy<IVertexMold> _entrance;
+        //private readonly Lazy<IVertexMold> _exit;
 
         private readonly List<IArcMold> _outgoingArcs;
         private readonly List<IArcMold> _incomingArcs;
@@ -24,6 +28,9 @@ namespace TauCode.Parsing.Graphs.Molds.Impl
                 throw new NotImplementedException();
             }
 
+            //_entrance = new Lazy<IVertexMold>(this);
+            //_exit = new Lazy<IVertexMold>(this);
+
             _outgoingArcs = new List<IArcMold>();
             _incomingArcs = new List<IArcMold>();
         }
@@ -31,6 +38,17 @@ namespace TauCode.Parsing.Graphs.Molds.Impl
         #endregion
 
         #region Overridden
+
+        public override string GetFullPath()
+        {
+            var ownerFullPath = this.Owner.GetFullPath();
+            if (ownerFullPath == null)
+            {
+                return null;
+            }
+
+            return $"{ownerFullPath}/{this.Name}";
+        }
 
         public override IVertexMold Entrance
         {
@@ -50,24 +68,10 @@ namespace TauCode.Parsing.Graphs.Molds.Impl
 
         public string Type { get; set; }
 
-        public string FullPath
-        {
-            get
-            {
-                var ownerFullPath = this.Owner.FullPath;
-                if (ownerFullPath == null)
-                {
-                    return null;
-                }
-
-                return $"{ownerFullPath}/{this.Name}";
-            }
-        }
-
         public IArcMold AddLinkTo(IVertexMold head)
         {
             // todo checks
-            var arcMold = new ArcMold
+            var arcMold = new ArcMold(this.Owner)
             {
                 Tail = this,
                 Head = head,
@@ -81,7 +85,7 @@ namespace TauCode.Parsing.Graphs.Molds.Impl
         {
             // todo checks
 
-            var arcMold = new ArcMold
+            var arcMold = new ArcMold(this.Owner)
             {
                 Tail = this,
                 HeadPath = headPath

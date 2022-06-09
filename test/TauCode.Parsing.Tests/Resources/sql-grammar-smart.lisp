@@ -1,165 +1,173 @@
-﻿(group :name "main"
+﻿(group
+	:name "main"
 
-	(splitter
+	(sequence
 		:name "create"
-		:is-top t
 
-		("CREATE" :is-entrance t)
-		(group-ref :name "../create-table/")
-		(group-ref :name "../create-index/")
-		(end :is-exit t)
+		("CREATE")
+
+		(alternatives
+			(group-ref :group-path "../../create-table/")
+			(group-ref :group-path "../../create-index/")
+		)
+
+		(end)
 	)
 
-	(sequence :name "create-table"
+	(sequence
+		:name "create-table"
+
 		("TABLE" :name "do-create-table")
 		(identifier :name "table-name")
 		("(")
 		(group-ref
-			:group-name "column-definition"
+			:group-path "../column-def/"
 			:name "column-definition-ref"
 			:links-to ("table-closing")
 		)
 		("," :links-to ("column-definition-ref"))
-		(group-ref
-			:group-name "constraint-definitions")
+		(group-ref :group-path "../constraint-definitions/")
 		(")" :name "table-closing")
 	)
 
-)
+	(sequence
+		:name "column-def"
 
-
-
-
-;===============================
-
-(defblock :name create :is-top t
-	(exact-text :classes word :value "CREATE")
-	(alt (block :ref create-table) (block :ref create-index))
-	(end)
-)
-
-; CREATE TABLE
-(defblock :name create-table
-	(exact-text :classes word :value "TABLE" :name do-create-table)
-	(some-text :classes identifier :name table-name)
-	(exact-punctuation :value "(")
-	(block :ref column-def :links table-closing next)
-	(exact-punctuation :value "," :links column-def next)
-	(block :ref constraint-defs)
-	(exact-punctuation :value ")" :name table-closing)
-)
-
-; column definition
-(defblock :name column-def
-	(some-text :classes identifier :name column-name)
-	(some-text :classes identifier :name type-name)
-	(opt 
-		(exact-punctuation :value "(")
-		(some-integer :name precision)
-		(opt
-			(exact-punctuation :value ",")
-			(some-integer :name scale)
+		(identifier :name "column-name")
+		(identifier :name "type-name")
+		(optional
+			("(")
+			(integer :name "precision")
+			(optional
+				(",")
+				(integer :name "scale")
+			)
+			(")")
 		)
-		(exact-punctuation :value ")")
-	)
-	(opt
-		(alt
-			(exact-text :classes word :value "NULL" :name null)
-			(seq
-				(exact-text :classes word :value "NOT")
-				(exact-text :classes word :value "NULL" :name not-null)
+		(optional
+			(alternatives
+				("NULL" :name "null")
+				(sequence
+					("NOT")
+					("NULL" :name "not-null")
+				)
+			)
+		)
+		(optional
+			("PRIMARY")
+			("KEY" :name "inline-primary-key")
+		)
+		(optional
+			("DEFAULT")
+			(alternatives
+				("NULL" :name "default-null")
+				(integer :name "default-integer")
+				(string :name "default-string")
 			)
 		)
 	)
-	(opt
-		(exact-text :classes word :value "PRIMARY")
-		(exact-text :classes word :value "KEY" :name inline-primary-key)
-	)
-	(opt
-		(exact-text :classes word :value "DEFAULT")
-		(alt
-			(exact-text :classes word :value "NULL" :name default-null)
-			(some-integer :name default-integer)
-			(some-text :classes string :name default-string)
+
+	(sequence
+		:name "constraint-defs"
+
+		("CONSTRAINT" :name "constraint")
+		(identifier :name "constraint-name")
+		(alternatives
+			(group-ref :group-path "../../primary-key/")
+			(group-ref :group-path "../../foreign-key/")
+		)
+		(splitter
+			(idle :is-entrance t)
+
+			(exact-punctuation :value "," :links-to "constraint")
+			(idle) ;;;;;; NB: _not_ joint! :is-exit is nil here.
 		)
 	)
-)
 
-; constraint definitions
-(defblock :name constraint-defs
-	(exact-text :classes word :value "CONSTRAINT" :name constraint)
-	(some-text :classes identifier :name constraint-name)
-	(alt (block :ref primary-key) (block :ref foreign-key))
-	(alt
-		(exact-punctuation :value "," :links constraint)
-		(idle)
+	(sequence
+		:name "primary-key"
+
+		("PRIMARY" :name do-primary-key)
+		("KEY")
+		(group-ref :group-path "../pk-columns/")
 	)
-)
 
-; PRIMARY KEY
-(defblock :name primary-key
-	(exact-text :classes word :value "PRIMARY" :name do-primary-key)
-	(exact-text :classes word :value "KEY")
-	(block :ref pk-columns)
-)
+	(sequence
+		:name "pk-columns"
 
-; PRIMARY KEY columns
-(defblock :name pk-columns
-	(exact-punctuation :value "(")
-	(some-text :classes identifier :name pk-column-name)
-	(opt (multi-text :classes word :values "ASC" "DESC" :name pk-asc-or-desc))
-	(alt
-		(exact-punctuation :value "," :links pk-column-name)
-		(idle)
+		("(")
+		(identifier :name "pk-column-name")
+		(optional
+			(multi-text :values ("ASC" "DESC") :name "pk-asc-or-desc")
+		)
+		(splitter
+			(idle :is-entrance t)
+
+			(exact-punctuation :value "," :links pk-column-name)
+			(idle) ;;;;;; NB: _not_ joint! :is-exit is nil here.
+		)
+		(")")
 	)
-	(exact-punctuation :value ")")
-)
 
-; FOREIGN KEY
-(defblock :name foreign-key
-	(exact-text :classes word :value "FOREIGN" :name do-foreign-key)
-	(exact-text :classes word :value "KEY")
-	(block :ref fk-columns)
-	(exact-text :classes word :value "REFERENCES")
-	(some-text :classes identifier :name fk-referenced-table-name)
-	(block :ref fk-referenced-columns)
-)
+	(sequence
+		:name foreign-key
 
-; FOREIGN KEY columns
-(defblock :name fk-columns
-	(exact-punctuation :value "(")
-	(some-text :classes identifier :name fk-column-name)
-	(alt
-		(exact-punctuation :value "," :links fk-column-name)
-		(idle)
+		("FOREIGN" :name do-foreign-key)
+		("KEY")
+		(group-ref :group-path "../fk-columns/")
+		("REFERENCES")
+		(identifier :name "fk-referenced-table-name")
+		(group-ref :group-path "../fk-referenced-columns/")
 	)
-	(exact-punctuation :value ")")
-)
 
-; FOREIGN KEY referenced columns
-(defblock :name fk-referenced-columns
-	(exact-punctuation :value "(")
-	(some-text :classes identifier :name fk-referenced-column-name)
-	(alt
-		(exact-punctuation :value "," :links fk-referenced-column-name)
-		(idle)
-	)
-	(exact-punctuation :value ")")
-)
+	(sequence
+		:name fk-columns
 
-; CREATE INDEX
-(defblock :name create-index
-	(opt (exact-text :classes word :value "UNIQUE" :name do-create-unique-index))
-	(exact-text :classes word :value "INDEX" :name do-create-index)
-	(some-text :classes identifier :name index-name)
-	(exact-text :classes word :value "ON")
-	(some-text :classes identifier :name index-table-name)
-	(exact-punctuation :value "(")
-	(some-text :classes identifier :name index-column-name)
-	(opt (multi-text :classes word :values "ASC" "DESC" :name index-column-asc-or-desc))
-	(alt
-		(exact-punctuation :value "," :links index-column-name)
-		(idle)
+		("(")
+		(identifier :name fk-column-name)
+		(splitter
+			(idle :is-entrance t)
+
+			("," :links-to "../fk-column-name")
+			(idle) ;;;;;; NB: _not_ joint! :is-exit is nil here.
+		)
+		(")")
 	)
-	(exact-punctuation :value ")")
+
+	(sequence
+		:name "fk-referenced-columns"
+
+		("(")
+		(identifier :name fk-referenced-column-name)
+		(splitter
+			(idle :is-entrance t)
+
+			("," :links-to ("../fk-referenced-column-name"))
+			(idle) ;;;;;; NB: _not_ joint! :is-exit is nil here.
+		)
+		(exact-punctuation :value ")")
+	)
+
+	(sequence
+		:name "create-index"
+
+		(optional
+			("UNIQUE" :name "do-create-unique-index")
+		)
+		("INDEX" :name "do-create-index")
+		(identifier :name "index-name")
+		("ON")
+		(identifier :name "index-table-name")
+		("(")
+		(identifier :name "index-column-name")
+		(optional
+			(multi-text :values ("ASC" "DESC") :name "index-column-asc-or-desc"))
+		(splitter
+			(idle :is-entrance t)
+
+			(:value "," :links-to ("../index-column-name"))
+			(idle) ;;;;;; NB: _not_ joint! :is-exit is nil here.
+		)
+		(")")
+	)
 )

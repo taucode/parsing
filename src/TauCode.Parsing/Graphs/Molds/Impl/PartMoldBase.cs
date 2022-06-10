@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using TauCode.Parsing.TinyLisp.Data;
 
 namespace TauCode.Parsing.Graphs.Molds.Impl
 {
@@ -7,8 +8,8 @@ namespace TauCode.Parsing.Graphs.Molds.Impl
     {
         #region ctor
 
-        protected PartMoldBase(IGroupMold owner)
-            : base(owner)
+        protected PartMoldBase(IGroupMold owner, Atom car)
+            : base(owner, car)
         {   
         }
 

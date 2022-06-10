@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using TauCode.Parsing.TinyLisp.Data;
 
 namespace TauCode.Parsing.Graphs.Molds.Impl
 {
@@ -17,8 +18,8 @@ namespace TauCode.Parsing.Graphs.Molds.Impl
 
         #region ctor
 
-        public GroupMold(IGroupMold owner)
-            : base(owner)
+        public GroupMold(IGroupMold owner, Atom car)
+            : base(owner, car)
         {
             _scriptElements = new List<IScriptElementMold>();
         }

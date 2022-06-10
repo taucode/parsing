@@ -389,6 +389,7 @@ namespace TauCode.Parsing.TinyLisp
             return result;
         }
 
+        // todo: GetCar<TElement>() where TElement : Element
         public static Element GetCar(this Element shouldBePseudoList)
         {
             // todo checks

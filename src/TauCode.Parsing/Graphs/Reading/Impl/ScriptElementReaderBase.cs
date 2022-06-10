@@ -15,7 +15,7 @@ namespace TauCode.Parsing.Graphs.Reading.Impl
             this.ScriptReader = scriptReader ?? throw new ArgumentNullException(nameof(scriptReader));
         }
 
-        protected abstract IScriptElementMold CreateScriptElementMold(IGroupMold owner);
+        protected abstract IScriptElementMold CreateScriptElementMold(IGroupMold owner, Element element);
 
         protected abstract void ReadContent(Element element, IScriptElementMold scriptElementMold);
 
@@ -82,7 +82,7 @@ namespace TauCode.Parsing.Graphs.Reading.Impl
                 throw new NotImplementedException();
             }
 
-            scriptElementMold.Properties.Add(dictionaryKey, dictionaryValue);
+            scriptElementMold.KeywordValues.Add(dictionaryKey, dictionaryValue);
         }
 
         protected static List<string> PseudoListToStringList(Element element)
@@ -152,7 +152,7 @@ namespace TauCode.Parsing.Graphs.Reading.Impl
 
         public IScriptElementMold Read(IGroupMold owner, Element element)
         {
-            var scriptElementMold = this.CreateScriptElementMold(owner);
+            var scriptElementMold = this.CreateScriptElementMold(owner, element);
 
             this.ReadKeywordValues(element, scriptElementMold);
             this.ReadContent(element, scriptElementMold);

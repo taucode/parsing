@@ -1,6 +1,7 @@
 ﻿using System;
 using TauCode.Parsing.Graphs.Molds;
 using TauCode.Parsing.Graphs.Molds.Impl;
+using TauCode.Parsing.TinyLisp;
 using TauCode.Parsing.TinyLisp.Data;
 
 namespace TauCode.Parsing.Graphs.Reading.Impl
@@ -12,14 +13,14 @@ namespace TauCode.Parsing.Graphs.Reading.Impl
         {
         }
 
-        protected override IScriptElementMold CreateScriptElementMold(IGroupMold owner)
+        protected override IScriptElementMold CreateScriptElementMold(IGroupMold owner, Element element)
         {
             if (owner == null)
             {
                 throw new NotImplementedException(); // todo: owner of vertex cannot be null
             }
 
-            return new VertexMold(owner);
+            return new VertexMold(owner, (Atom)element.GetCar());
         }
 
         protected internal override void ProcessBasicKeyword(

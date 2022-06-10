@@ -35,20 +35,19 @@ public class CliVertexFactory : IVertexFactory
         switch (vertexMold.Type)
         {
             case "term":
-                var term = (string)vertexMold.Properties["TERM"];
+                var term = (string)vertexMold.KeywordValues["TERM"];
                 result = new TermNode(term);
                 break;
-                
 
             case "key":
-                var keyValues = (List<string>)vertexMold.Properties["KEYS"];
-                alias = (string)vertexMold.Properties["ALIAS"];
-                var isUnique = (bool)vertexMold.Properties["IS-UNIQUE"];
+                var keyValues = (List<string>)vertexMold.KeywordValues["KEYS"]; // todo: don't emit ':'
+                alias = (string)vertexMold.KeywordValues["ALIAS"];
+                var isUnique = (bool)vertexMold.KeywordValues["IS-UNIQUE"];
                 result = new KeyNode(keyValues, alias, isUnique);
                 break;
 
             case "key-value":
-                alias = (string)vertexMold.Properties["ALIAS"];
+                alias = (string)vertexMold.KeywordValues["ALIAS"];
                 result = new KeyValueNode(alias);
                 break;
 

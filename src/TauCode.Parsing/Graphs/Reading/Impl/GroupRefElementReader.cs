@@ -18,7 +18,7 @@ namespace TauCode.Parsing.Graphs.Reading.Impl
             _vertexElementReader = new VertexElementReader(scriptReader);
         }
 
-        protected override IScriptElementMold CreateScriptElementMold(IGroupMold owner)
+        protected override IScriptElementMold CreateScriptElementMold(IGroupMold owner, Element element)
         {
             IScriptElementMold scriptElementMold = new GroupRefMold(owner);
             return scriptElementMold;

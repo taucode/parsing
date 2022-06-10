@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using TauCode.Parsing.TinyLisp.Data;
 
 namespace TauCode.Parsing.Graphs.Molds.Impl
 {
@@ -8,7 +9,7 @@ namespace TauCode.Parsing.Graphs.Molds.Impl
     public sealed class GroupRefEntranceVertexResolver : VertexMold
     {
         public GroupRefEntranceVertexResolver(IGroupRefMold keeper)
-            : base(UnknownGroupMold.Instance)
+            : base(UnknownGroupMold.Instance, Nil.Instance)
         {
             this.Keeper = keeper ?? throw new ArgumentNullException(nameof(keeper));
         }
@@ -17,7 +18,7 @@ namespace TauCode.Parsing.Graphs.Molds.Impl
 
         #region Overridden (ScriptElementMoldBase)
 
-        public override IDictionary<string, object> Properties => throw new NotImplementedException("error: invalid operation");
+        public override IDictionary<string, object> KeywordValues => throw new NotImplementedException("error: invalid operation");
 
         #endregion
 

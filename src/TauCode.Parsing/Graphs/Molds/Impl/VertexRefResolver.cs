@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using TauCode.Parsing.TinyLisp.Data;
 
 namespace TauCode.Parsing.Graphs.Molds.Impl
 {
@@ -8,13 +9,13 @@ namespace TauCode.Parsing.Graphs.Molds.Impl
     public sealed class VertexRefResolver : VertexMold
     {
         public VertexRefResolver(IGroupMold owner)
-            : base(owner)
+            : base(owner, Symbol.Create("VERTEX-REF"))
         {
         }
 
         #region Overridden (ScriptElementMoldBase)
 
-        public override IDictionary<string, object> Properties => throw new NotImplementedException("error: invalid operation");
+        public override IDictionary<string, object> KeywordValues => throw new NotImplementedException("error: invalid operation");
 
         #endregion
 

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using TauCode.Parsing.TinyLisp.Data;
 
 namespace TauCode.Parsing.Graphs.Molds.Impl
 {
@@ -11,7 +12,7 @@ namespace TauCode.Parsing.Graphs.Molds.Impl
         private readonly GroupRefExitVertexResolver _exit;
 
         public GroupRefMold(IGroupMold owner)
-            : base(owner)
+            : base(owner, Symbol.Create("GROUP-REF"))
         {
             _entrance = new GroupRefEntranceVertexResolver(this);
             _exit = new GroupRefExitVertexResolver(this);

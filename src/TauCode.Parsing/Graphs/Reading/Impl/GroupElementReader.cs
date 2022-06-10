@@ -14,9 +14,9 @@ namespace TauCode.Parsing.Graphs.Reading.Impl
         {
         }
 
-        protected override IScriptElementMold CreateScriptElementMold(IGroupMold owner)
+        protected override IScriptElementMold CreateScriptElementMold(IGroupMold owner, Element element)
         {
-            IScriptElementMold scriptElementMold = new GroupMold(owner);
+            IScriptElementMold scriptElementMold = new GroupMold(owner, (Atom)element.GetCar()); // todo can throw
             return scriptElementMold;
         }
 
@@ -31,7 +31,7 @@ namespace TauCode.Parsing.Graphs.Reading.Impl
             var pseudoList = (PseudoList)element; // todo: can throw?
 
             var content = pseudoList.GetFreeArguments();
-            var groupMold = (IGroupMold)scriptElementMold; // todo: can throw?
+            var groupMold = (GroupMold)scriptElementMold; // todo: can throw?
 
             foreach (var contentElement in content)
             {

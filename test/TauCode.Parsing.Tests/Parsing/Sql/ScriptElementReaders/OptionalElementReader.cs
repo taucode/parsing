@@ -55,15 +55,8 @@ public class OptionalElementReader : GroupElementReader
             throw new NotImplementedException("error: optional content must have exit.");
         }
 
-        var optionalEntrance = new VertexMold(groupMold)
-        {
-            Type = "idle"
-        };
-
-        var optionalExit = new VertexMold(groupMold)
-        {
-            Type = "idle"
-        };
+        var optionalEntrance = new VertexMold(groupMold, Symbol.Create("idle"));
+        var optionalExit = new VertexMold(groupMold, Symbol.Create("idle"));
 
         optionalEntrance.AddLinkTo(innerPartMold.Entrance);
         optionalEntrance.AddLinkTo(optionalExit);

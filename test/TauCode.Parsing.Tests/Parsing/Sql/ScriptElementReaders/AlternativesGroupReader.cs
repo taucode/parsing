@@ -22,18 +22,12 @@ public class AlternativesGroupReader : GroupElementReader
     {
         var alternativesGroupMold = (GroupMold)scriptElementMold;
 
-        var entrance = new VertexMold(alternativesGroupMold)
-        {
-            Type = "idle",
-        };
+        var entrance = new VertexMold(alternativesGroupMold, Symbol.Create("idle"));
         alternativesGroupMold.Add(entrance);
 
         base.ReadContent(element, alternativesGroupMold);
 
-        var exit = new VertexMold(alternativesGroupMold)
-        {
-            Type = "idle",
-        };
+        var exit = new VertexMold(alternativesGroupMold, Symbol.Create("idle"));
         alternativesGroupMold.Add(exit);
 
         for (var i = 1; i < alternativesGroupMold.Content.Count - 2; i++)

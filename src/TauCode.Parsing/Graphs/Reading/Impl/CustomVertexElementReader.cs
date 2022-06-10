@@ -9,21 +9,21 @@ namespace TauCode.Parsing.Graphs.Reading.Impl
     {
         public CustomVertexElementReader(
             IGraphScriptReader scriptReader,
-            IReadOnlyDictionary<string, string> initialProperties)
+            IReadOnlyDictionary<string, string> initialKeywordValues)
             : base(scriptReader)
         {
             // todo checks
-            this.InitialProperties = initialProperties;
+            this.InitialKeywordValues = initialKeywordValues;
         }
 
-        public IReadOnlyDictionary<string, string> InitialProperties { get; }
+        public IReadOnlyDictionary<string, string> InitialKeywordValues { get; }
 
-        protected override IScriptElementMold CreateScriptElementMold(IGroupMold owner)
+        protected override IScriptElementMold CreateScriptElementMold(IGroupMold owner, Element element)
         {
-            var scriptElementMold = base.CreateScriptElementMold(owner);
-            foreach (var pair in this.InitialProperties)
+            var scriptElementMold = base.CreateScriptElementMold(owner, element);
+            foreach (var pair in this.InitialKeywordValues)
             {
-                scriptElementMold.Properties.Add(pair.Key, pair.Value);
+                scriptElementMold.KeywordValues.Add(pair.Key, pair.Value);
             }
 
             return scriptElementMold;
@@ -35,7 +35,7 @@ namespace TauCode.Parsing.Graphs.Reading.Impl
             string keywordName,
             Element keywordValue)
         {
-            if (this.InitialProperties.ContainsKey(keywordName))
+            if (this.InitialKeywordValues.ContainsKey(keywordName))
             {
                 throw new NotImplementedException($"error: '{keywordName}' is contained in initial props.");
             }

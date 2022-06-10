@@ -20,8 +20,8 @@ namespace TauCode.Parsing.Graphs.Molds.Impl
 
         public bool IsEntrance { get; set; }
         public bool IsExit { get; set; }
-        public abstract IVertexMold Entrance { get; internal set; }
-        public abstract IVertexMold Exit { get; internal set; }
+        public abstract IVertexMold Entrance { get; set; }
+        public abstract IVertexMold Exit { get; set; }
 
         #endregion
     }

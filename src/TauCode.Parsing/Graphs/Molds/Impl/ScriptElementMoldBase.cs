@@ -13,6 +13,6 @@ namespace TauCode.Parsing.Graphs.Molds.Impl
 
         public IGroupMold Owner { get; }
         public string Name { get; set; }
-        public IDictionary<string, object> Properties { get; } = new Dictionary<string, object>();
+        public virtual IDictionary<string, object> Properties { get; } = new Dictionary<string, object>();
     }
 }

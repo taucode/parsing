@@ -61,9 +61,9 @@ namespace TauCode.Parsing.Graphs.Molds.Impl
             return $"{ownerFullPath}{this.Name}/";
         }
 
-        public override IVertexMold Entrance { get; internal set; }
+        public override IVertexMold Entrance { get; set; }
 
-        public override IVertexMold Exit { get; internal set; }
+        public override IVertexMold Exit { get; set; }
 
         #endregion
     }

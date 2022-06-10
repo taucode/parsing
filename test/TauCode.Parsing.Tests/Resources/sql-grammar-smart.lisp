@@ -7,6 +7,8 @@
 		("CREATE")
 
 		(alternatives
+			:name "create-alternatives"
+
 			(group-ref :group-path "../../create-table/")
 			(group-ref :group-path "../../create-index/")
 		)

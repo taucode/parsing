@@ -53,22 +53,22 @@ namespace TauCode.Parsing.Graphs.Molds.Impl
         public override IVertexMold Entrance
         {
             get => this;
-            internal set => throw new InvalidOperationException();
+            set => throw new InvalidOperationException();
         }
 
         public override IVertexMold Exit
         {
             get => this;
-            internal set => throw new InvalidOperationException();
+            set => throw new InvalidOperationException();
         }
 
         #endregion
 
         #region IVertexMold Members
 
-        public string Type { get; set; }
+        public virtual string Type { get; set; }
 
-        public IArcMold AddLinkTo(IVertexMold head)
+        public virtual IArcMold AddLinkTo(IVertexMold head)
         {
             // todo checks
             var arcMold = new ArcMold(this.Owner)
@@ -81,7 +81,7 @@ namespace TauCode.Parsing.Graphs.Molds.Impl
             return arcMold;
         }
 
-        public IArcMold AddLinkTo(string headPath)
+        public virtual IArcMold AddLinkTo(string headPath)
         {
             // todo checks
 
@@ -96,12 +96,12 @@ namespace TauCode.Parsing.Graphs.Molds.Impl
             return arcMold;
         }
 
-        public IArcMold AddLinkFrom(IVertexMold tail)
+        public virtual IArcMold AddLinkFrom(IVertexMold tail)
         {
             throw new System.NotImplementedException();
         }
 
-        public IArcMold AddLinkFrom(string tailPath)
+        public virtual IArcMold AddLinkFrom(string tailPath)
         {
             throw new System.NotImplementedException();
         }

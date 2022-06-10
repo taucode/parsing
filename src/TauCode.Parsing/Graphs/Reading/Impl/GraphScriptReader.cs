@@ -25,9 +25,11 @@ namespace TauCode.Parsing.Graphs.Reading.Impl
         private readonly ILexer _lexer;
         private readonly ITinyLispPseudoReader _lispReader;
 
+        private readonly IScriptElementReader _groupReader;
         private readonly IScriptElementReader _sequenceReader;
         private readonly IScriptElementReader _splitterReader;
         private readonly IScriptElementReader _vertexReader;
+        private readonly IScriptElementReader _groupRefReader;
 
         #endregion
 
@@ -38,9 +40,11 @@ namespace TauCode.Parsing.Graphs.Reading.Impl
             _lexer = new TinyLispLexer();
             _lispReader = new TinyLispPseudoReader();
 
+            _groupReader = new GroupElementReader(this);
             _sequenceReader = new SequenceElementReader(this);
             _splitterReader = new SplitterElementReader(this);
             _vertexReader = new VertexElementReader(this);
+            _groupRefReader = new GroupRefElementReader(this);
         }
 
         #endregion
@@ -59,6 +63,9 @@ namespace TauCode.Parsing.Graphs.Reading.Impl
             {
                 switch (symbol.Name)
                 {
+                    case "GROUP":
+                        return _groupReader;
+
                     case "SEQUENCE":
                         return _sequenceReader;
 
@@ -67,6 +74,9 @@ namespace TauCode.Parsing.Graphs.Reading.Impl
 
                     case "VERTEX":
                         return _vertexReader;
+
+                    case "GROUP-REF":
+                        return _groupRefReader;
 
                     default:
                         throw new NotImplementedException();

@@ -1,25 +1,24 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Text;
 using TauCode.Parsing.Graphs.Molds;
 using TauCode.Parsing.Graphs.Molds.Impl;
 using TauCode.Parsing.TinyLisp.Data;
 
+// todo regions, clean
 namespace TauCode.Parsing.Graphs.Reading.Impl
 {
-    public class VertexElementReader : ScriptElementReaderBase
+    public class GroupRefElementReader : ScriptElementReaderBase
     {
-        public VertexElementReader(IGraphScriptReader scriptReader)
+        public GroupRefElementReader(IGraphScriptReader scriptReader)
             : base(scriptReader)
         {
         }
 
         protected override IScriptElementMold CreateScriptElementMold(IGroupMold owner)
         {
-            if (owner == null)
-            {
-                throw new NotImplementedException(); // todo: owner of vertex cannot be null
-            }
-
-            return new VertexMold(owner);
+            IScriptElementMold scriptElementMold = new GroupRefMold(owner);
+            return scriptElementMold;
         }
 
         protected override void ProcessBasicKeyword(
@@ -27,29 +26,30 @@ namespace TauCode.Parsing.Graphs.Reading.Impl
             string keywordName,
             Element keywordValue)
         {
-            var vertexMold = (VertexMold)scriptElementMold;
+            var groupRefMold = (GroupRefMold)scriptElementMold;
 
             switch (keywordName)
             {
-                case ":TYPE":
+                case ":GROUP-PATH":
                     var stringAtom = (StringAtom)keywordValue; // todo can throw
-                    vertexMold.Type = stringAtom.Value;
+                    groupRefMold.ReferencedGroupPath = stringAtom.Value;
                     break;
 
-                case ":LINKS-TO":
-                    var linksTo = PseudoListToStringList(keywordValue); // todo can throw
-                    foreach (var linkTo in linksTo)
-                    {
-                        vertexMold.AddLinkTo(linkTo);
-                    }
+                //case ":LINKS-TO":
+                //    var linksTo = PseudoListToStringList(keywordValue);
+                //    foreach (var linkTo in linksTo)
+                //    {
+                //        vertexMold.AddLinkTo(linkTo);
+                //    }
 
-                    break;
+                //    break;
 
                 default:
                     base.ProcessBasicKeyword(scriptElementMold, keywordName, keywordValue);
                     break;
             }
         }
+
 
         protected override void ReadContent(Element element, IScriptElementMold scriptElementMold)
         {

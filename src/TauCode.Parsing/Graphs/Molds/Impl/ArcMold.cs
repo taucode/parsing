@@ -1,4 +1,5 @@
 ﻿using System;
+using TauCode.Parsing.TinyLisp.Data;
 
 namespace TauCode.Parsing.Graphs.Molds.Impl
 {
@@ -16,8 +17,13 @@ namespace TauCode.Parsing.Graphs.Molds.Impl
 
         #region ctor
 
+        public ArcMold(IGroupMold owner, Atom car)
+            : base(owner, car)
+        {
+        }
+
         public ArcMold(IGroupMold owner)
-            : base(owner)
+            : base(owner, Symbol.Create("arc"))
         {
         }
 

@@ -101,7 +101,7 @@ namespace TauCode.Parsing.Graphs.Reading.Impl
             throw new NotImplementedException();
         }
 
-        protected virtual void ProcessBasicKeyword(
+        protected internal virtual void ProcessBasicKeyword(
             IScriptElementMold scriptElementMold,
             string keywordName,
             Element keywordValue)
@@ -115,7 +115,7 @@ namespace TauCode.Parsing.Graphs.Reading.Impl
                     }
                     else
                     {
-                        throw new NotImplementedException();
+                        throw new NotImplementedException("error: script element name must be of type StringAtom.");
                     }
                     break;
 

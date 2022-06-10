@@ -29,7 +29,8 @@ namespace TauCode.Parsing.Graphs.Reading.Impl
             return scriptElementMold;
         }
 
-        protected override void ProcessBasicKeyword(
+        // todo: protected internal - not very good. better consider public (or internal) static methods extracting things like ":LINKS-TO" etc.
+        protected internal override void ProcessBasicKeyword(
             IScriptElementMold scriptElementMold,
             string keywordName,
             Element keywordValue)

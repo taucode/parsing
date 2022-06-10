@@ -3,9 +3,9 @@
 
 //namespace TauCode.Parsing.Tests.Parsing.Sql.ScriptElementReaders;
 
-//public class PunctuationVertexReader : VertexElementReader
+//public class IdentifierVertexReader : VertexElementReader
 //{
-//    public PunctuationVertexReader(IGraphScriptReader scriptReader)
+//    public IdentifierVertexReader(IGraphScriptReader scriptReader)
 //        : base(scriptReader)
 //    {
 //    }

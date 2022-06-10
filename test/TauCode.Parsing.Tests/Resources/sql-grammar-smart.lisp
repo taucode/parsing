@@ -38,13 +38,17 @@
 		(identifier :name "column-name")
 		(identifier :name "type-name")
 		(optional
-			("(")
-			(integer :name "precision")
-			(optional
-				(",")
-				(integer :name "scale")
+			(sequence
+				("(")
+				(integer :name "precision")
+				(optional
+					(sequence
+						(",")
+						(integer :name "scale")
+					)
+				)
+				(")")
 			)
-			(")")
 		)
 		(optional
 			(alternatives
@@ -56,15 +60,19 @@
 			)
 		)
 		(optional
-			("PRIMARY")
-			("KEY" :name "inline-primary-key")
+			(sequence
+				("PRIMARY")
+				("KEY" :name "inline-primary-key")
+			)
 		)
 		(optional
-			("DEFAULT")
-			(alternatives
-				("NULL" :name "default-null")
-				(integer :name "default-integer")
-				(string :name "default-string")
+			(sequence
+				("DEFAULT")
+				(alternatives
+					("NULL" :name "default-null")
+					(integer :name "default-integer")
+					(string :name "default-string")
+				)
 			)
 		)
 	)
@@ -81,7 +89,7 @@
 		(splitter
 			(idle :is-entrance t)
 
-			(exact-punctuation :value "," :links-to "constraint")
+			("," :links-to ("constraint"))
 			(idle) ;;;;;; NB: _not_ joint! :is-exit is nil here.
 		)
 	)
@@ -89,7 +97,7 @@
 	(sequence
 		:name "primary-key"
 
-		("PRIMARY" :name do-primary-key)
+		("PRIMARY" :name "do-primary-key")
 		("KEY")
 		(group-ref :group-path "../pk-columns/")
 	)
@@ -100,12 +108,13 @@
 		("(")
 		(identifier :name "pk-column-name")
 		(optional
-			(multi-text :values ("ASC" "DESC") :name "pk-asc-or-desc")
+			(multi-text :@values ("ASC" "DESC") :name "pk-asc-or-desc")
 		)
 		(splitter
-			(idle :is-entrance t)
+			:name "more-pk-columns"
 
-			(exact-punctuation :value "," :links pk-column-name)
+			(idle :is-entrance t)
+			("," :links-to ("pk-column-name"))
 			(idle) ;;;;;; NB: _not_ joint! :is-exit is nil here.
 		)
 		(")")

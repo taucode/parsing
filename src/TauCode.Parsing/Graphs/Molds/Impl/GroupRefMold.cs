@@ -13,7 +13,8 @@ namespace TauCode.Parsing.Graphs.Molds.Impl
         public GroupRefMold(IGroupMold owner)
             : base(owner)
         {
-            _entrance = new GroupRefEntranceVertexResolver();
+            _entrance = new GroupRefEntranceVertexResolver(this);
+            _exit = new GroupRefExitVertexResolver(this);
         }
 
         public override string GetFullPath()
@@ -23,26 +24,14 @@ namespace TauCode.Parsing.Graphs.Molds.Impl
 
         public override IVertexMold Entrance
         {
-            get
-            {
-                throw new NotImplementedException();
-            }
-            set
-            {
-                throw new NotImplementedException();
-            }
+            get => _entrance;
+            set => throw new NotImplementedException("error: invalid operation");
         }
 
         public override IVertexMold Exit
         {
-            get
-            {
-                throw new NotImplementedException();
-            }
-            set
-            {
-                throw new NotImplementedException();
-            }
+            get => _exit;
+            set => throw new NotImplementedException("error: invalid operation");
         }
 
         public string ReferencedGroupPath { get; set; }

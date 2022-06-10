@@ -7,10 +7,13 @@ namespace TauCode.Parsing.Graphs.Molds.Impl
     // todo: internal?
     public sealed class GroupRefEntranceVertexResolver : VertexMold
     {
-        public GroupRefEntranceVertexResolver(IGroupMold owner)
-            : base(owner)
+        public GroupRefEntranceVertexResolver(IGroupRefMold keeper)
+            : base(UnknownGroupMold.Instance)
         {
+            this.Keeper = keeper ?? throw new ArgumentNullException(nameof(keeper));
         }
+
+        public IGroupRefMold Keeper { get; }
 
         #region Overridden (ScriptElementMoldBase)
 

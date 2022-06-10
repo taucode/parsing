@@ -22,7 +22,7 @@ namespace TauCode.Parsing.Graphs.Reading.Impl
             return new VertexMold(owner);
         }
 
-        protected override void ProcessBasicKeyword(
+        protected internal override void ProcessBasicKeyword(
             IScriptElementMold scriptElementMold,
             string keywordName,
             Element keywordValue)

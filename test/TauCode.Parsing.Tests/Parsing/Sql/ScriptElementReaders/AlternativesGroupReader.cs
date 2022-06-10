@@ -28,7 +28,7 @@ public class AlternativesGroupReader : GroupElementReader
         };
         alternativesGroupMold.Add(entrance);
 
-        base.ReadContent(element, scriptElementMold);
+        base.ReadContent(element, alternativesGroupMold);
 
         var exit = new VertexMold(alternativesGroupMold)
         {
@@ -59,7 +59,5 @@ public class AlternativesGroupReader : GroupElementReader
 
         alternativesGroupMold.Entrance = entrance;
         alternativesGroupMold.Exit = exit;
-
-        throw new NotImplementedException();
     }
 }

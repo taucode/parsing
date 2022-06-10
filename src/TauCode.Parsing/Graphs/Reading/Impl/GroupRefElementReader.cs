@@ -10,9 +10,12 @@ namespace TauCode.Parsing.Graphs.Reading.Impl
 {
     public class GroupRefElementReader : ScriptElementReaderBase
     {
+        private readonly VertexElementReader _vertexElementReader;
+
         public GroupRefElementReader(IGraphScriptReader scriptReader)
             : base(scriptReader)
         {
+            _vertexElementReader = new VertexElementReader(scriptReader);
         }
 
         protected override IScriptElementMold CreateScriptElementMold(IGroupMold owner)
@@ -21,7 +24,7 @@ namespace TauCode.Parsing.Graphs.Reading.Impl
             return scriptElementMold;
         }
 
-        protected override void ProcessBasicKeyword(
+        protected internal override void ProcessBasicKeyword(
             IScriptElementMold scriptElementMold,
             string keywordName,
             Element keywordValue)
@@ -35,14 +38,19 @@ namespace TauCode.Parsing.Graphs.Reading.Impl
                     groupRefMold.ReferencedGroupPath = stringAtom.Value;
                     break;
 
-                //case ":LINKS-TO":
-                //    var linksTo = PseudoListToStringList(keywordValue);
-                //    foreach (var linkTo in linksTo)
-                //    {
-                //        vertexMold.AddLinkTo(linkTo);
-                //    }
+                case ":LINKS-TO":
+                    _vertexElementReader.ProcessBasicKeyword(
+                        groupRefMold.Exit,
+                        keywordName,
+                        keywordValue);
 
-                //    break;
+                    //var linksTo = PseudoListToStringList(keywordValue);
+                    //foreach (var linkTo in linksTo)
+                    //{
+                    //    vertexMold.AddLinkTo(linkTo);
+                    //}
+
+                    break;
 
                 default:
                     base.ProcessBasicKeyword(scriptElementMold, keywordName, keywordValue);

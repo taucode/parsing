@@ -8,6 +8,7 @@ namespace TauCode.Parsing.Graphs.Molds.Impl
     // todo regions
     public class GroupRefMold : PartMoldBase, IGroupRefMold
     {
+        private string _referencedGroupPath;
         private readonly GroupRefEntranceVertexResolver _entrance;
         private readonly GroupRefExitVertexResolver _exit;
 
@@ -23,18 +24,46 @@ namespace TauCode.Parsing.Graphs.Molds.Impl
             throw new NotImplementedException();
         }
 
-        public override IVertexMold Entrance
+        protected override IVertexMold GetEntranceVertexImpl() => _entrance;
+
+        protected override IVertexMold GetExitVertexImpl() => _exit;
+
+        public override void ProcessKeywords()
         {
-            get => _entrance;
-            set => throw new NotImplementedException("error: invalid operation");
+            base.ProcessKeywords();
+
+            _referencedGroupPath = (string)this.GetKeywordValue(":GROUP-PATH");
         }
 
-        public override IVertexMold Exit
+        //public override IVertexMold Entrance
+        //{
+        //    get => _entrance;
+        //    set => throw new NotImplementedException("error: invalid operation");
+        //}
+
+        //public override IVertexMold Exit
+        //{
+        //    get => _exit;
+        //    set => throw new NotImplementedException("error: invalid operation");
+        //}
+
+        //public string ReferencedGroupPath { get; set; }
+        protected override void ValidateAndFinalizeImpl()
         {
-            get => _exit;
-            set => throw new NotImplementedException("error: invalid operation");
+            if (this.ReferencedGroupPath == null)
+            {
+                throw new NotImplementedException("error: should be set.");
+            }
         }
 
-        public string ReferencedGroupPath { get; set; }
+        public string ReferencedGroupPath
+        {
+            get => _referencedGroupPath;
+            set
+            {
+                this.CheckNotFinalized();
+                _referencedGroupPath = value;
+            }
+        }
     }
 }

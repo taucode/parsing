@@ -3,6 +3,9 @@ using System;
 using System.Linq;
 using TauCode.Extensions;
 using TauCode.Parsing.Exceptions;
+using TauCode.Parsing.Graphs.Building;
+using TauCode.Parsing.Graphs.Building.Impl;
+using TauCode.Parsing.Graphs.Molds;
 using TauCode.Parsing.Graphs.Reading;
 using TauCode.Parsing.LexicalTokenProducers;
 using TauCode.Parsing.LexicalTokens;
@@ -54,7 +57,11 @@ namespace TauCode.Parsing.Tests.Parsing.Sql
             //var script = reader.Read(tokens);
 
             IGraphScriptReader scriptReader = new SqlGraphScriptReader();
-            var graph = scriptReader.ReadScript(input.AsMemory());
+            var graphMold = scriptReader.ReadScript(input.AsMemory());
+            var vertexFactory = new SqlVertexFactory();
+            IGraphBuilder graphBuilder = new GraphBuilder(vertexFactory);
+
+            var graph = graphBuilder.Build(graphMold.Linkables.Single() as IGroupMold);
 
             throw new NotImplementedException("go on!");
 

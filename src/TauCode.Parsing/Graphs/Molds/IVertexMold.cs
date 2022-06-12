@@ -3,9 +3,9 @@ using System.Collections.Generic;
 
 namespace TauCode.Parsing.Graphs.Molds
 {
-    public interface IVertexMold : IPartMold
+    public interface IVertexMold : ILinkableMold
     {
-        string Type { get; set; }
+        string TypeAlias { get; set; }
 
         IArcMold AddLinkTo(IVertexMold head);
         IArcMold AddLinkTo(string headPath);

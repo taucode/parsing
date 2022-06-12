@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using TauCode.Parsing.Graphs.Molds;
+using TauCode.Parsing.Graphs.Molds.Impl;
 using TauCode.Parsing.TinyLisp;
 using TauCode.Parsing.TinyLisp.Data;
 
@@ -17,33 +18,31 @@ namespace TauCode.Parsing.Graphs.Reading.Impl
 
         protected abstract IScriptElementMold CreateScriptElementMold(IGroupMold owner, Element element);
 
-        protected abstract void ReadContent(Element element, IScriptElementMold scriptElementMold);
-
-        protected abstract void ValidateResult(Element element, IScriptElementMold scriptElementMold);
-
-        protected virtual void ReadKeywordValues(Element element, IScriptElementMold scriptElementMold)
+        protected virtual void ReadKeywordValues(IScriptElementMold scriptElementMold, Element element)
         {
             var keywordValues = element.GetAllKeywordArguments();
 
-            foreach (var tuple in keywordValues)
+            foreach (var (_, keyword, keywordValue) in keywordValues)
             {
-                var keyword = tuple.Item2;
-                var keywordValue = tuple.Item3;
+                this.AddKeywordValue(scriptElementMold, keyword.Name, keywordValue);
 
-                if (keyword.Name.StartsWith(":@"))
-                {
-                    this.AddProperty(scriptElementMold, keyword.Name, keywordValue);
-                }
-                else
-                {
-                    this.ProcessBasicKeyword(scriptElementMold, keyword.Name, keywordValue);
-                }
+                //if (keyword.Name.StartsWith(":@"))
+                //{
+                //    this.AddProperty(scriptElementMold, keyword.Name, keywordValue);
+                //}
+                //else
+                //{
+                //    this.ProcessBasicKeyword(scriptElementMold, keyword.Name, keywordValue);
+                //}
             }
         }
 
-        private void AddProperty(IScriptElementMold scriptElementMold, string keywordName, Element keywordValue)
+        protected abstract void ReadContent(IScriptElementMold scriptElementMold, Element element);
+
+        //protected abstract void FinalizeMold(IScriptElementMold scriptElementMold, Element element);
+
+        private void AddKeywordValue(IScriptElementMold scriptElementMold, string keyword, Element keywordValue)
         {
-            var dictionaryKey = keywordName.Substring(2);
             object dictionaryValue;
             if (keywordValue is StringAtom stringAtom)
             {
@@ -82,8 +81,52 @@ namespace TauCode.Parsing.Graphs.Reading.Impl
                 throw new NotImplementedException();
             }
 
-            scriptElementMold.KeywordValues.Add(dictionaryKey, dictionaryValue);
+            scriptElementMold.SetKeywordValue(keyword, dictionaryValue);
         }
+
+        //private void AddProperty(IScriptElementMold scriptElementMold, string keywordName, Element keywordValue)
+        //{
+        //    var dictionaryKey = keywordName.Substring(2);
+        //    object dictionaryValue;
+        //    if (keywordValue is StringAtom stringAtom)
+        //    {
+        //        dictionaryValue = stringAtom.Value;
+        //    }
+        //    else if (keywordValue is True || keywordValue is Nil)
+        //    {
+        //        dictionaryValue = keywordValue.ToBool();
+        //    }
+        //    else if (keywordValue is PseudoList pseudoList)
+        //    {
+        //        if (pseudoList.Count == 0)
+        //        {
+        //            throw new NotImplementedException();
+        //        }
+        //        else
+        //        {
+        //            var first = pseudoList[0];
+
+        //            if (first is StringAtom)
+        //            {
+        //                dictionaryValue = PseudoListToStringList(pseudoList);
+        //            }
+        //            else if (first is Keyword)
+        //            {
+        //                throw new NotImplementedException();
+        //            }
+        //            else
+        //            {
+        //                throw new NotImplementedException();
+        //            }
+        //        }
+        //    }
+        //    else
+        //    {
+        //        throw new NotImplementedException();
+        //    }
+
+        //    scriptElementMold.KeywordValues.Add(dictionaryKey, dictionaryValue);
+        //}
 
         protected static List<string> PseudoListToStringList(Element element)
         {
@@ -96,57 +139,57 @@ namespace TauCode.Parsing.Graphs.Reading.Impl
                 .ToList();
         }
 
-        private bool IsPropertyKeyword(string keywordName)
-        {
-            throw new NotImplementedException();
-        }
+        //private bool IsPropertyKeyword(string keywordName)
+        //{
+        //    throw new NotImplementedException();
+        //}
 
-        protected internal virtual void ProcessBasicKeyword(
-            IScriptElementMold scriptElementMold,
-            string keywordName,
-            Element keywordValue)
-        {
-            switch (keywordName)
-            {
-                case ":NAME":
-                    if (keywordValue is StringAtom stringAtom)
-                    {
-                        scriptElementMold.Name = stringAtom.Value;
-                    }
-                    else
-                    {
-                        throw new NotImplementedException("error: script element name must be of type StringAtom.");
-                    }
-                    break;
+        //protected internal virtual void ProcessBasicKeyword(
+        //    IScriptElementMold scriptElementMold,
+        //    string keywordName,
+        //    Element keywordValue)
+        //{
+        //    switch (keywordName)
+        //    {
+        //        case ":NAME":
+        //            if (keywordValue is StringAtom stringAtom)
+        //            {
+        //                scriptElementMold.N-ame = stringAtom.Value;
+        //            }
+        //            else
+        //            {
+        //                throw new NotImplementedException("error: script element name must be of type StringAtom.");
+        //            }
+        //            break;
 
-                case ":IS-ENTRANCE":
-                    if (scriptElementMold is IPartMold partMold1)
-                    {
-                        partMold1.IsEntrance = keywordValue.ToBool();
-                    }
-                    else
-                    {
-                        throw new NotImplementedException();
-                    }
+        //        case ":IS-ENTRANCE":
+        //            if (scriptElementMold is IPartMold partMold1)
+        //            {
+        //                partMold1.IsEntrance = keywordValue.ToBool();
+        //            }
+        //            else
+        //            {
+        //                throw new NotImplementedException();
+        //            }
 
-                    break;
+        //            break;
 
-                case ":IS-EXIT":
-                    if (scriptElementMold is IPartMold partMold2)
-                    {
-                        partMold2.IsExit = keywordValue.ToBool();
-                    }
-                    else
-                    {
-                        throw new NotImplementedException();
-                    }
+        //        case ":IS-EXIT":
+        //            if (scriptElementMold is IPartMold partMold2)
+        //            {
+        //                partMold2.IsExit = keywordValue.ToBool();
+        //            }
+        //            else
+        //            {
+        //                throw new NotImplementedException();
+        //            }
 
-                    break;
+        //            break;
 
-                default:
-                    throw new NotImplementedException();
-            }
-        }
+        //        default:
+        //            throw new NotImplementedException();
+        //    }
+        //}
 
         public IGraphScriptReader ScriptReader { get; }
 
@@ -154,11 +197,20 @@ namespace TauCode.Parsing.Graphs.Reading.Impl
         {
             var scriptElementMold = this.CreateScriptElementMold(owner, element);
 
-            this.ReadKeywordValues(element, scriptElementMold);
-            this.ReadContent(element, scriptElementMold);
-            this.ValidateResult(element, scriptElementMold);
+            ((ScriptElementMoldBase)scriptElementMold).LispElement = element;
+
+            this.ReadKeywordValues(scriptElementMold, element);
+            scriptElementMold.ProcessKeywords();
+            this.ReadContent(scriptElementMold, element);
+            this.CustomizeContent(scriptElementMold, element);
+
+            scriptElementMold.ValidateAndFinalize();
+
+            //this.FinalizeMold(scriptElementMold, element);
 
             return scriptElementMold;
         }
+
+        protected abstract void CustomizeContent(IScriptElementMold scriptElementMold, Element element);
     }
 }

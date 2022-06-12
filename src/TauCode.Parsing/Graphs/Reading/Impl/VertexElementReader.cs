@@ -23,43 +23,48 @@ namespace TauCode.Parsing.Graphs.Reading.Impl
             return new VertexMold(owner, (Atom)element.GetCar());
         }
 
-        protected internal override void ProcessBasicKeyword(
-            IScriptElementMold scriptElementMold,
-            string keywordName,
-            Element keywordValue)
-        {
-            var vertexMold = (VertexMold)scriptElementMold;
+        //protected internal override void ProcessBasicKeyword(
+        //    IScriptElementMold scriptElementMold,
+        //    string keywordName,
+        //    Element keywordValue)
+        //{
+        //    var vertexMold = (VertexMold)scriptElementMold;
 
-            switch (keywordName)
-            {
-                case ":TYPE":
-                    var stringAtom = (StringAtom)keywordValue; // todo can throw
-                    vertexMold.Type = stringAtom.Value;
-                    break;
+        //    switch (keywordName)
+        //    {
+        //        case ":TYPE":
+        //            var stringAtom = (StringAtom)keywordValue; // todo can throw
+        //            vertexMold.Type = stringAtom.Value;
+        //            break;
 
-                case ":LINKS-TO":
-                    var linksTo = PseudoListToStringList(keywordValue); // todo can throw
-                    foreach (var linkTo in linksTo)
-                    {
-                        vertexMold.AddLinkTo(linkTo);
-                    }
+        //        case ":LINKS-TO":
+        //            var linksTo = PseudoListToStringList(keywordValue); // todo can throw
+        //            foreach (var linkTo in linksTo)
+        //            {
+        //                vertexMold.AddLinkTo(linkTo);
+        //            }
 
-                    break;
+        //            break;
 
-                default:
-                    base.ProcessBasicKeyword(scriptElementMold, keywordName, keywordValue);
-                    break;
-            }
-        }
+        //        default:
+        //            base.ProcessBasicKeyword(scriptElementMold, keywordName, keywordValue);
+        //            break;
+        //    }
+        //}
 
-        protected override void ReadContent(Element element, IScriptElementMold scriptElementMold)
+        protected override void ReadContent(IScriptElementMold scriptElementMold, Element element)
         {
             // idle. todo: check that is no content
         }
 
-        protected override void ValidateResult(Element element, IScriptElementMold scriptElementMold)
+        protected override void CustomizeContent(IScriptElementMold scriptElementMold, Element element)
         {
             // idle.
         }
+
+        //protected override void FinalizeMold(IScriptElementMold scriptElementMold, Element element)
+        //{
+        //    // idle.
+        //}
     }
 }

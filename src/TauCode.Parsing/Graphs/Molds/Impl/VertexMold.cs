@@ -11,6 +11,8 @@ namespace TauCode.Parsing.Graphs.Molds.Impl
     {
         #region Fields
 
+        private string _typeAlias;
+
         //private readonly Lazy<IVertexMold> _entrance;
         //private readonly Lazy<IVertexMold> _exit;
 
@@ -42,6 +44,11 @@ namespace TauCode.Parsing.Graphs.Molds.Impl
 
         public override string GetFullPath()
         {
+            if (!this.IsFinalized)
+            {
+                throw new NotImplementedException("error: finalize to get Full path.");
+            }
+
             var ownerFullPath = this.Owner.GetFullPath();
             if (ownerFullPath == null)
             {
@@ -51,23 +58,53 @@ namespace TauCode.Parsing.Graphs.Molds.Impl
             return $"{ownerFullPath}/{this.Name}";
         }
 
-        public override IVertexMold Entrance
+        protected override IVertexMold GetEntranceVertexImpl() => this;
+
+        protected override IVertexMold GetExitVertexImpl() => this;
+
+        public override void ProcessKeywords()
         {
-            get => this;
-            set => throw new InvalidOperationException();
+            base.ProcessKeywords();
+            this.TypeAlias = (string)this.GetKeywordValue(":TYPE"); // todo: use GetKeywordValueAsString everywhere
+
+            var linksTo = (List<string>)this.GetKeywordValue(":LINKS-TO");
+            if (linksTo != null)
+            {
+                foreach (var link in linksTo)
+                {
+                    this.AddLinkTo(link);
+                }
+            }
         }
 
-        public override IVertexMold Exit
-        {
-            get => this;
-            set => throw new InvalidOperationException();
-        }
+        //public override IVertexMold Entrance
+        //{
+        //    get => this;
+        //    set => throw new InvalidOperationException();
+        //}
+
+        //public override IVertexMold Exit
+        //{
+        //    get => this;
+        //    set => throw new InvalidOperationException();
+        //}
 
         #endregion
 
         #region IVertexMold Members
 
-        public virtual string Type { get; set; }
+        //public virtual string Type { get; set; }
+
+
+        public virtual string TypeAlias
+        {
+            get => _typeAlias;
+            set
+            {
+                this.CheckNotFinalized();
+                _typeAlias = value;
+            }
+        }
 
         public virtual IArcMold AddLinkTo(IVertexMold head)
         {
@@ -89,7 +126,7 @@ namespace TauCode.Parsing.Graphs.Molds.Impl
             var arcMold = new ArcMold(this.Owner)
             {
                 Tail = this,
-                HeadPath = headPath
+                HeadPath = headPath,
             };
 
             _outgoingArcs.Add(arcMold);
@@ -111,5 +148,12 @@ namespace TauCode.Parsing.Graphs.Molds.Impl
         public IReadOnlyList<IArcMold> IncomingArcs => _incomingArcs;
 
         #endregion
+
+        //protected override void Validat-eAndFinalizeImpl()
+        //{
+        //    base.ValidateAndFinalizeImpl();
+
+        //    _typeAlias = (string)this.GetKeywordValue(":TYPE");
+        //}
     }
 }

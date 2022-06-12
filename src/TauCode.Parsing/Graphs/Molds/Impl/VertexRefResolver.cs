@@ -15,7 +15,7 @@ namespace TauCode.Parsing.Graphs.Molds.Impl
 
         #region Overridden (ScriptElementMoldBase)
 
-        public override IDictionary<string, object> KeywordValues => throw new NotImplementedException("error: invalid operation");
+        
 
         #endregion
 

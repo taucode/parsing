@@ -1,18 +1,21 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using TauCode.Parsing.TinyLisp.Data;
 
 namespace TauCode.Parsing.Graphs.Molds.Impl
 {
+    // todo: clean, regions
     public class GroupMold : PartMoldBase, IGroupMold
     {
         #region Fields
 
-        private readonly List<IScriptElementMold> _scriptElements;
+        private readonly List<IScriptElementMold> _allElements;
+        private readonly List<ILinkableMold> _linkables;
 
-        private Lazy<IVertexMold> _entrance;
-        private Lazy<IVertexMold> _exit;
+        private IVertexMold _entranceVertex;
+        private IVertexMold _exitVertex;
 
         #endregion
 
@@ -21,18 +24,57 @@ namespace TauCode.Parsing.Graphs.Molds.Impl
         public GroupMold(IGroupMold owner, Atom car)
             : base(owner, car)
         {
-            _scriptElements = new List<IScriptElementMold>();
+            _allElements = new List<IScriptElementMold>();
+            _linkables = new List<ILinkableMold>();
         }
 
         #endregion
 
         #region IGroupMold Members
 
-        public IReadOnlyList<IScriptElementMold> Content => _scriptElements;
+        public IReadOnlyList<IScriptElementMold> AllElements => _allElements;
+        public IReadOnlyList<ILinkableMold> Linkables => _linkables;
+
         public void Add(IScriptElementMold scriptElement)
         {
-            // todo checks
-            _scriptElements.Add(scriptElement);
+            if (scriptElement == null)
+            {
+                throw new ArgumentNullException(nameof(scriptElement));
+            }
+
+            this.CheckNotFinalized();
+
+            if (!scriptElement.IsFinalized)
+            {
+                throw new NotImplementedException("error: inner must be finalized.");
+            }
+
+            _allElements.Add(scriptElement);
+
+            if (scriptElement is ILinkableMold linkable)
+            {
+                _linkables.Add(linkable);
+
+                if (linkable.IsEntrance)
+                {
+                    if (_entranceVertex != null)
+                    {
+                        throw new NotImplementedException("error: more than one entrance");
+                    }
+
+                    _entranceVertex = linkable.GetEntranceVertex();
+                }
+
+                if (linkable.IsExit)
+                {
+                    if (_exitVertex != null)
+                    {
+                        throw new NotImplementedException("error: more than one exit");
+                    }
+
+                    _exitVertex = linkable.GetExitVertex();
+                }
+            }
         }
 
         #endregion
@@ -41,6 +83,8 @@ namespace TauCode.Parsing.Graphs.Molds.Impl
 
         public override string GetFullPath()
         {
+            this.CheckFinalized();
+
             if (this.Owner == null)
             {
                 if (this.Name == null)
@@ -62,10 +106,18 @@ namespace TauCode.Parsing.Graphs.Molds.Impl
             return $"{ownerFullPath}{this.Name}/";
         }
 
-        public override IVertexMold Entrance { get; set; }
+        protected override IVertexMold GetEntranceVertexImpl() => _entranceVertex;
 
-        public override IVertexMold Exit { get; set; }
+        protected override IVertexMold GetExitVertexImpl() => _exitVertex;
+
+        //public override IVertexMold Entrance { get; set; }
+
+        //public override IVertexMold Exit { get; set; }
 
         #endregion
+
+        //protected override void ValidateAndFinalizeImpl()
+        //{
+        //}
     }
 }

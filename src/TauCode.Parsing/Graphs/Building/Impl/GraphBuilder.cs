@@ -80,7 +80,7 @@ namespace TauCode.Parsing.Graphs.Building.Impl
 
         private void WriteVertices(IGroupMold group, List<IVertexMold> vertexMolds, List<IArcMold> arcMolds)
         {
-            foreach (var partMold in group.Content)
+            foreach (var partMold in group.AllElements)
             {
                 if (partMold is IVertexMold vertexMold)
                 {

@@ -18,26 +18,21 @@ namespace TauCode.Parsing.Graphs.Molds.Impl
 
         #region Overridden (ScriptElementMoldBase)
 
-        public override IDictionary<string, object> KeywordValues => throw new NotImplementedException("error: invalid operation");
-
         #endregion
 
         #region Overridden (PartMoldBase)
 
-        public override string GetFullPath()
+        public override string GetFullPath() => throw new NotImplementedException("error: invalid operation");
+
+        public override string TypeAlias
         {
-            throw new NotImplementedException("error: invalid operation");
+            get => throw new NotImplementedException("error: invalid operation");
+            set => throw new NotImplementedException("error: invalid operation");
         }
 
         #endregion
 
         #region Overridden (VertexMold)
-
-        public override string Type
-        {
-            get => throw new NotImplementedException("error: invalid operation");
-            set => throw new NotImplementedException("error: invalid operation");
-        }
 
         public override IArcMold AddLinkFrom(IVertexMold head)
         {

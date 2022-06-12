@@ -18,40 +18,81 @@ public class AlternativesGroupReader : GroupElementReader
     {
     }
 
-    protected override void ReadContent(Element element, IScriptElementMold scriptElementMold)
+    protected override void CustomizeContent(IScriptElementMold scriptElementMold, Element element)
     {
         var alternativesGroupMold = (GroupMold)scriptElementMold;
 
-        var entrance = new VertexMold(alternativesGroupMold, Symbol.Create("idle"));
+        var entrance = new VertexMold(alternativesGroupMold, Symbol.Create("idle"))
+        {
+            IsEntrance = true,
+        };
+        entrance.ValidateAndFinalize();
         alternativesGroupMold.Add(entrance);
 
-        base.ReadContent(element, alternativesGroupMold);
-
-        var exit = new VertexMold(alternativesGroupMold, Symbol.Create("idle"));
+        var exit = new VertexMold(alternativesGroupMold, Symbol.Create("idle"))
+        {
+            IsExit = true,
+        };
+        exit.ValidateAndFinalize();
         alternativesGroupMold.Add(exit);
 
-        for (var i = 1; i < alternativesGroupMold.Content.Count - 2; i++)
+        for (var i = 1; i < alternativesGroupMold.Linkables.Count - 2; i++)
         {
-            var innerScriptElement = alternativesGroupMold.Content[i];
-            if (innerScriptElement is IPartMold innerPartMold)
+            var innerLinkable = alternativesGroupMold.Linkables[i];
+            if (innerLinkable.GetEntranceVertex() == null)
             {
-                if (innerPartMold.Entrance == null)
-                {
-                    throw new NotImplementedException("error: in alternatives, all elements must have entrance.");
-                }
-
-                entrance.AddLinkTo(innerPartMold.Entrance);
-
-                if (innerPartMold.Exit == null)
-                {
-                    throw new NotImplementedException("error: in alternatives, all elements must have exit.");
-                }
-
-                innerPartMold.Exit.AddLinkTo(exit);
+                throw new NotImplementedException("error: in alternatives, all elements must have entrance.");
             }
+
+            entrance.AddLinkTo(innerLinkable.GetEntranceVertex());
+
+            if (innerLinkable.GetExitVertex() == null)
+            {
+                throw new NotImplementedException("error: in alternatives, all elements must have exit.");
+            }
+
+            innerLinkable.GetExitVertex().AddLinkTo(exit);
         }
 
-        alternativesGroupMold.Entrance = entrance;
-        alternativesGroupMold.Exit = exit;
+        //alternativesGroupMold.Entrance = entrance;
+        //alternativesGroupMold.Exit = exit;
+
     }
+
+    //protected override void ReadContent(Element element, IScriptElementMold scriptElementMold)
+    //{
+    //    var alternativesGroupMold = (GroupMold)scriptElementMold;
+
+    //    var entrance = new VertexMold(alternativesGroupMold, Symbol.Create("idle"));
+    //    alternativesGroupMold.Add(entrance);
+
+    //    base.ReadContent(element, alternativesGroupMold);
+
+    //    var exit = new VertexMold(alternativesGroupMold, Symbol.Create("idle"));
+    //    alternativesGroupMold.Add(exit);
+
+    //    for (var i = 1; i < alternativesGroupMold.AllElements.Count - 2; i++)
+    //    {
+    //        var innerScriptElement = alternativesGroupMold.AllElements[i];
+    //        if (innerScriptElement is IPartMold innerPartMold)
+    //        {
+    //            if (innerPartMold.Entrance == null)
+    //            {
+    //                throw new NotImplementedException("error: in alternatives, all elements must have entrance.");
+    //            }
+
+    //            entrance.AddLinkTo(innerPartMold.Entrance);
+
+    //            if (innerPartMold.Exit == null)
+    //            {
+    //                throw new NotImplementedException("error: in alternatives, all elements must have exit.");
+    //            }
+
+    //            innerPartMold.Exit.AddLinkTo(exit);
+    //        }
+    //    }
+
+    //    alternativesGroupMold.Entrance = entrance;
+    //    alternativesGroupMold.Exit = exit;
+    //}
 }

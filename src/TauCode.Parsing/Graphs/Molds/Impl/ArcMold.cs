@@ -3,13 +3,13 @@ using TauCode.Parsing.TinyLisp.Data;
 
 namespace TauCode.Parsing.Graphs.Molds.Impl
 {
+    // todo clean, regions
     public class ArcMold : ScriptElementMoldBase, IArcMold
     {
         #region Fields
 
         private IVertexMold _tail;
         private string _tailPath;
-
         private IVertexMold _head;
         private string _headPath;
 
@@ -36,11 +36,7 @@ namespace TauCode.Parsing.Graphs.Molds.Impl
             get => _tail;
             set
             {
-                if (_tailPath != null)
-                {
-                    throw new NotImplementedException();
-                }
-
+                this.CheckNotFinalized();
                 _tail = value;
             }
         }
@@ -50,11 +46,7 @@ namespace TauCode.Parsing.Graphs.Molds.Impl
             get => _tailPath;
             set
             {
-                if (_tail != null)
-                {
-                    throw new NotImplementedException();
-                }
-
+                this.CheckNotFinalized();
                 _tailPath = value;
             }
         }
@@ -64,11 +56,7 @@ namespace TauCode.Parsing.Graphs.Molds.Impl
             get => _head;
             set
             {
-                if (_headPath != null)
-                {
-                    throw new NotImplementedException();
-                }
-
+                this.CheckNotFinalized();
                 _head = value;
             }
         }
@@ -78,15 +66,16 @@ namespace TauCode.Parsing.Graphs.Molds.Impl
             get => _headPath;
             set
             {
-                if (_head != null)
-                {
-                    throw new NotImplementedException();
-                }
-
+                this.CheckNotFinalized();
                 _headPath = value;
             }
         }
 
         #endregion
+
+        protected override void ValidateAndFinalizeImpl()
+        {
+            throw new NotImplementedException("todo: check heads and tails");
+        }
     }
 }

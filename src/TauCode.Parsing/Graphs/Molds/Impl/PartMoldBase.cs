@@ -4,8 +4,12 @@ using TauCode.Parsing.TinyLisp.Data;
 
 namespace TauCode.Parsing.Graphs.Molds.Impl
 {
-    public abstract class PartMoldBase : ScriptElementMoldBase, IPartMold
+    // todo clean
+    public abstract class PartMoldBase : ScriptElementMoldBase, ILinkableMold
     {
+        private bool _isEntrance;
+        private bool _isExit;
+
         #region ctor
 
         protected PartMoldBase(IGroupMold owner, Atom car)
@@ -19,10 +23,56 @@ namespace TauCode.Parsing.Graphs.Molds.Impl
 
         public abstract string GetFullPath();
 
-        public bool IsEntrance { get; set; }
-        public bool IsExit { get; set; }
-        public abstract IVertexMold Entrance { get; set; }
-        public abstract IVertexMold Exit { get; set; }
+        public bool IsEntrance
+        {
+            get => _isEntrance;
+            set
+            {
+                this.CheckNotFinalized();
+                _isEntrance = value;
+            }
+        }
+
+        public bool IsExit
+        {
+            get => _isExit;
+            set
+            {
+                this.CheckNotFinalized();
+                _isExit = value;
+            }
+        }
+
+        public IVertexMold GetEntranceVertex()
+        {
+            this.CheckFinalized();
+
+            return this.GetEntranceVertexImpl();
+        }
+
+        protected abstract IVertexMold GetEntranceVertexImpl();
+
+        public IVertexMold GetExitVertex()
+        {
+            this.CheckFinalized();
+
+            return this.GetExitVertexImpl();
+        }
+
+        protected abstract IVertexMold GetExitVertexImpl();
+
+        public override void ProcessKeywords()
+        {
+            base.ProcessKeywords();
+
+            this.IsEntrance = this.GetKeywordValueAsBool(":IS-ENTRANCE");
+            this.IsExit = this.GetKeywordValueAsBool(":IS-EXIT");
+        }
+
+        //public bool IsEntrance { get; set; }
+        //public bool IsExit { get; set; }
+        //public abstract IVertexMold Entrance { get; set; }
+        //public abstract IVertexMold Exit { get; set; }
 
         #endregion
     }

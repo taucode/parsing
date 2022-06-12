@@ -24,49 +24,56 @@ namespace TauCode.Parsing.Graphs.Reading.Impl
             return scriptElementMold;
         }
 
-        protected internal override void ProcessBasicKeyword(
-            IScriptElementMold scriptElementMold,
-            string keywordName,
-            Element keywordValue)
-        {
-            var groupRefMold = (GroupRefMold)scriptElementMold;
+        //protected internal override void ProcessBasicKeyword(
+        //    IScriptElementMold scriptElementMold,
+        //    string keywordName,
+        //    Element keywordValue)
+        //{
+        //    var groupRefMold = (GroupRefMold)scriptElementMold;
 
-            switch (keywordName)
-            {
-                case ":GROUP-PATH":
-                    var stringAtom = (StringAtom)keywordValue; // todo can throw
-                    groupRefMold.ReferencedGroupPath = stringAtom.Value;
-                    break;
+        //    switch (keywordName)
+        //    {
+        //        case ":GROUP-PATH":
+        //            var stringAtom = (StringAtom)keywordValue; // todo can throw
+        //            groupRefMold.ReferencedGroupPath = stringAtom.Value;
+        //            break;
 
-                case ":LINKS-TO":
-                    _vertexElementReader.ProcessBasicKeyword(
-                        groupRefMold.Exit,
-                        keywordName,
-                        keywordValue);
+        //        case ":LINKS-TO":
+        //            _vertexElementReader.ProcessBasicKeyword(
+        //                groupRefMold.Exit,
+        //                keywordName,
+        //                keywordValue);
 
-                    //var linksTo = PseudoListToStringList(keywordValue);
-                    //foreach (var linkTo in linksTo)
-                    //{
-                    //    vertexMold.AddLinkTo(linkTo);
-                    //}
+        //            //var linksTo = PseudoListToStringList(keywordValue);
+        //            //foreach (var linkTo in linksTo)
+        //            //{
+        //            //    vertexMold.AddLinkTo(linkTo);
+        //            //}
 
-                    break;
+        //            break;
 
-                default:
-                    base.ProcessBasicKeyword(scriptElementMold, keywordName, keywordValue);
-                    break;
-            }
-        }
+        //        default:
+        //            base.ProcessBasicKeyword(scriptElementMold, keywordName, keywordValue);
+        //            break;
+        //    }
+        //}
+
+        
 
 
-        protected override void ReadContent(Element element, IScriptElementMold scriptElementMold)
+        protected override void ReadContent(IScriptElementMold scriptElementMold, Element element)
         {
             // idle. todo: check that is no content
         }
 
-        protected override void ValidateResult(Element element, IScriptElementMold scriptElementMold)
+        protected override void CustomizeContent(IScriptElementMold scriptElementMold, Element element)
         {
             // idle.
         }
+
+        //protected override void FinalizeMold(IScriptElementMold scriptElementMold, Element element)
+        //{
+        //    // idle.
+        //}
     }
 }

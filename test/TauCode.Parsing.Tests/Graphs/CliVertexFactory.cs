@@ -32,22 +32,22 @@ public class CliVertexFactory : IVertexFactory
         string alias;
         IParsingNode result;
 
-        switch (vertexMold.Type)
+        switch (vertexMold.TypeAlias)
         {
             case "term":
-                var term = (string)vertexMold.KeywordValues["TERM"];
+                var term = (string)vertexMold.GetKeywordValue(":TERM");
                 result = new TermNode(term);
                 break;
 
             case "key":
-                var keyValues = (List<string>)vertexMold.KeywordValues["KEYS"]; // todo: don't emit ':'
-                alias = (string)vertexMold.KeywordValues["ALIAS"];
-                var isUnique = (bool)vertexMold.KeywordValues["IS-UNIQUE"];
+                var keyValues = (List<string>)vertexMold.GetKeywordValue(":KEYS"); // todo: don't emit ':'
+                alias = (string)vertexMold.GetKeywordValue(":ALIAS");
+                var isUnique = (bool)vertexMold.GetKeywordValue(":IS-UNIQUE");
                 result = new KeyNode(keyValues, alias, isUnique);
                 break;
 
             case "key-value":
-                alias = (string)vertexMold.KeywordValues["ALIAS"];
+                alias = (string)vertexMold.GetKeywordValue(":ALIAS");
                 result = new KeyValueNode(alias);
                 break;
 
@@ -56,7 +56,7 @@ public class CliVertexFactory : IVertexFactory
                 break;
 
             case "end":
-                result =  new EndNode();
+                result = new EndNode();
                 break;
 
             default:

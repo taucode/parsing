@@ -26,7 +26,7 @@ namespace TauCode.Parsing.Graphs.Reading.Impl
         //    return result;
         //}
 
-        protected override void ReadContent(Element element, IScriptElementMold scriptElementMold)
+        protected override void ReadContent(IScriptElementMold scriptElementMold, Element element)
         {
             var pseudoList = (PseudoList)element; // todo: can throw?
 
@@ -41,8 +41,11 @@ namespace TauCode.Parsing.Graphs.Reading.Impl
                 if (car is Atom contentElementCar)
                 {
                     var innerElementReader = this.ScriptReader.ResolveElementReader(contentElementCar);
-                    var innerPartMold = innerElementReader.Read(groupMold, contentElement);
-                    groupMold.Add(innerPartMold);
+                    var innerScriptElementMold = innerElementReader.Read(groupMold, contentElement);
+
+                    //innerScriptElementMold.ValidateAndFinalize();
+
+                    groupMold.Add(innerScriptElementMold);
                 }
                 else
                 {
@@ -51,9 +54,15 @@ namespace TauCode.Parsing.Graphs.Reading.Impl
             }
         }
 
-        protected override void ValidateResult(Element element, IScriptElementMold scriptElementMold)
+        protected override void CustomizeContent(IScriptElementMold scriptElementMold, Element element)
         {
-            // todo: idle?
+            // idle
         }
+
+        //protected override void FinalizeMold(IScriptElementMold scriptElementMold, Element element)
+        //{
+        //    var groupMold = (GroupMold)scriptElementMold;
+        //    throw new NotImplementedException("todo: filter parts, find among them entrance and exit if they exist, set up own entrance and exit");
+        //}
     }
 }

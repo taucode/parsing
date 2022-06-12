@@ -17,9 +17,7 @@ namespace TauCode.Parsing.Graphs.Molds.Impl
         public IGroupRefMold Keeper { get; }
 
         #region Overridden (ScriptElementMoldBase)
-
-        public override IDictionary<string, object> KeywordValues => throw new NotImplementedException("error: invalid operation");
-
+        
         #endregion
 
         #region Overridden (PartMoldBase)
@@ -33,7 +31,7 @@ namespace TauCode.Parsing.Graphs.Molds.Impl
 
         #region Overridden (VertexMold)
 
-        public override string Type
+        public override string TypeAlias
         {
             get => throw new NotImplementedException("error: invalid operation");
             set => throw new NotImplementedException("error: invalid operation");

@@ -15,11 +15,11 @@ namespace TauCode.Parsing.Graphs.Molds.Impl
 
         #region Overridden (ScriptElementMoldBase)
 
-        
+
 
         #endregion
 
-        #region Overridden (PartMoldBase)
+        #region Overridden (LinkableMoldBase)
 
         public override string GetFullPath()
         {

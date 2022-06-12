@@ -16,11 +16,11 @@ namespace TauCode.Parsing.Tests.Parsing.Sql.Producers
         static SqlIdentifierProducer()
         {
             Delimiters = new[]
-            {
-                "[]",
-                "\"\"",
-                "``",
-            }
+                {
+                    "[]",
+                    "\"\"",
+                    "``",
+                }
                 .ToDictionary(x => x[0], x => x[1]);
 
             OpeningDelimiters = new HashSet<char>(Delimiters.Keys);
@@ -42,7 +42,7 @@ namespace TauCode.Parsing.Tests.Parsing.Sql.Producers
                 c == '_' ||
                 c.IsLatinLetterInternal())
             {
-                char? openingDelimiter = OpeningDelimiters.Contains(c) ? c : (char?)null;
+                var openingDelimiter = OpeningDelimiters.Contains(c) ? c : (char?)null;
 
                 var initialIndex = context.Position;
                 var index = initialIndex + 1;
@@ -53,8 +53,6 @@ namespace TauCode.Parsing.Tests.Parsing.Sql.Producers
                     {
                         if (openingDelimiter.HasValue)
                         {
-                            var delta = index - initialIndex;
-
                             this.ThrowUnclosedIdentifierException(context.Position);
                         }
                         break;
@@ -79,7 +77,6 @@ namespace TauCode.Parsing.Tests.Parsing.Sql.Producers
                                     index++;
 
                                     var delta = index - initialIndex;
-
                                     var str = text.Slice(initialIndex + 1, delta - 2).ToString();
 
                                     context.Position += delta;
@@ -90,21 +87,16 @@ namespace TauCode.Parsing.Tests.Parsing.Sql.Producers
                                 }
                                 else
                                 {
-                                    var delta = index - initialIndex;
-
                                     this.ThrowUnclosedIdentifierException(index);
                                 }
                             }
                             else
                             {
-                                var delta = index - initialIndex;
-
                                 throw new ParsingException($"Unexpected delimiter: '{c}'.", index);
                             }
                         }
                         else
                         {
-                            var delta = index - initialIndex;
                             throw new ParsingException($"Unexpected delimiter: '{c}'.", index);
                         }
                     }

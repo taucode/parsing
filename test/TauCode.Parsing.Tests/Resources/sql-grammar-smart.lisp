@@ -28,7 +28,9 @@
 			:links-to ("table-closing")
 		)
 		("," :links-to ("column-definition-ref"))
-		(group-ref :group-path "../constraint-definitions/")
+		(group-ref
+			:group-path "../constraint-defs/"
+		)
 		(")" :name "table-closing" :is-exit t)
 	)
 
@@ -108,13 +110,13 @@
 		("(" :is-entrance t)
 		(identifier :name "pk-column-name")
 		(optional
-			(multi-text :@values ("ASC" "DESC") :name "pk-asc-or-desc")
+			(multi-word :values ("ASC" "DESC") :name "pk-asc-or-desc")
 		)
 		(splitter
 			:name "more-pk-columns"
 
 			(idle :is-entrance t)
-			("," :links-to ("pk-column-name"))
+			("," :links-to ("../pk-column-name"))
 			(idle :is-exit t) ;;;;;; NB: _not_ joint! :is-exit is nil here.
 		)
 		(")" :is-exit t)
@@ -172,7 +174,7 @@
 		("(")
 		(identifier :name "index-column-name")
 		(optional
-			(multi-text :values ("ASC" "DESC") :name "index-column-asc-or-desc"))
+			(multi-word :values ("ASC" "DESC") :name "index-column-asc-or-desc"))
 		(splitter
 			(idle :is-entrance t)
 

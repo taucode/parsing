@@ -56,12 +56,17 @@ namespace TauCode.Parsing.Tests.Parsing.Sql
             //var reader = new TinyLispPseudoReader();
             //var script = reader.Read(tokens);
 
+
+
+
+
             IGraphScriptReader scriptReader = new SqlGraphScriptReader();
             var graphMold = scriptReader.ReadScript(input.AsMemory());
             var vertexFactory = new SqlVertexFactory();
             IGraphBuilder graphBuilder = new GraphBuilder(vertexFactory);
 
-            var graph = graphBuilder.Build(graphMold.Linkables.Single() as IGroupMold);
+            var graph = graphBuilder.Build(graphMold);
+
 
             throw new NotImplementedException("go on!");
 

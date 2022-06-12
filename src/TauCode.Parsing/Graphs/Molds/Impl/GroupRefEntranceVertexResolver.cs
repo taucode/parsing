@@ -17,10 +17,10 @@ namespace TauCode.Parsing.Graphs.Molds.Impl
         public IGroupRefMold Keeper { get; }
 
         #region Overridden (ScriptElementMoldBase)
-        
+
         #endregion
 
-        #region Overridden (PartMoldBase)
+        #region Overridden (LinkableMoldBase)
 
         public override string GetFullPath()
         {

@@ -17,29 +17,27 @@ namespace TauCode.Parsing.Graphs.Reading.Impl
 
         protected override void CustomizeContent(IScriptElementMold scriptElementMold, Element element)
         {
-            //base.ReadContent(scriptElementMold, element);
-
             var groupMold = (GroupMold)scriptElementMold;
-            var parts = groupMold.Linkables;
+            var linkables = groupMold.Linkables;
 
-            if (parts.Count < 2)
+            if (linkables.Count < 2)
             {
                 throw new NotImplementedException("error: too little vertices for splitter.");
             }
 
-            var splittingVertex = parts[0] as VertexMold;
+            var splittingVertex = linkables[0] as VertexMold;
             if (splittingVertex == null)
             {
-                throw new NotImplementedException("error: zeroth part must be vertex");
+                throw new NotImplementedException("error: zeroth linkable must be vertex");
             }
 
             if (!splittingVertex.IsEntrance)
             {
-                throw new NotImplementedException("error: zeroth part must be entrance");
+                throw new NotImplementedException("error: zeroth linkable must be entrance");
             }
 
-            var jointPart = parts.SingleOrDefault(x => x.GetKeywordValueAsBool(":IS-JOINT"));
-            if (jointPart == null || jointPart is VertexMold)
+            var jointLinkableMold = linkables.SingleOrDefault(x => x.GetKeywordValueAsBool(":IS-JOINT"));
+            if (jointLinkableMold == null || jointLinkableMold is VertexMold)
             {
                 // that's ok
             }
@@ -48,7 +46,7 @@ namespace TauCode.Parsing.Graphs.Reading.Impl
                 throw new NotImplementedException("error: joint must be a vertex.");
             }
 
-            var joint = (VertexMold)jointPart;
+            var joint = (VertexMold)jointLinkableMold;
             if (joint == splittingVertex)
             {
                 throw new NotImplementedException("error: splitting vertex and joint vertex cannot be the same");
@@ -56,18 +54,18 @@ namespace TauCode.Parsing.Graphs.Reading.Impl
 
             if (joint != null)
             {
-                if (parts.Count < 3)
+                if (linkables.Count < 3)
                 {
                     throw new NotImplementedException("error: if both splitting and joint vertices present, count should be >=3");
                 }
             }
 
-            if (joint != null && joint != parts[^1])
+            if (joint != null && joint != linkables[^1])
             {
                 throw new NotImplementedException("error: joint (if presents) must be the last vertex.");
             }
 
-            var upper = parts.Count;
+            var upper = linkables.Count;
             if (joint != null)
             {
                 upper--;
@@ -75,101 +73,14 @@ namespace TauCode.Parsing.Graphs.Reading.Impl
 
             for (var i = 1; i < upper; i++)
             {
-                var part = parts[i];
-                splittingVertex.AddLinkTo(part.GetEntranceVertexOrThrow());
+                var linkableMold = linkables[i];
+                splittingVertex.AddLinkTo(linkableMold.GetEntranceVertexOrThrow());
 
                 if (joint != null)
                 {
-                    part.GetExitVertexOrThrow().AddLinkTo(joint);
+                    linkableMold.GetExitVertexOrThrow().AddLinkTo(joint);
                 }
             }
         }
-
-        //protected override void FinalizeMold(IScriptElementMold scriptElementMold, Element element)
-        //{
-        //    var groupMold = (GroupMold)scriptElementMold;
-
-        //    throw new NotImplementedException();
-
-        //    //var innerParts = groupMold
-        //    //    .Content
-        //    //    .Where(x => x is IPartMold)
-        //    //    .Cast<PartMoldBase>() // todo can throw
-        //    //    .ToList();
-
-        //    //if (innerParts.Count < 2)
-        //    //{
-        //    //    throw new NotImplementedException("error: splitter must have at lease two nodes: root + some other");
-        //    //}
-
-        //    //if (!(innerParts[0] is VertexMold splitterRoot))
-        //    //{
-        //    //    throw new NotImplementedException("error: first element in splitter must be a vertex");
-        //    //}
-
-        //    //if (!splitterRoot.IsEntrance)
-        //    //{
-        //    //    throw new NotImplementedException("error: first element in splitter must be entrance.");
-        //    //}
-
-        //    //var choiceCount = innerParts.Count - 1; // emitting root
-
-        //    //var last = innerParts[^1];
-        //    //IVertexMold exitVertex = null;
-
-        //    //if (last.IsExit)
-        //    //{
-        //    //    if (innerParts.Count < 3)
-        //    //    {
-        //    //        throw new NotImplementedException();
-        //    //    }
-
-        //    //    if (last is IVertexMold lastVertex)
-        //    //    {
-        //    //        exitVertex = lastVertex;
-        //    //        choiceCount--;
-        //    //    }
-        //    //    else
-        //    //    {
-        //    //        throw new NotImplementedException();
-        //    //    }
-        //    //}
-
-        //    //for (var i = 0; i < choiceCount; i++)
-        //    //{
-        //    //    var index = i + 1;
-        //    //    var innerPart = innerParts[index];
-
-        //    //    if (innerPart.IsEntrance)
-        //    //    {
-        //    //        throw new NotImplementedException();
-        //    //    }
-
-        //    //    if (innerPart.IsExit)
-        //    //    {
-        //    //        throw new NotImplementedException();
-        //    //    }
-
-        //    //    if (innerPart.Entrance == null)
-        //    //    {
-        //    //        throw new NotImplementedException();
-        //    //    }
-
-        //    //    splitterRoot.AddLinkTo(innerPart.Entrance);
-
-        //    //    if (exitVertex != null)
-        //    //    {
-        //    //        if (innerPart.Exit == null)
-        //    //        {
-        //    //            throw new NotImplementedException();
-        //    //        }
-
-        //    //        innerPart.Exit.AddLinkTo(exitVertex);
-        //    //    }
-        //    //}
-
-        //    //groupMold.Entrance = splitterRoot;
-        //    //groupMold.Exit = exitVertex;
-        //}
     }
 }

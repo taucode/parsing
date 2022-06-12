@@ -5,21 +5,21 @@ using TauCode.Parsing.TinyLisp.Data;
 namespace TauCode.Parsing.Graphs.Molds.Impl
 {
     // todo clean
-    public abstract class PartMoldBase : ScriptElementMoldBase, ILinkableMold
+    public abstract class LinkableMoldBase : ScriptElementMoldBase, ILinkableMold
     {
         private bool _isEntrance;
         private bool _isExit;
 
         #region ctor
 
-        protected PartMoldBase(IGroupMold owner, Atom car)
+        protected LinkableMoldBase(IGroupMold owner, Atom car)
             : base(owner, car)
         {   
         }
 
         #endregion
 
-        #region IGraphPartMold Members
+        #region ILinkableMold Members
 
         public abstract string GetFullPath();
 

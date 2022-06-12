@@ -53,46 +53,5 @@ public class AlternativesGroupReader : GroupElementReader
 
             innerLinkable.GetExitVertex().AddLinkTo(exit);
         }
-
-        //alternativesGroupMold.Entrance = entrance;
-        //alternativesGroupMold.Exit = exit;
-
     }
-
-    //protected override void ReadContent(Element element, IScriptElementMold scriptElementMold)
-    //{
-    //    var alternativesGroupMold = (GroupMold)scriptElementMold;
-
-    //    var entrance = new VertexMold(alternativesGroupMold, Symbol.Create("idle"));
-    //    alternativesGroupMold.Add(entrance);
-
-    //    base.ReadContent(element, alternativesGroupMold);
-
-    //    var exit = new VertexMold(alternativesGroupMold, Symbol.Create("idle"));
-    //    alternativesGroupMold.Add(exit);
-
-    //    for (var i = 1; i < alternativesGroupMold.AllElements.Count - 2; i++)
-    //    {
-    //        var innerScriptElement = alternativesGroupMold.AllElements[i];
-    //        if (innerScriptElement is IPartMold innerPartMold)
-    //        {
-    //            if (innerPartMold.Entrance == null)
-    //            {
-    //                throw new NotImplementedException("error: in alternatives, all elements must have entrance.");
-    //            }
-
-    //            entrance.AddLinkTo(innerPartMold.Entrance);
-
-    //            if (innerPartMold.Exit == null)
-    //            {
-    //                throw new NotImplementedException("error: in alternatives, all elements must have exit.");
-    //            }
-
-    //            innerPartMold.Exit.AddLinkTo(exit);
-    //        }
-    //    }
-
-    //    alternativesGroupMold.Entrance = entrance;
-    //    alternativesGroupMold.Exit = exit;
-    //}
 }

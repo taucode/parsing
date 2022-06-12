@@ -10,7 +10,7 @@ namespace TauCode.Parsing.Graphs
     // todo clean
     public static class GraphExtensions
     {
-        public static ILinkableMold ResolvePath(this ILinkableMold partMold, string path)
+        public static ILinkableMold ResolvePath(this ILinkableMold linkableMold, string path)
         {
             // todo checks
             if (path.StartsWith("/"))
@@ -22,11 +22,11 @@ namespace TauCode.Parsing.Graphs
 
             IGroupMold currentGroup;
 
-            if (partMold is IGroupMold groupMold)
+            if (linkableMold is IGroupMold groupMold)
             {
                 currentGroup = groupMold;
             }
-            else if (partMold is IVertexMold vertexMold)
+            else if (linkableMold is IVertexMold vertexMold)
             {
                 currentGroup = vertexMold.Owner;
             }
@@ -53,7 +53,7 @@ namespace TauCode.Parsing.Graphs
                 }
                 else if (part == "")
                 {
-                    throw new NotImplementedException();
+                    return currentGroup;
                 }
                 else
                 {
@@ -77,6 +77,25 @@ namespace TauCode.Parsing.Graphs
                             throw new NotImplementedException();
                         }
                     }
+                    else if (child is IGroupMold childGroupMold)
+                    {
+                        currentGroup = childGroupMold;
+                    }
+                    else if (child is IGroupRefMold groupRefMold)
+                    {
+                        if (i == parts.Length - 1)
+                        {
+                            return groupRefMold;
+                        }
+                        else
+                        {
+                            throw new NotImplementedException();
+                        }
+                    }
+                    else
+                    {
+                        throw new NotImplementedException();
+                    }
                 }
             }
 
@@ -99,10 +118,10 @@ namespace TauCode.Parsing.Graphs
             throw new NotImplementedException("error: not expected type");
         }
 
-        public static IVertexMold GetEntranceVertexOrThrow(this ILinkableMold part)
+        public static IVertexMold GetEntranceVertexOrThrow(this ILinkableMold linkableMold)
         {
             // todo checks
-            var entranceVertex = part.GetEntranceVertex();
+            var entranceVertex = linkableMold.GetEntranceVertex();
             if (entranceVertex == null)
             {
                 throw new NotImplementedException("error: wanted entrance, but there is no one.");
@@ -111,10 +130,10 @@ namespace TauCode.Parsing.Graphs
             return entranceVertex;
         }
 
-        public static IVertexMold GetExitVertexOrThrow(this ILinkableMold part)
+        public static IVertexMold GetExitVertexOrThrow(this ILinkableMold linkableMold)
         {
             // todo checks
-            var exitVertex = part.GetExitVertex();
+            var exitVertex = linkableMold.GetExitVertex();
             if (exitVertex == null)
             {
                 throw new NotImplementedException("error: wanted exit, but there is no one.");
@@ -122,63 +141,5 @@ namespace TauCode.Parsing.Graphs
 
             return exitVertex;
         }
-
-
-        //public static IList<IPartMold> GetPartsOfGroup(
-        //    this IGroupMold groupMold,
-        //    out int? entrancePartIndex,
-        //    out int? exitPartIndex,
-        //    Action<int, IScriptElementMold> scriptElementCallback = null,
-        //    Action<int, IPartMold> partCallback = null)
-        //{
-        //    // todo checks
-        //    var list = new List<IPartMold>();
-
-        //    entrancePartIndex = null;
-        //    exitPartIndex = null;
-
-        //    var index = -1;
-
-        //    for (var i = 0; i < groupMold.Content.Count; i++)
-        //    {
-        //        var scriptElementMold = groupMold.Content[i];
-        //        scriptElementCallback?.Invoke(i, scriptElementMold);
-
-        //        if (scriptElementMold is IPartMold partMold)
-        //        {
-        //            index++;
-        //            list.Add(partMold);
-
-        //            if (partMold.IsEntrance)
-        //            {
-        //                if (entrancePartIndex != null)
-        //                {
-        //                    throw new NotImplementedException("error: more than one part with IsEntrance == true");
-        //                }
-
-        //                entrancePartIndex = index;
-        //            }
-
-        //            if (partMold.IsExit)
-        //            {
-        //                if (exitPartIndex != null)
-        //                {
-        //                    throw new NotImplementedException("error: more than one part with IsExit == true");
-        //                }
-
-        //                exitPartIndex = index;
-        //            }
-
-        //            partCallback?.Invoke(index, partMold);
-        //        }
-        //    }
-
-        //    foreach (var scriptElementMold in groupMold.Content)
-        //    {
-
-        //    }
-
-        //    return list;
-        //}
     }
 }

@@ -1,59 +1,58 @@
 ﻿using TauCode.Parsing.LexicalTokens;
 
-namespace TauCode.Parsing.Tests.Parsing.Sql.Producers
+namespace TauCode.Parsing.Tests.Parsing.Sql.Producers;
+
+public class WordProducer : ILexicalTokenProducer
 {
-    public class WordProducer : ILexicalTokenProducer
+    public ILexicalToken Produce(LexingContext context)
     {
-        public ILexicalToken Produce(LexingContext context)
+        var text = context.Input.Span;
+        var length = text.Length;
+
+        var c = text[context.Position];
+
+        if (c.IsLatinLetterInternal() || c == '_')
         {
-            var text = context.Input.Span;
-            var length = text.Length;
+            var initialIndex = context.Position;
+            var index = initialIndex + 1;
 
-            var c = text[context.Position];
-
-            if (c.IsLatinLetterInternal() || c == '_')
+            while (true)
             {
-                var initialIndex = context.Position;
-                var index = initialIndex + 1;
-
-                while (true)
+                if (index == length)
                 {
-                    if (index == length)
-                    {
-                        break;
-                    }
-
-                    c = text[index];
-
-                    if (
-                        c.IsInlineWhiteSpaceOrCaretControl() ||
-                        c.IsStandardPunctuationChar())
-                    {
-                        break;
-                    }
-
-                    if (c == '_' || c.IsLatinLetterInternal() || c.IsDecimalDigit())
-                    {
-                        index++;
-
-                        continue;
-                    }
-
-                    return null;
+                    break;
                 }
 
-                var delta = index - initialIndex;
-                var str = text.Slice(initialIndex, delta).ToString();
+                c = text[index];
 
-                context.Position += delta;
+                if (
+                    c.IsInlineWhiteSpaceOrCaretControl() ||
+                    c.IsStandardPunctuationChar())
+                {
+                    break;
+                }
 
-                return new WordToken(
-                    initialIndex,
-                    delta,
-                    str);
+                if (c == '_' || c.IsLatinLetterInternal() || c.IsDecimalDigit())
+                {
+                    index++;
+
+                    continue;
+                }
+
+                return null;
             }
 
-            return null;
+            var delta = index - initialIndex;
+            var str = text.Slice(initialIndex, delta).ToString();
+
+            context.Position += delta;
+
+            return new WordToken(
+                initialIndex,
+                delta,
+                str);
         }
+
+        return null;
     }
 }

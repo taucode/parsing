@@ -20,7 +20,7 @@ namespace TauCode.Parsing.Graphs.Molds.Impl
 
         #endregion
 
-        #region Overridden (PartMoldBase)
+        #region Overridden (LinkableMoldBase)
 
         public override string GetFullPath() => throw new NotImplementedException("error: invalid operation");
 

@@ -10,6 +10,10 @@ namespace TauCode.Parsing.ParsingNodes
             this.Action = action;
         }
 
+        protected ActionNode()
+        {   
+        }
+
         public Action<ActionNode, ILexicalToken, IParsingResult> Action { get; set; }
 
         protected override void ActImpl(ILexicalToken token, IParsingResult parsingResult)

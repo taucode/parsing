@@ -6,7 +6,7 @@ using TauCode.Parsing.TinyLisp.Data;
 namespace TauCode.Parsing.Graphs.Molds.Impl
 {
     // todo regions
-    public class GroupRefMold : PartMoldBase, IGroupRefMold
+    public class GroupRefMold : LinkableMoldBase, IGroupRefMold
     {
         private string _referencedGroupPath;
         private readonly GroupRefEntranceVertexResolver _entrance;

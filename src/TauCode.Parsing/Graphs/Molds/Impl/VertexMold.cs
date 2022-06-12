@@ -7,7 +7,7 @@ namespace TauCode.Parsing.Graphs.Molds.Impl
 {
     // todo: internal?
     // todo clean, regions
-    public class VertexMold : PartMoldBase, IVertexMold
+    public class VertexMold : LinkableMoldBase, IVertexMold
     {
         #region Fields
 

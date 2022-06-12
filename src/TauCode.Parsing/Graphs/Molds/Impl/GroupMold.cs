@@ -7,7 +7,7 @@ using TauCode.Parsing.TinyLisp.Data;
 namespace TauCode.Parsing.Graphs.Molds.Impl
 {
     // todo: clean, regions
-    public class GroupMold : PartMoldBase, IGroupMold
+    public class GroupMold : LinkableMoldBase, IGroupMold
     {
         #region Fields
 

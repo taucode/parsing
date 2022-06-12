@@ -20,12 +20,6 @@ namespace TauCode.Parsing.Graphs.Reading.Impl
             return scriptElementMold;
         }
 
-        //protected override IPartMold CreatePartMold(IGroupMold owner)
-        //{
-        //    IPartMold result = new GroupMold(owner);
-        //    return result;
-        //}
-
         protected override void ReadContent(IScriptElementMold scriptElementMold, Element element)
         {
             var pseudoList = (PseudoList)element; // todo: can throw?
@@ -43,8 +37,6 @@ namespace TauCode.Parsing.Graphs.Reading.Impl
                     var innerElementReader = this.ScriptReader.ResolveElementReader(contentElementCar);
                     var innerScriptElementMold = innerElementReader.Read(groupMold, contentElement);
 
-                    //innerScriptElementMold.ValidateAndFinalize();
-
                     groupMold.Add(innerScriptElementMold);
                 }
                 else
@@ -58,11 +50,5 @@ namespace TauCode.Parsing.Graphs.Reading.Impl
         {
             // idle
         }
-
-        //protected override void FinalizeMold(IScriptElementMold scriptElementMold, Element element)
-        //{
-        //    var groupMold = (GroupMold)scriptElementMold;
-        //    throw new NotImplementedException("todo: filter parts, find among them entrance and exit if they exist, set up own entrance and exit");
-        //}
     }
 }

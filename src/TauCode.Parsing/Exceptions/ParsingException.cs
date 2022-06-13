@@ -1,10 +1,11 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Runtime.Serialization;
+using System.Text;
 
 namespace TauCode.Parsing.Exceptions
 {
-    [Serializable]
-    public class ParsingException : Exception
+    public class ParsingException : ParsingExceptionBase
     {
         public ParsingException()
         {
@@ -15,10 +16,11 @@ namespace TauCode.Parsing.Exceptions
         {
         }
 
-        public ParsingException(string message, int? index)
-            : base(message)
+        public ParsingException(string message, IReadOnlyCollection<IParsingNode> nodes, ILexicalToken token)
+            : base(BuildMessageWithNodesAndToken(message, nodes, token))
         {
-            this.Index = index;
+            this.Nodes = nodes;
+            this.Token = token;
         }
 
         public ParsingException(string message, Exception inner)
@@ -26,19 +28,38 @@ namespace TauCode.Parsing.Exceptions
         {
         }
 
-        public ParsingException(string message, Exception inner, int? index)
-            : base(message, inner)
-        {
-            this.Index = index;
-        }
+        public IReadOnlyCollection<IParsingNode> Nodes { get; }
 
-        protected ParsingException(
-            SerializationInfo info,
-            StreamingContext context) : base(info, context)
-        {
-            info.AddValue(nameof(Index), this.Index);
-        }
+        public ILexicalToken Token { get; }
 
-        public int? Index { get; }
+        private static string BuildMessageWithNodesAndToken(string message, IEnumerable<IParsingNode> nodes, ILexicalToken token)
+        {
+            var sb = new StringBuilder();
+            sb.Append(message);
+
+            if (nodes != null)
+            {
+                sb.AppendLine();
+                sb.AppendLine("Node(s):");
+                foreach (var node in nodes)
+                {
+                    if (node == null)
+                    {
+                        throw new ArgumentException($"'{nameof(nodes)}' cannot contain nulls.");
+                    }
+
+                    sb.AppendLine(node.GetTag());
+                }
+            }
+
+            if (token != null)
+            {
+                sb.Append("Token: ");
+                sb.Append($"[{token}]");
+                sb.Append($" Position: {token.Position}");
+            }
+
+            return sb.ToString();
+        }
     }
 }

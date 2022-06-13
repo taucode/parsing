@@ -1,6 +1,6 @@
 ﻿using System;
-using TauCode.Parsing.Graphs.Molds;
-using TauCode.Parsing.Graphs.Molds.Impl;
+using TauCode.Parsing.Graphs.Molding;
+using TauCode.Parsing.Graphs.Molding.Impl;
 using TauCode.Parsing.TinyLisp.Data;
 
 namespace TauCode.Parsing.Graphs.Reading.Impl
@@ -33,9 +33,6 @@ namespace TauCode.Parsing.Graphs.Reading.Impl
 
         protected override void CustomizeContent(IScriptElementMold scriptElementMold, Element element)
         {
-            //base.ReadContent(scriptElementMold, element);
-
-            // todo: next block must be extracted into a brand new method 'CustomizeContent' or something.
             var group = (GroupMold)scriptElementMold;
 
             var linkables = group.Linkables;

@@ -27,3 +27,7 @@
 2021-04-29
 ==========
     1. Adding utility for parsing emails, hosts, usernames, urls, etc.
+
+2022-06-14
+==========
+    1. Completely refactored.

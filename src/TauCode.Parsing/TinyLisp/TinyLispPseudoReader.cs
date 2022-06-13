@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using TauCode.Parsing.Exceptions;
-using TauCode.Parsing.LexicalTokens;
 using TauCode.Parsing.TinyLisp.Data;
 using TauCode.Parsing.TinyLisp.Tokens;
+using TauCode.Parsing.Tokens;
 
 namespace TauCode.Parsing.TinyLisp
 {
@@ -26,8 +26,8 @@ namespace TauCode.Parsing.TinyLisp
                 {
                     if (depth > 0)
                     {
-                        throw Helper.CreateException(
-                            ParsingErrorTag.TinyLispUnclosedForm,
+                        throw TinyLispHelper.CreateException(
+                            TinyLispErrorTag.UnclosedForm,
                             tokens[^1].Position + tokens[^1].ConsumedLength);
                     }
                     else
@@ -44,8 +44,8 @@ namespace TauCode.Parsing.TinyLisp
                         case Punctuation.RightParenthesis:
                             if (depth == 0)
                             {
-                                throw Helper.CreateException(
-                                    ParsingErrorTag.TinyLispUnexpectedRightParenthesis,
+                                throw TinyLispHelper.CreateException(
+                                    TinyLispErrorTag.UnexpectedRightParenthesis,
                                     punctuationToken.Position);
                             }
                             else
@@ -58,7 +58,7 @@ namespace TauCode.Parsing.TinyLisp
                             index++;
                             var innerList = new PseudoList();
                             this.ReadPseudoListContent(innerList, tokens, ref index, depth + 1);
-                            list.AddElement(innerList);
+                            list.Add(innerList);
                             break;
 
                         default:
@@ -68,25 +68,25 @@ namespace TauCode.Parsing.TinyLisp
                 else if (token is KeywordToken keywordToken)
                 {
                     var element = Symbol.Create(keywordToken.Keyword);
-                    list.AddElement(element);
+                    list.Add(element);
                     index++;
                 }
                 else if (token is LispSymbolToken symbolToken)
                 {
                     var element = Symbol.Create(symbolToken.SymbolName);
-                    list.AddElement(element);
+                    list.Add(element);
                     index++;
                 }
                 else if (token is StringToken stringToken)
                 {
                     var element = new StringAtom(stringToken.Text);
-                    list.AddElement(element);
+                    list.Add(element);
                     index++;
                 }
                 else
                 {
-                    throw Helper.CreateException(
-                        ParsingErrorTag.TinyLispCannotReadToken,
+                    throw TinyLispHelper.CreateException(
+                        TinyLispErrorTag.CannotReadToken,
                         null,
                         token.GetType().FullName);
                 }

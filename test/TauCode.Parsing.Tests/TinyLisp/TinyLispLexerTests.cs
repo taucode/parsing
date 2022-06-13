@@ -3,9 +3,9 @@ using System;
 using System.Linq;
 using TauCode.Extensions;
 using TauCode.Parsing.Exceptions;
-using TauCode.Parsing.LexicalTokens;
 using TauCode.Parsing.TinyLisp;
 using TauCode.Parsing.TinyLisp.Tokens;
+using TauCode.Parsing.Tokens;
 
 namespace TauCode.Parsing.Tests.TinyLisp
 {
@@ -249,7 +249,7 @@ namespace TauCode.Parsing.Tests.TinyLisp
             var input = notClosedString;
 
             // Act
-            var ex = Assert.Throws<ParsingException>(() => _lexer.Tokenize(input.AsMemory()));
+            var ex = Assert.Throws<LexingException>(() => _lexer.Tokenize(input.AsMemory()));
 
             // Assert
             Assert.That(ex.Message, Does.StartWith("Unclosed string."));
@@ -427,7 +427,7 @@ namespace TauCode.Parsing.Tests.TinyLisp
             var input = $"{DQ}line0{CR}line1{CR}";
             
             // Act
-            var ex = Assert.Throws<ParsingException>(() => _lexer.Tokenize(input.AsMemory()));
+            var ex = Assert.Throws<LexingException>(() => _lexer.Tokenize(input.AsMemory()));
             
             // Assert
             Assert.That(ex.Message, Does.StartWith("Unclosed string."));
@@ -443,10 +443,10 @@ namespace TauCode.Parsing.Tests.TinyLisp
             // Arrange
             
             // Act
-            var ex = Assert.Throws<ParsingException>(() => _lexer.Tokenize(input.AsMemory()));
+            var ex = Assert.Throws<TinyLispException>(() => _lexer.Tokenize(input.AsMemory()));
 
             // Assert
-            Assert.That(ex.Message, Does.StartWith("TinyLisp: bad keyword."));
+            Assert.That(ex.Message, Does.StartWith("Bad keyword."));
             Assert.That(ex.Index, Is.EqualTo(expectedIndex));
         }
 
@@ -457,10 +457,10 @@ namespace TauCode.Parsing.Tests.TinyLisp
             var input = "symbol:bad";
 
             // Act
-            var ex = Assert.Throws<ParsingException>(() => _lexer.Tokenize(input.AsMemory()));
+            var ex = Assert.Throws<TinyLispException>(() => _lexer.Tokenize(input.AsMemory()));
 
             // Assert
-            Assert.That(ex.Message, Does.StartWith("TinyLisp: bad symbol name."));
+            Assert.That(ex.Message, Does.StartWith("Bad symbol name."));
             Assert.That(ex.Index, Is.EqualTo(6));
         }
 
@@ -473,10 +473,10 @@ namespace TauCode.Parsing.Tests.TinyLisp
             // Arrange
             
             // Act
-            var ex = Assert.Throws<ParsingException>(() => _lexer.Tokenize(input.AsMemory()));
+            var ex = Assert.Throws<TinyLispException>(() => _lexer.Tokenize(input.AsMemory()));
 
             // Assert
-            Assert.That(ex.Message, Does.StartWith("TinyLisp: symbol producer delivered an integer."));
+            Assert.That(ex.Message, Does.StartWith("Symbol producer delivered an integer."));
             Assert.That(ex.Index, Is.EqualTo(0));
         }
 

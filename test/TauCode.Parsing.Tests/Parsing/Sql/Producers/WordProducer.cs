@@ -1,4 +1,4 @@
-﻿using TauCode.Parsing.LexicalTokens;
+﻿using TauCode.Parsing.Tokens;
 
 namespace TauCode.Parsing.Tests.Parsing.Sql.Producers;
 

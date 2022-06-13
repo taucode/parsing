@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Diagnostics;
-using TauCode.Parsing.LexicalTokens;
+using TauCode.Parsing.Tokens;
 
 namespace TauCode.Parsing.TinyLisp.Tokens
 {

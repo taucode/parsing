@@ -7,8 +7,8 @@ using System.Threading.Tasks;
 using TauCode.Data.Graphs;
 using TauCode.Parsing.Graphs.Building;
 using TauCode.Parsing.Graphs.Building.Impl;
-using TauCode.Parsing.Graphs.Molds;
-using TauCode.Parsing.ParsingNodes;
+using TauCode.Parsing.Graphs.Molding;
+using TauCode.Parsing.Nodes;
 using TauCode.Parsing.Tests.Parsing.Sql.Nodes;
 using TauCode.Parsing.TinyLisp.Data;
 

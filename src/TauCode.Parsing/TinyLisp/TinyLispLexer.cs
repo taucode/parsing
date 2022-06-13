@@ -1,5 +1,5 @@
-﻿using TauCode.Parsing.LexicalTokenProducers;
-using TauCode.Parsing.TinyLisp.Producers;
+﻿using TauCode.Parsing.TinyLisp.TokenProducers;
+using TauCode.Parsing.TokenProducers;
 
 namespace TauCode.Parsing.TinyLisp
 {

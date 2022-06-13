@@ -76,7 +76,7 @@ namespace TauCode.Parsing.Tests.TinyLisp
 
             // Act
             var anotherSymbol = Symbol.Create("another");
-            pseudoList.AddElement(anotherSymbol);
+            pseudoList.Add(anotherSymbol);
 
             // Assert
             var expectedList = new List<Element>(elements)
@@ -102,7 +102,7 @@ namespace TauCode.Parsing.Tests.TinyLisp
             var pseudoList = new PseudoList(elements);
 
             // Act
-            var ex = Assert.Throws<ArgumentNullException>(() => pseudoList.AddElement(null));
+            var ex = Assert.Throws<ArgumentNullException>(() => pseudoList.Add(null));
 
             // Assert
             Assert.That(ex.ParamName, Is.EqualTo("element"));

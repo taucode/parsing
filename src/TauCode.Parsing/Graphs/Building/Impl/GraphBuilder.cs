@@ -2,22 +2,31 @@
 using System.Collections.Generic;
 using System.Text;
 using TauCode.Data.Graphs;
-using TauCode.Parsing.Graphs.Molds;
-using TauCode.Parsing.Graphs.Molds.Impl;
+using TauCode.Parsing.Graphs.Molding;
+using TauCode.Parsing.Graphs.Molding.Impl;
 
 namespace TauCode.Parsing.Graphs.Building.Impl
 {
-    // todo regions, clean
     public class GraphBuilder : IGraphBuilder
     {
+        #region Fields
+
         private readonly IVertexFactory _vertexFactory;
         private readonly IArcFactory _arcFactory;
+
+        #endregion
+
+        #region ctor
 
         public GraphBuilder(IVertexFactory vertexFactory = null, IArcFactory arcFactory = null)
         {
             _vertexFactory = vertexFactory ?? new VertexFactory();
             _arcFactory = arcFactory ?? new ArcFactory();
         }
+
+        #endregion
+
+        #region IGraphBuilder Members
 
         public IGraph Build(IGroupMold group)
         {
@@ -52,10 +61,8 @@ namespace TauCode.Parsing.Graphs.Building.Impl
 
                 if (arcMold.Tail != null && arcMold.Head != null)
                 {
-                    //tail = vertexMappings[arcMold.Tail];
-
-                    tail = ResolveVertex(arcMold.Tail, vertexMappings, groupRefMolds);
-                    head = ResolveVertex(arcMold.Head, vertexMappings, groupRefMolds);
+                    tail = ResolveVertex(arcMold.Tail, vertexMappings);
+                    head = ResolveVertex(arcMold.Head, vertexMappings);
                 }
                 else if (arcMold.TailPath != null && arcMold.HeadPath != null)
                 {
@@ -63,10 +70,10 @@ namespace TauCode.Parsing.Graphs.Building.Impl
                 }
                 else if (arcMold.Tail != null && arcMold.HeadPath != null)
                 {
-                    tail = ResolveVertex(arcMold.Tail, vertexMappings, groupRefMolds);
+                    tail = ResolveVertex(arcMold.Tail, vertexMappings);
                     var headMold = arcMold.Tail.ResolvePath(arcMold.HeadPath);
                     var headEntrance = headMold.GetEntranceVertex();
-                    head = ResolveVertex(headEntrance, vertexMappings, groupRefMolds);
+                    head = ResolveVertex(headEntrance, vertexMappings);
                 }
                 else if (arcMold.TailPath != null && arcMold.Head != null)
                 {
@@ -83,10 +90,22 @@ namespace TauCode.Parsing.Graphs.Building.Impl
             return graph;
         }
 
+        #endregion
+
+        #region Protected
+
+        protected virtual IGraph CreateGraph()
+        {
+            return new Graph();
+        }
+
+        #endregion
+
+        #region Private
+
         private static IVertex ResolveVertex(
             IVertexMold vertexMold,
-            Dictionary<IVertexMold, IVertex> vertexMappings,
-            List<IGroupRefMold> groupRefMolds) // todo: groupRefMolds not used.
+            Dictionary<IVertexMold, IVertex> vertexMappings)
         {
             if (vertexMold is GroupRefEntranceVertexResolver groupRefEntranceVertexResolver)
             {
@@ -96,10 +115,9 @@ namespace TauCode.Parsing.Graphs.Building.Impl
                 var referencedGroup = groupRef.Owner.ResolvePath(groupPath);
                 var referencedGroupEntrance = referencedGroup.GetEntranceVertex();
 
-
                 // todo: will get stack overflow in case of cycle in group referencing
                 // todo: use ReSharper 'convert recursion to iteration'
-                return ResolveVertex(referencedGroupEntrance, vertexMappings, groupRefMolds);
+                return ResolveVertex(referencedGroupEntrance, vertexMappings);
             }
             else if (vertexMold is GroupRefExitVertexResolver groupRefExitVertexResolver)
             {
@@ -109,20 +127,15 @@ namespace TauCode.Parsing.Graphs.Building.Impl
                 var referencedGroup = groupRef.Owner.ResolvePath(groupPath);
                 var referencedGroupExit = referencedGroup.GetExitVertex();
 
-                
+
                 // todo: will get stack overflow in case of cycle in group referencing
                 // todo: use ReSharper 'convert recursion to iteration'
-                return ResolveVertex(referencedGroupExit, vertexMappings, groupRefMolds);
+                return ResolveVertex(referencedGroupExit, vertexMappings);
             }
             else
             {
                 return vertexMappings[vertexMold];
             }
-        }
-
-        protected virtual IGraph CreateGraph()
-        {
-            return new Graph();
         }
 
         private void WriteContent(
@@ -156,5 +169,7 @@ namespace TauCode.Parsing.Graphs.Building.Impl
                 }
             }
         }
+
+        #endregion
     }
 }

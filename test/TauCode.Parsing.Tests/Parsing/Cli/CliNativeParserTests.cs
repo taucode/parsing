@@ -6,10 +6,10 @@ using System.Text;
 using NUnit.Framework;
 using TauCode.Data.Graphs;
 using TauCode.Extensions;
-using TauCode.Parsing.LexicalTokenProducers;
-using TauCode.Parsing.ParsingNodes;
+using TauCode.Parsing.Nodes;
 using TauCode.Parsing.Tests.Parsing.Cli.Nodes;
 using TauCode.Parsing.Tests.Parsing.Cli.Result;
+using TauCode.Parsing.TokenProducers;
 
 namespace TauCode.Parsing.Tests.Parsing.Cli;
 

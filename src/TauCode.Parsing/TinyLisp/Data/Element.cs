@@ -14,7 +14,9 @@ namespace TauCode.Parsing.TinyLisp.Data
             return Equals((Element)obj);
         }
 
-        public override int GetHashCode() => base.GetHashCode(); // todo: not a good thing, reSharper is right.
+        protected abstract int GetHashCodeImpl();
+
+        public override int GetHashCode() => this.GetHashCodeImpl();
 
         public static bool operator ==(Element a, Element b) => Equals(a, b);
 

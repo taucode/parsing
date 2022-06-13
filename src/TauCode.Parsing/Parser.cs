@@ -1,23 +1,31 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Xml.XPath;
 using Serilog;
-using TauCode.Parsing.Graphs.Reading.Impl;
-using TauCode.Parsing.ParsingNodes;
+using TauCode.Parsing.Exceptions;
+using TauCode.Parsing.Nodes;
 
 namespace TauCode.Parsing
 {
-    // todo regions, clean
     public class Parser : IParser
     {
+        #region Fields
+
         private readonly Dictionary<IParsingNode, HashSet<IParsingNode>> _routes;
         private IParsingNode _root;
+
+        #endregion
+
+        #region ctor
 
         public Parser()
         {
             _routes = new Dictionary<IParsingNode, HashSet<IParsingNode>>();
         }
+
+        #endregion
+
+        #region IParser Members
 
         public ILogger Logger { get; set; }
 
@@ -34,18 +42,11 @@ namespace TauCode.Parsing
         public void Parse(IReadOnlyList<ILexicalToken> tokens, IParsingResult parsingResult)
         {
             // todo: skip empty tokens (and ut)
-            // todo: parse multi-result script
 
             var context = new ParsingContext(tokens);
-            //var currentNodes = new HashSet<IParsingNode>(new[] { this.Root });
-
-            //var currentNodes = GetRoutes(this.Root);
             var currentNodes = this.GetInitialNodes(this.Root);
-            ILexicalToken todoPrevToken = null;
 
             var gotEndNode = false;
-
-            //IParsingNode endNode = null;
 
             while (true)
             {
@@ -58,7 +59,7 @@ namespace TauCode.Parsing
                     }
                     else
                     {
-                        throw new NotImplementedException(); // unexpected end
+                        throw new ParsingException("Unexpected end.", currentNodes, null);
                     }
                 }
 
@@ -73,7 +74,7 @@ namespace TauCode.Parsing
                 {
                     if (currentNode is IdleNode)
                     {
-                        throw new NotImplementedException("error. should never happen");
+                        throw new ParsingException("Internal error: idle node questioned.");
                     }
 
                     if (currentNode is EndNode)
@@ -93,7 +94,14 @@ namespace TauCode.Parsing
                         else
                         {
                             // we've got concurrency
-                            throw new NotImplementedException();
+                            throw new ParsingException(
+                                "Parsing node concurrency occurred.",
+                                new List<IParsingNode>
+                                {
+                                    realWinner,
+                                    currentNode,
+                                },
+                                currentToken);
                         }
                     }
                 }
@@ -110,16 +118,15 @@ namespace TauCode.Parsing
                         }
 
                         gotEndNode = false;
-                        //throw new NotImplementedException();
-                        //currentNodes = new HashSet<IParsingNode>(new[] { this.Root }); // todo: use "cached" hashset
-                        //currentNodes = GetRoutes(this.Root);
                         currentNodes = this.GetInitialNodes(this.Root);
-                        todoPrevToken = null;
                         continue;
                     }
 
                     // unexpected token
-                    throw new NotImplementedException("error: unexpected token");
+                    throw new ParsingException(
+                        "Unexpected token.",
+                        currentNodes,
+                        currentToken);
                 }
 
                 var versionBeforeAct = parsingResult.Version;
@@ -130,18 +137,10 @@ namespace TauCode.Parsing
 
                 if (versionAfterAct != versionBeforeAct + 1)
                 {
-                    //var log = TodoLogKeeper.Log.ToString();
-
                     throw new NotImplementedException("error: increase version.");
                 }
 
                 context.Position++;
-
-                if (context.Position == 70)
-                {
-                    var log = TodoLogKeeper.Log.ToString();
-                    var todo = 3;
-                }
 
                 currentNodes = GetRoutes(realWinner);
                 if (currentNodes.Count == 0)
@@ -150,6 +149,10 @@ namespace TauCode.Parsing
                 }
             }
         }
+
+        #endregion
+
+        #region Private
 
         private HashSet<IParsingNode> GetInitialNodes(IParsingNode root)
         {
@@ -197,5 +200,7 @@ namespace TauCode.Parsing
                 }
             }
         }
+
+        #endregion
     }
 }

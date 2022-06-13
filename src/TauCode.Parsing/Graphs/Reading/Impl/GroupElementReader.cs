@@ -1,18 +1,24 @@
 ﻿using System;
-using TauCode.Parsing.Graphs.Molds;
-using TauCode.Parsing.Graphs.Molds.Impl;
+using TauCode.Parsing.Graphs.Molding;
+using TauCode.Parsing.Graphs.Molding.Impl;
 using TauCode.Parsing.TinyLisp;
 using TauCode.Parsing.TinyLisp.Data;
 
 namespace TauCode.Parsing.Graphs.Reading.Impl
 {
-    // todo clean, regions
     public class GroupElementReader : ScriptElementReaderBase
     {
+        #region ctor
+
         public GroupElementReader(IGraphScriptReader scriptReader)
             : base(scriptReader)
         {
         }
+
+
+        #endregion
+
+        #region Overridden
 
         protected override IScriptElementMold CreateScriptElementMold(IGroupMold owner, Element element)
         {
@@ -50,5 +56,7 @@ namespace TauCode.Parsing.Graphs.Reading.Impl
         {
             // idle
         }
+
+        #endregion
     }
 }

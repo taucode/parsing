@@ -1,8 +1,8 @@
 ﻿using System;
 using TauCode.Extensions;
-using TauCode.Parsing.LexicalTokens;
-using TauCode.Parsing.ParsingNodes;
+using TauCode.Parsing.Nodes;
 using TauCode.Parsing.Tests.Parsing.Cli.Result;
+using TauCode.Parsing.Tokens;
 
 namespace TauCode.Parsing.Tests.Parsing.Cli.Nodes;
 
@@ -30,4 +30,6 @@ public class KeyValueNode : ActionNode
     {
         return token is TextToken;
     }
+
+    protected override string GetDataTag() => $"Alias: '{this.Alias}'";
 }

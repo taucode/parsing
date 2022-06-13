@@ -1,20 +1,16 @@
 ﻿using TauCode.Parsing.Exceptions;
-using TauCode.Parsing.Lexing;
 using TauCode.Parsing.TinyLisp.Tokens;
 
 namespace TauCode.Parsing.TinyLisp.Producers
 {
-    public class TinyLispSymbolProducer : ITokenProducer
+    public class TinyLispSymbolProducer : ILexicalTokenProducer
     {
-        public LexingContext Context { get; set; }
-
-        public IToken Produce()
+        public ILexicalToken Produce(LexingContext context)
         {
-            var context = this.Context;
-            var text = context.Text;
-            var length = context.Length;
+            var text = context.Input.Span;
+            var length = text.Length;
 
-            var c = text[context.Index];
+            var c = text[context.Position];
 
             if (TinyLispHelper.IsAcceptableSymbolNameChar(c))
             {
@@ -22,17 +18,13 @@ namespace TauCode.Parsing.TinyLisp.Producers
                 var pureDigits = 0;
                 if (!gotSign)
                 {
-                    pureDigits = LexingHelper.IsDigit(c) ? 1 : 0;
+                    pureDigits = c.IsDecimalDigit() ? 1 : 0;
                 }
 
                 var gotNonDigits = false;
 
-                var initialIndex = context.Index;
-                var initialColumn = context.Column;
-
+                var initialIndex = context.Position;
                 var index = initialIndex + 1;
-                var column = context.Column + 1;
-                
 
                 while (true)
                 {
@@ -45,7 +37,7 @@ namespace TauCode.Parsing.TinyLisp.Producers
 
                     if (c == ':')
                     {
-                        throw new LexingException("Bad symbol name.", new Position(context.Line, context.Column));
+                        throw Helper.CreateException(ParsingErrorTag.TinyLispBadSymbolName, index);
                     }
 
                     if (!TinyLispHelper.IsAcceptableSymbolNameChar(c))
@@ -53,7 +45,7 @@ namespace TauCode.Parsing.TinyLisp.Producers
                         break;
                     }
 
-                    if (LexingHelper.IsDigit(c))
+                    if (c.IsDecimalDigit())
                     {
                         if (!gotNonDigits)
                         {
@@ -67,20 +59,19 @@ namespace TauCode.Parsing.TinyLisp.Producers
                     }
 
                     index++;
-                    column++;
                 }
 
                 var couldBeInt = pureDigits > 0;
 
                 if (couldBeInt)
                 {
-                    throw new LexingException("Symbol producer delivered an integer.", new Position(context.Line, context.Column));
+                    throw new ParsingException("TinyLisp: symbol producer delivered an integer.", initialIndex);
                 }
 
                 var delta = index - initialIndex;
-                var str = text.Substring(initialIndex, delta); // todo: use ReadOnlySpan<char> instead of Substring everywhere.
-                var symbolToken = new LispSymbolToken(str, new Position(context.Line, initialColumn), delta);
-                context.Advance(delta, 0, column);
+                var str = text.Slice(initialIndex, delta); // todo: use ReadOnlySpan<char> instead of Substring everywhere.
+                var symbolToken = new LispSymbolToken(initialIndex, delta, str.ToString());
+                context.Position += delta;
                 return symbolToken;
             }
             else

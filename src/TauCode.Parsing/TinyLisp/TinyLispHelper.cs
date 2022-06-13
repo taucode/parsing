@@ -132,7 +132,7 @@ namespace TauCode.Parsing.TinyLisp
 
         public static Punctuation CharToPunctuation(char c)
         {
-            var punctuation = PunctuationsByChar.GetOrDefault(c);
+            var punctuation = PunctuationsByChar.GetDictionaryValueOrDefault(c);
             if (punctuation == default)
             {
                 throw new ArgumentOutOfRangeException(nameof(c), $"'{c}' is not a known punctuation character.");
@@ -144,7 +144,7 @@ namespace TauCode.Parsing.TinyLisp
         public static char PunctuationToChar(this Punctuation punctuation)
         {
 
-            var c = CharsByPunctuation.GetOrDefault(punctuation);
+            var c = CharsByPunctuation.GetDictionaryValueOrDefault(punctuation);
             if (c == default)
             {
                 throw new ArgumentOutOfRangeException(nameof(c), $"'{punctuation}' is not a known punctuation.");
@@ -155,7 +155,7 @@ namespace TauCode.Parsing.TinyLisp
 
         public static Punctuation? TryCharToPunctuation(char c)
         {
-            var punctuation = PunctuationsByChar.GetOrDefault(c);
+            var punctuation = PunctuationsByChar.GetDictionaryValueOrDefault(c);
             if (punctuation == default)
             {
                 return null;

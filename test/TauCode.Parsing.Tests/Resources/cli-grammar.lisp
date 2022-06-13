@@ -1,4 +1,4 @@
-(defblock :name serialize-data :is-top t
+﻿(defblock :name serialize-data :is-top t
 	(worker
 		:worker-name serialize-data
 		:verbs "serialize-data" "sd"

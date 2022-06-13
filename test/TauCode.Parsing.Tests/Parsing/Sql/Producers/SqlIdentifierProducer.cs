@@ -1,14 +1,12 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using TauCode.Parsing.Exceptions;
-using TauCode.Parsing.Lexing;
-using TauCode.Parsing.Tests.Parsing.Sql.TextClasses;
-using TauCode.Parsing.TextDecorations;
-using TauCode.Parsing.Tokens;
+using TauCode.Parsing.LexicalTokens;
 
 namespace TauCode.Parsing.Tests.Parsing.Sql.Producers
 {
-    public class SqlIdentifierProducer : ITokenProducer
+    public class SqlIdentifierProducer : ILexicalTokenProducer
     {
         private static Dictionary<char, char> Delimiters { get; }
         private static HashSet<char> OpeningDelimiters { get; }
@@ -18,11 +16,11 @@ namespace TauCode.Parsing.Tests.Parsing.Sql.Producers
         static SqlIdentifierProducer()
         {
             Delimiters = new[]
-            {
-                "[]",
-                "\"\"",
-                "``",
-            }
+                {
+                    "[]",
+                    "\"\"",
+                    "``",
+                }
                 .ToDictionary(x => x[0], x => x[1]);
 
             OpeningDelimiters = new HashSet<char>(Delimiters.Keys);
@@ -33,23 +31,20 @@ namespace TauCode.Parsing.Tests.Parsing.Sql.Producers
 
         }
 
-        public LexingContext Context { get; set; }
-
-        public IToken Produce()
+        public ILexicalToken Produce(LexingContext context)
         {
-            var context = this.Context;
-            var text = context.Text;
+            var text = context.Input.Span;
             var length = text.Length;
 
-            var c = text[context.Index];
+            var c = text[context.Position];
 
             if (OpeningDelimiters.Contains(c) ||
                 c == '_' ||
-                LexingHelper.IsLatinLetter(c))
+                c.IsLatinLetterInternal())
             {
-                char? openingDelimiter = OpeningDelimiters.Contains(c) ? c : (char?)null;
+                var openingDelimiter = OpeningDelimiters.Contains(c) ? c : (char?)null;
 
-                var initialIndex = context.Index;
+                var initialIndex = context.Position;
                 var index = initialIndex + 1;
                 
                 while (true)
@@ -58,17 +53,14 @@ namespace TauCode.Parsing.Tests.Parsing.Sql.Producers
                     {
                         if (openingDelimiter.HasValue)
                         {
-                            var delta = index - initialIndex;
-                            var column = context.Column + delta;
-
-                            this.ThrowUnclosedIdentifierException(context.Line, column);
+                            this.ThrowUnclosedIdentifierException(context.Position);
                         }
                         break;
                     }
 
                     c = text[index];
 
-                    if (c == '_' || LexingHelper.IsLatinLetter(c) || LexingHelper.IsDigit(c))
+                    if (c == '_' || c.IsLatinLetterInternal() || c.IsDecimalDigit())
                     {
                         index++;
                         continue;
@@ -85,39 +77,27 @@ namespace TauCode.Parsing.Tests.Parsing.Sql.Producers
                                     index++;
 
                                     var delta = index - initialIndex;
-                                    var column = context.Column + delta;
+                                    var str = text.Slice(initialIndex + 1, delta - 2).ToString();
 
-                                    var str = text.Substring(initialIndex + 1, delta - 2);
-                                    var position = new Position(context.Line, context.Column);
-                                    context.Advance(delta, 0, column);
-                                    return new TextToken(
-                                        SqlIdentifierClass.Instance,
-                                        NoneTextDecoration.Instance,
-                                        str,
-                                        position,
-                                        delta);
+                                    context.Position += delta;
+                                    return new IdentifierToken(
+                                        index,
+                                        delta,
+                                        str);
                                 }
                                 else
                                 {
-                                    var delta = index - initialIndex;
-                                    var column = context.Column + delta;
-
-                                    this.ThrowUnclosedIdentifierException(context.Line, column);
+                                    this.ThrowUnclosedIdentifierException(index);
                                 }
                             }
                             else
                             {
-                                var delta = index - initialIndex;
-                                var column = context.Column + delta;
-
-                                throw new LexingException($"Unexpected delimiter: '{c}'.", new Position(context.Line, column));
+                                throw new ParsingException($"Unexpected delimiter: '{c}'.", index);
                             }
                         }
                         else
                         {
-                            var delta = index - initialIndex;
-                            var column = context.Column + delta;
-                            throw new LexingException($"Unexpected delimiter: '{c}'.", new Position(context.Line, column));
+                            throw new ParsingException($"Unexpected delimiter: '{c}'.", index);
                         }
                     }
                 }
@@ -126,9 +106,9 @@ namespace TauCode.Parsing.Tests.Parsing.Sql.Producers
             return null;
         }
 
-        private void ThrowUnclosedIdentifierException(int line, int column)
+        private void ThrowUnclosedIdentifierException(int position)
         {
-            throw new LexingException("Unclosed identifier.", new Position(line, column));
+            throw new ParsingException("Unclosed identifier.", position);
         }
     }
 }

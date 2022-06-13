@@ -1,7 +1,6 @@
 ﻿using NUnit.Framework;
 using System;
 using TauCode.Extensions;
-using TauCode.Parsing.Lexing;
 using TauCode.Parsing.TinyLisp;
 
 namespace TauCode.Parsing.Tests.TinyLisp
@@ -9,7 +8,6 @@ namespace TauCode.Parsing.Tests.TinyLisp
     [TestFixture]
     public class PerformanceTests
     {
-
         [Test]
         [Ignore("Performance test")]
         public void PerformanceTestForTinyLispLexer()
@@ -23,7 +21,7 @@ namespace TauCode.Parsing.Tests.TinyLisp
             var num = 10 * 1000;
             for (var i = 0; i < num; i++)
             {
-                tinyLispLexer.Lexize(grammar);
+                tinyLispLexer.Tokenize(grammar.AsMemory());
             }
 
             var end = DateTime.UtcNow;

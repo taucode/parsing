@@ -1,45 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 
 namespace TauCode.Parsing
 {
-    public class ParsingContext : IParsingContext
+    public class ParsingContext
     {
-        #region Fields
-
-        private IReadOnlyCollection<INode> _nodes;
-
-        #endregion
-
-        #region Constructor
-
-        public ParsingContext(ITokenStream tokenStream)
+        public ParsingContext(IReadOnlyList<ILexicalToken> tokens)
         {
-            this.TokenStream = tokenStream ?? throw new ArgumentNullException(nameof(tokenStream));
-            this.ResultAccumulator = new ResultAccumulator();
+            this.Tokens = tokens;
         }
 
-        #endregion
-
-        #region Private
-
-
-
-        #endregion
-
-        #region IContext Members
-
-        public ITokenStream TokenStream { get; }
-
-        public void SetNodes(IReadOnlyCollection<INode> nodes)
-        {
-            _nodes = nodes ?? throw new ArgumentNullException(nameof(nodes));
-        }
-
-        public IReadOnlyCollection<INode> GetNodes() => _nodes;
-
-        public IResultAccumulator ResultAccumulator { get; }
-
-        #endregion
+        public readonly IReadOnlyList<ILexicalToken> Tokens;
+        public int Position;
     }
 }

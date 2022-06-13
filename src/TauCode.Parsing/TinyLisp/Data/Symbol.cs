@@ -7,7 +7,10 @@ namespace TauCode.Parsing.TinyLisp.Data
     [DebuggerDisplay("{" + nameof(Name) + "}")]
     public class Symbol : Atom
     {
-        private static readonly Dictionary<string, Symbol> Symbols;
+        /// <summary>
+        /// todo: not a good thing. who will remove symbols when they are not used anymore? GC won't since this property is static.
+        /// </summary>
+        private static readonly Dictionary<string, Symbol> Symbols; 
 
         static Symbol()
         {

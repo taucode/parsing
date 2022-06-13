@@ -1,68 +1,58 @@
-﻿using TauCode.Parsing.Lexing;
-using TauCode.Parsing.TextClasses;
-using TauCode.Parsing.TextDecorations;
-using TauCode.Parsing.Tokens;
+﻿using TauCode.Parsing.LexicalTokens;
 
-namespace TauCode.Parsing.Tests.Parsing.Sql.Producers
+namespace TauCode.Parsing.Tests.Parsing.Sql.Producers;
+
+public class WordProducer : ILexicalTokenProducer
 {
-    public class WordProducer : ITokenProducer
+    public ILexicalToken Produce(LexingContext context)
     {
-        public LexingContext Context { get; set; }
+        var text = context.Input.Span;
+        var length = text.Length;
 
-        public IToken Produce()
+        var c = text[context.Position];
+
+        if (c.IsLatinLetterInternal() || c == '_')
         {
-            var context = this.Context;
-            var text = context.Text;
-            var length = text.Length;
+            var initialIndex = context.Position;
+            var index = initialIndex + 1;
 
-            var c = text[context.Index];
-
-            if (LexingHelper.IsLatinLetter(c) || c == '_')
+            while (true)
             {
-                var initialIndex = context.Index;
-                var index = initialIndex + 1;
-                var column = context.Column + 1;
-
-                while (true)
+                if (index == length)
                 {
-                    if (index == length)
-                    {
-                        break;
-                    }
-
-                    c = text[index];
-
-                    if (
-                        LexingHelper.IsInlineWhiteSpaceOrCaretControl(c) ||
-                        LexingHelper.IsStandardPunctuationChar(c))
-                    {
-                        break;
-                    }
-
-                    if (c == '_' || LexingHelper.IsLatinLetter(c) || LexingHelper.IsDigit(c))
-                    {
-                        index++;
-                        column++;
-
-                        continue;
-                    }
-
-                    return null;
+                    break;
                 }
 
-                var delta = index - initialIndex;
-                var str = text.Substring(initialIndex, delta);
+                c = text[index];
 
-                context.Advance(delta, 0, column);
+                if (
+                    c.IsInlineWhiteSpaceOrCaretControl() ||
+                    c.IsStandardPunctuationChar())
+                {
+                    break;
+                }
 
-                return new TextToken(
-                    WordTextClass.Instance,
-                    NoneTextDecoration.Instance,
-                    str,
-                    new Position(context.Line, column), delta);
+                if (c == '_' || c.IsLatinLetterInternal() || c.IsDecimalDigit())
+                {
+                    index++;
+
+                    continue;
+                }
+
+                return null;
             }
 
-            return null;
+            var delta = index - initialIndex;
+            var str = text.Slice(initialIndex, delta).ToString();
+
+            context.Position += delta;
+
+            return new WordToken(
+                initialIndex,
+                delta,
+                str);
         }
+
+        return null;
     }
 }

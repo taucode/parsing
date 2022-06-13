@@ -1,17 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using TauCode.Parsing.Tokens;
 
 namespace TauCode.Parsing.TinyLisp.Tokens
 {
     [DebuggerDisplay("{" + nameof(Keyword) + "}")]
-    public class KeywordToken : TokenBase
-    {
+    public class KeywordToken : LexicalTokenBase {
         public KeywordToken(
-            string keyword,
-            Position position,
-            int consumedLength)
+            int position,
+            int consumedLength,
+            string keyword)
             : base(position, consumedLength)
         {
             this.Keyword = keyword ?? throw new ArgumentNullException(nameof(keyword));

@@ -12,14 +12,14 @@
 
 2019-11-20
 ==========
-todo1. Cache non-idle successor nodes for finalized nodes.
++   1. Cache non-idle successor nodes for finalized nodes.
 +   2. LexerBase
-todo3. IParser.Parse ==> List<IParsingResult>!
++   3. IParser.Parse ==> List<IParsingResult>!
 
 2019-11-28
 ==========
 x   1. Enums for all symbols (+UT-s)
-todo2. Non-advance inquire result
+x   2. Non-advance inquire result
 x   3. Only \SpecialString and "<some_exact_special_string>" want ':Some_Class' suffix.
 
 2019-11-30
@@ -30,7 +30,7 @@ x   3. Only \SpecialString and "<some_exact_special_string>" want ':Some_Class' 
 2019-12-02
 ==========
 +   1. Node factory.
-todo2. Symbols vs integers: +1488, +1488+, +, -, etc.
+todo2. Symbols vs integers: +1599, +1599+, +, -, etc.
 todo3. TinyLisp: ratios and doubles.
 +   4. SQLite test lexer remastered.
 +   5. ILexingEnvironment: IsSpace, IsLineBreak
@@ -45,7 +45,7 @@ todo3. TinyLisp: ratios and doubles.
     1. Lexize C lang string
     2. Lexize C# verbatim string
     3. Lexize C# $ string.
-    4. Remove all 'alpha' which is a 'todo' actually.
++   4. Remove all 'alpha' which is a 'todo' actually.
 +   5. Remove all 'gamma' which is a 'todo' actually.
 
 2020-05-29
@@ -58,7 +58,7 @@ X   1. Get rid of TauCode.Extensions?
 
 2021-04-29
 ==========
-    1. Producers must respect Context's Length, _not_ Context.Text's Length. UT it.
++   1. Producers must respect Context's Length, _not_ Context.Text's Length. UT it.
 
     2. https://www.amazon.com/Pro-NET-Performance-Optimize-Applications/dp/1430244585
     3. https://stackoverflow.com/questions/51864673/c-sharp-readonlyspanchar-vs-substring-for-string-dissection
@@ -70,3 +70,6 @@ X   1. Get rid of TauCode.Extensions?
     2. IToken: add property:
        public StringSegment ConsumedText { get; }
 
+2022-06-08
+==========
+    1. Variety of exceptions

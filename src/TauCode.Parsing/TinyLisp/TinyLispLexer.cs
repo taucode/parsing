@@ -1,14 +1,13 @@
-﻿using TauCode.Parsing.Lexing;
-using TauCode.Parsing.Lexing.StandardProducers;
+﻿using TauCode.Parsing.LexicalTokenProducers;
 using TauCode.Parsing.TinyLisp.Producers;
 
 namespace TauCode.Parsing.TinyLisp
 {
-    public class TinyLispLexer : LexerBase
+    public class TinyLispLexer : Lexer
     {
-        protected override ITokenProducer[] CreateProducers()
+        public TinyLispLexer()
         {
-            return new ITokenProducer[]
+            this.Producers = new ILexicalTokenProducer[]
             {
                 new WhiteSpaceProducer(), // NB: it is very important that this one goes first. it will skip white spaces without producing a real token.
                 new TinyLispPunctuationProducer(),
@@ -22,7 +21,7 @@ namespace TauCode.Parsing.TinyLisp
 
         private static bool IntegerTerminatorPredicate(char c)
         {
-            if (LexingHelper.IsInlineWhiteSpaceOrCaretControl(c))
+            if (c.IsInlineWhiteSpaceOrCaretControl())
             {
                 return true;
             }

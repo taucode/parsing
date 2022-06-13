@@ -1,31 +1,30 @@
 ﻿using System.Collections.Generic;
 using System.Text;
 
-namespace TauCode.Parsing.Tests.Parsing.Sql.Data
+namespace TauCode.Parsing.Tests.Parsing.Sql.Data;
+
+public class PrimaryKeyInfo
 {
-    public class PrimaryKeyInfo
+    public string Name { get; set; }
+    public List<IndexColumnInfo> Columns { get; set; } = new List<IndexColumnInfo>();
+
+    public override string ToString()
     {
-        public string Name { get; set; }
-        public List<IndexColumnInfo> Columns { get; set; } = new List<IndexColumnInfo>();
+        var sb = new StringBuilder();
+        sb.Append($"    CONSTRAINT [{this.Name}] PRIMARY KEY(");
 
-        public override string ToString()
+        for (var i = 0; i < this.Columns.Count; i++)
         {
-            var sb = new StringBuilder();
-            sb.Append($"    CONSTRAINT [{this.Name}] PRIMARY KEY(");
+            var indexColumn = this.Columns[i];
+            sb.Append($"[{indexColumn.ColumnName}] {indexColumn.SortDirection.ToString().ToUpperInvariant()}");
 
-            for (var i = 0; i < this.Columns.Count; i++)
+            if (i < this.Columns.Count - 1)
             {
-                var indexColumn = this.Columns[i];
-                sb.Append($"[{indexColumn.ColumnName}] {indexColumn.SortDirection.ToString().ToUpperInvariant()}");
-
-                if (i < this.Columns.Count - 1)
-                {
-                    sb.Append(", ");
-                }
+                sb.Append(", ");
             }
-
-            sb.Append(")");
-            return sb.ToString();
         }
+
+        sb.Append(")");
+        return sb.ToString();
     }
 }

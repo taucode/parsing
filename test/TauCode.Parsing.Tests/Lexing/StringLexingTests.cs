@@ -1,23 +1,36 @@
-﻿using NUnit.Framework;
+﻿using System;
 using System.Linq;
+using NUnit.Framework;
 using TauCode.Parsing.Exceptions;
-using TauCode.Parsing.Lexing;
-using TauCode.Parsing.Tokens;
+using TauCode.Parsing.LexicalTokenProducers;
+using TauCode.Parsing.LexicalTokens;
 
 namespace TauCode.Parsing.Tests.Lexing
 {
     [TestFixture]
     public class StringLexingTests
     {
+        private ILexer _lexer;
+
+        [SetUp]
+        public void SetUp()
+        {
+            _lexer = new Lexer();
+            _lexer.Producers = new ILexicalTokenProducer[]
+            {
+                new WhiteSpaceProducer(),
+                new CLangStringProducer(),
+            };
+        }
+
         [Test]
         public void EscapeString_SingleCharEscape_EscapesCorrectly()
         {
             // Arrange
             var input = "\"\\n\\v\\t\\r\\a\\b\\0\\t\\f\\\\\\\"\"";
-            ILexer lexer = new MyStringLexer();
 
             // Act
-            var tokens = lexer.Lexize(input);
+            var tokens = _lexer.Tokenize(input.AsMemory());
 
             // Assert
             var textToken = (TextToken)tokens.Single();
@@ -29,10 +42,9 @@ namespace TauCode.Parsing.Tests.Lexing
         {
             // Arrange
             var input = "\"\\n\\v\\t\\r\\a\\b\\0\\t\\f\\\\\\u1488\"";
-            ILexer lexer = new MyStringLexer();
 
             // Act
-            var tokens = lexer.Lexize(input);
+            var tokens = _lexer.Tokenize(input.AsMemory());
 
             // Assert
             var textToken = (TextToken)tokens.Single();
@@ -40,18 +52,17 @@ namespace TauCode.Parsing.Tests.Lexing
         }
 
         [Test]
-        public void Lexize_UnclosedString_ThrowsLexingException()
+        public void Tokenize_UnclosedString_ThrowsLexingException()
         {
             // Arrange
             var input = " \"Unclosed string";
-            ILexer lexer = new MyStringLexer();
 
             // Act
-            var ex = Assert.Throws<LexingException>(() => lexer.Lexize(input));
+            var ex = Assert.Throws<ParsingException>(() => _lexer.Tokenize(input.AsMemory()));
             
             // Assert
-            Assert.That(ex.Message, Is.EqualTo("Unclosed string."));
-            Assert.That(ex.Position, Is.EqualTo(new Position(0, 17)));
+            Assert.That(ex.Message, Does.StartWith("Unclosed string."));
+            Assert.That(ex.Index, Is.EqualTo(17));
         }
 
         [Test]
@@ -59,47 +70,44 @@ namespace TauCode.Parsing.Tests.Lexing
         [TestCase("\"Broken string\r")]
         [TestCase("\"Broken string\n\r")]
         [TestCase("\"Broken string\r\n")]
-        public void Lexize_NewLineInString_ThrowsLexingException(string input)
+        public void Tokenize_NewLineInString_ThrowsLexingException(string input)
         {
             // Arrange
-            ILexer lexer = new MyStringLexer();
 
             // Act
-            var ex = Assert.Throws<LexingException>(() => lexer.Lexize(input));
+            var ex = Assert.Throws<ParsingException>(() => _lexer.Tokenize(input.AsMemory()));
 
             // Assert
-            Assert.That(ex.Message, Is.EqualTo("Newline in string constant."));
-            Assert.That(ex.Position, Is.EqualTo(new Position(0, 14)));
+            Assert.That(ex.Message, Does.StartWith("Newline in string."));
+            Assert.That(ex.Index, Is.EqualTo(14));
         }
 
         [Test]
         [TestCase("\"End after escape\\")]
-        public void Lexize_EndAfterEscape_ThrowsLexingException(string input)
+        public void Tokenize_EndAfterEscape_ThrowsLexingException(string input)
         {
             // Arrange
-            ILexer lexer = new MyStringLexer();
 
             // Act
-            var ex = Assert.Throws<LexingException>(() => lexer.Lexize(input));
+            var ex = Assert.Throws<ParsingException>(() => _lexer.Tokenize(input.AsMemory()));
 
             // Assert
-            Assert.That(ex.Message, Is.EqualTo("Unclosed string."));
-            Assert.That(ex.Position, Is.EqualTo(new Position(0, 18)));
+            Assert.That(ex.Message, Does.StartWith("Unclosed string."));
+            Assert.That(ex.Index, Is.EqualTo(18));
         }
 
         [Test]
         [TestCase("\"Bad\\o\"")]
-        public void Lexize_WrongSingleCharEscape_ThrowsLexingException(string input)
+        public void Tokenize_WrongSingleCharEscape_ThrowsLexingException(string input)
         {
             // Arrange
-            ILexer lexer = new MyStringLexer();
 
             // Act
-            var ex = Assert.Throws<LexingException>(() => lexer.Lexize(input));
+            var ex = Assert.Throws<ParsingException>(() => _lexer.Tokenize(input.AsMemory()));
 
             // Assert
-            Assert.That(ex.Message, Is.EqualTo("Bad escape."));
-            Assert.That(ex.Position, Is.EqualTo(new Position(0, 4)));
+            Assert.That(ex.Message, Does.StartWith("Bad escape sequence."));
+            Assert.That(ex.Index, Is.EqualTo(4));
         }
 
         [Test]
@@ -108,18 +116,16 @@ namespace TauCode.Parsing.Tests.Lexing
         [TestCase("\"Bad\\u11")]
         [TestCase("\"Bad\\u111")]
         [TestCase("\"Bad\\u111z\"")]
-        public void Lexize_BadUEscape_ThrowsLexingException(string input)
+        public void Tokenize_BadUEscape_ThrowsLexingException(string input)
         {
             // Arrange
-            ILexer lexer = new MyStringLexer();
 
             // Act
-            var ex = Assert.Throws<LexingException>(() => lexer.Lexize(input));
+            var ex = Assert.Throws<ParsingException>(() => _lexer.Tokenize(input.AsMemory()));
 
             // Assert
-            Assert.That(ex.Message, Is.EqualTo("Bad escape."));
-            Assert.That(ex.Position, Is.EqualTo(new Position(0, 4)));
+            Assert.That(ex.Message, Does.StartWith("Bad escape sequence."));
+            Assert.That(ex.Index, Is.EqualTo(4));
         }
-
     }
 }

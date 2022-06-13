@@ -1,42 +1,41 @@
 ﻿using System.Text;
 
-namespace TauCode.Parsing.Tests.Parsing.Sql.Data
+namespace TauCode.Parsing.Tests.Parsing.Sql.Data;
+
+public class ColumnInfo
 {
-    public class ColumnInfo
+    public string Name { get; set; }
+    public string TypeName { get; set; }
+    public int? Precision { get; set; }
+    public int? Scale { get; set; }
+    public bool IsNullable { get; set; } = true;
+    public bool IsPrimaryKey { get; set; }
+    public string Default { get; set; }
+
+    public override string ToString()
     {
-        public string Name { get; set; }
-        public string TypeName { get; set; }
-        public int? Precision { get; set; }
-        public int? Scale { get; set; }
-        public bool IsNullable { get; set; } = true;
-        public bool IsPrimaryKey { get; set; }
-        public string Default { get; set; }
+        var sb = new StringBuilder();
+        sb.Append($"    [{this.Name}] {this.TypeName}");
 
-        public override string ToString()
+        if (this.IsNullable)
         {
-            var sb = new StringBuilder();
-            sb.Append($"    [{this.Name}] {this.TypeName}");
-
-            if (this.IsNullable)
-            {
-                sb.Append(" NULL");
-            }
-            else
-            {
-                sb.Append(" NOT NULL");
-            }
-
-            if (this.IsPrimaryKey)
-            {
-                sb.Append(" PRIMARY KEY");
-            }
-
-            if (this.Default != null)
-            {
-                sb.Append($" DEFAULT {this.Default}");
-            }
-
-            return sb.ToString();
+            sb.Append(" NULL");
         }
+        else
+        {
+            sb.Append(" NOT NULL");
+        }
+
+        if (this.IsPrimaryKey)
+        {
+            sb.Append(" PRIMARY KEY");
+        }
+
+        if (this.Default != null)
+        {
+            sb.Append($" DEFAULT {this.Default}");
+        }
+
+        return sb.ToString();
     }
 }

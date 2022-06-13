@@ -39,7 +39,8 @@ namespace TauCode.Parsing
             var context = new ParsingContext(tokens);
             //var currentNodes = new HashSet<IParsingNode>(new[] { this.Root });
 
-            var currentNodes = GetRoutes(this.Root);
+            //var currentNodes = GetRoutes(this.Root);
+            var currentNodes = this.GetInitialNodes(this.Root);
             ILexicalToken todoPrevToken = null;
 
             var gotEndNode = false;
@@ -111,7 +112,8 @@ namespace TauCode.Parsing
                         gotEndNode = false;
                         //throw new NotImplementedException();
                         //currentNodes = new HashSet<IParsingNode>(new[] { this.Root }); // todo: use "cached" hashset
-                        currentNodes = GetRoutes(this.Root);
+                        //currentNodes = GetRoutes(this.Root);
+                        currentNodes = this.GetInitialNodes(this.Root);
                         todoPrevToken = null;
                         continue;
                     }
@@ -128,7 +130,7 @@ namespace TauCode.Parsing
 
                 if (versionAfterAct != versionBeforeAct + 1)
                 {
-                    var log = TodoLogKeeper.Log.ToString();
+                    //var log = TodoLogKeeper.Log.ToString();
 
                     throw new NotImplementedException("error: increase version.");
                 }
@@ -149,9 +151,18 @@ namespace TauCode.Parsing
             }
         }
 
+        private HashSet<IParsingNode> GetInitialNodes(IParsingNode root)
+        {
+            if (root is IdleNode)
+            {
+                return this.GetRoutes(root);
+            }
+
+            return new HashSet<IParsingNode>(new[] { root }); // todo: cache 'new[] { root }'
+        }
+
         private HashSet<IParsingNode> GetRoutes(IParsingNode node)
         {
-
             var contains = _routes.TryGetValue(node, out var hashSet);
             if (contains)
             {

@@ -31,5 +31,7 @@ public class TermNode : ActionNode
         var thisNode = (TermNode)node;
 
         cliResult.SetCommand(thisNode.Term);
+
+        parsingResult.IncreaseVersion();
     }
 }

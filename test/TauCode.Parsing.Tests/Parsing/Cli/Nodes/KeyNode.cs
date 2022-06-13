@@ -35,6 +35,8 @@ public class KeyNode : ActionNode
         var cliKeyToken = (CliKeyToken)token;
         var cliParsingResult = (CliParsingResult)parsingResult;
 
+        parsingResult.IncreaseVersion();
+
         // todo: obey 'IsUnique'
 
         // do nothing, KeyValueNode will do its job

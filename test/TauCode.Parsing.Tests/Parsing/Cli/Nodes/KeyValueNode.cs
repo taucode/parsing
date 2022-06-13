@@ -22,6 +22,8 @@ public class KeyValueNode : ActionNode
         var cliParsingResult = (CliParsingResult)parsingResult;
 
         cliParsingResult.AddKeyValue(thisNode.Alias, token.ToString());
+
+        parsingResult.IncreaseVersion();
     }
 
     protected override bool AcceptsTokenImpl(ILexicalToken token, IParsingResult parsingResult)

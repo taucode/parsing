@@ -51,4 +51,9 @@ public class CliParsingResult : IParsingResult
     }
 
     public IReadOnlyDictionary<string, List<string>> KeyValues => _keyValues;
+    public int Version => throw new NotImplementedException();
+    public void IncreaseVersion()
+    {
+        throw new NotImplementedException();
+    }
 }

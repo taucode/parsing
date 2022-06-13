@@ -62,22 +62,6 @@ namespace TauCode.Parsing.Graphs.Molds.Impl
 
         public IVertexMold GetExitVertex() => throw new NotImplementedException("error: invalid operation");
 
-        //public bool IsEntrance
-        //{
-        //    get => throw new NotImplementedException("error: invalid operation");
-        //    set => throw new NotImplementedException("error: invalid operation");
-        //}
-
-        //public bool IsExit
-        //{
-        //    get => throw new NotImplementedException("error: invalid operation");
-        //    set => throw new NotImplementedException("error: invalid operation");
-        //}
-
-        //public IVertexMold Entrance => throw new NotImplementedException("error: invalid operation");
-
-        //public IVertexMold Exit => throw new NotImplementedException("error: invalid operation");
-
         public IReadOnlyList<IScriptElementMold> AllElements => throw new NotImplementedException("error: invalid operation");
         public IReadOnlyList<ILinkableMold> Linkables => throw new NotImplementedException("error: invalid operation");
         public void Add(IScriptElementMold scriptElementMold) => throw new NotImplementedException("error: invalid operation");

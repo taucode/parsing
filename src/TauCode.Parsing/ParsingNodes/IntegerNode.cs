@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using TauCode.Parsing.LexicalTokens;
 
 namespace TauCode.Parsing.ParsingNodes
 {
@@ -13,12 +14,12 @@ namespace TauCode.Parsing.ParsingNodes
         }
 
         public IntegerNode()
-        {   
+        {
         }
 
         protected override bool AcceptsTokenImpl(ILexicalToken token, IParsingResult parsingResult)
         {
-            throw new NotImplementedException();
+            return token is IntegerToken;
         }
     }
 }

@@ -14,5 +14,7 @@ namespace TauCode.Parsing.LexicalTokens
         }
 
         public char Value { get; }
+
+        public override string ToString() => this.Value.ToString();
     }
 }

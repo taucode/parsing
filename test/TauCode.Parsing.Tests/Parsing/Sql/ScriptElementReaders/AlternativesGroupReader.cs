@@ -36,7 +36,7 @@ public class AlternativesGroupReader : GroupElementReader
         exit.ValidateAndFinalize();
         alternativesGroupMold.Add(exit);
 
-        for (var i = 1; i < alternativesGroupMold.Linkables.Count - 2; i++)
+        for (var i = 0; i < alternativesGroupMold.Linkables.Count - 2; i++)
         {
             var innerLinkable = alternativesGroupMold.Linkables[i];
             if (innerLinkable.GetEntranceVertex() == null)

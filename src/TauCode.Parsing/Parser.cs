@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Xml.XPath;
 using Serilog;
+using TauCode.Parsing.Graphs.Reading.Impl;
 using TauCode.Parsing.ParsingNodes;
 
 namespace TauCode.Parsing
@@ -36,7 +37,12 @@ namespace TauCode.Parsing
             // todo: parse multi-result script
 
             var context = new ParsingContext(tokens);
-            var currentNodes = new HashSet<IParsingNode>(new[] { this.Root });
+            //var currentNodes = new HashSet<IParsingNode>(new[] { this.Root });
+
+            var currentNodes = GetRoutes(this.Root);
+            ILexicalToken todoPrevToken = null;
+
+            var gotEndNode = false;
 
             //IParsingNode endNode = null;
 
@@ -57,14 +63,21 @@ namespace TauCode.Parsing
 
                 var currentToken = context.Tokens[context.Position];
 
+                this.Logger?.Verbose($"Position: {context.Position} Current Token: {currentToken}");
+
                 IParsingNode realWinner = null; // 'real' means it is not an EndNode
-                //endNode = null;
+                gotEndNode = false;
 
                 foreach (var currentNode in currentNodes)
                 {
+                    if (currentNode is IdleNode)
+                    {
+                        throw new NotImplementedException("error. should never happen");
+                    }
+
                     if (currentNode is EndNode)
                     {
-                        // not our guy since we've got current token
+                        gotEndNode = true;
                         continue;
                     }
 
@@ -86,13 +99,47 @@ namespace TauCode.Parsing
 
                 if (realWinner == null)
                 {
+                    if (gotEndNode)
+                    {
+                        // ok, nobody accepted but end node => current clause is over, let's start from beginning
+                        if (context.Position == context.Tokens.Count)
+                        {
+                            // will we ever get here?!
+                            throw new NotImplementedException();
+                        }
+
+                        gotEndNode = false;
+                        //throw new NotImplementedException();
+                        //currentNodes = new HashSet<IParsingNode>(new[] { this.Root }); // todo: use "cached" hashset
+                        currentNodes = GetRoutes(this.Root);
+                        todoPrevToken = null;
+                        continue;
+                    }
+
                     // unexpected token
-                    throw new NotImplementedException();
+                    throw new NotImplementedException("error: unexpected token");
                 }
+
+                var versionBeforeAct = parsingResult.Version;
 
                 realWinner.Act(currentToken, parsingResult);
 
+                var versionAfterAct = parsingResult.Version;
+
+                if (versionAfterAct != versionBeforeAct + 1)
+                {
+                    var log = TodoLogKeeper.Log.ToString();
+
+                    throw new NotImplementedException("error: increase version.");
+                }
+
                 context.Position++;
+
+                if (context.Position == 70)
+                {
+                    var log = TodoLogKeeper.Log.ToString();
+                    var todo = 3;
+                }
 
                 currentNodes = GetRoutes(realWinner);
                 if (currentNodes.Count == 0)
@@ -104,20 +151,19 @@ namespace TauCode.Parsing
 
         private HashSet<IParsingNode> GetRoutes(IParsingNode node)
         {
-            var contains = _routes.TryGetValue(node, out var list);
+
+            var contains = _routes.TryGetValue(node, out var hashSet);
             if (contains)
             {
-                return list;
+                return hashSet;
             }
 
-            var hashSet = new HashSet<IParsingNode>();
+            hashSet = new HashSet<IParsingNode>();
             AddNextNodesOf(node, hashSet);
 
-            list = hashSet;
+            _routes.Add(node, hashSet);
 
-            _routes.Add(node, list);
-
-            return list;
+            return hashSet;
         }
 
         private static void AddNextNodesOf(IParsingNode node, HashSet<IParsingNode> hashSet)

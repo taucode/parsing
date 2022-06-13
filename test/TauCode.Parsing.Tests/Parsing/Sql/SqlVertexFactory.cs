@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 using TauCode.Data.Graphs;
@@ -8,6 +9,7 @@ using TauCode.Parsing.Graphs.Building;
 using TauCode.Parsing.Graphs.Building.Impl;
 using TauCode.Parsing.Graphs.Molds;
 using TauCode.Parsing.ParsingNodes;
+using TauCode.Parsing.Tests.Parsing.Sql.Nodes;
 using TauCode.Parsing.TinyLisp.Data;
 
 namespace TauCode.Parsing.Tests.Parsing.Sql;
@@ -43,7 +45,7 @@ public class SqlVertexFactory : IVertexFactory
                     break;
 
                 case "IDENTIFIER":
-                    result = new IdentifierNode();
+                    result = new SqlIdentifierNode();
                     break;
 
                 case "INTEGER":
@@ -55,7 +57,7 @@ public class SqlVertexFactory : IVertexFactory
                     break;
 
                 case "MULTI-WORD":
-                    result = new MultiWordNode((List<string>)vertexMold.GetKeywordValue(":VALUES"));
+                    result = new MultiWordNode((List<string>)vertexMold.GetKeywordValue(":VALUES"), false);
                     break;
 
                 default:
@@ -67,7 +69,18 @@ public class SqlVertexFactory : IVertexFactory
             throw new NotImplementedException();
         }
 
+        if (result is ActionNode actionNode)
+        {
+            actionNode.Action = IdleAction;
+        }
+
         result.Name = vertexMold.Name;
         return result;
+    }
+
+    private static void IdleAction(ActionNode node, ILexicalToken token, IParsingResult parsingResult)
+    {
+        SqlParsingResult sqlParsingResult = (SqlParsingResult)parsingResult;
+        sqlParsingResult.IncreaseVersion();
     }
 }

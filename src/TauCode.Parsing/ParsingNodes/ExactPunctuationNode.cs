@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using TauCode.Parsing.LexicalTokens;
 
 namespace TauCode.Parsing.ParsingNodes
 {
@@ -23,7 +24,12 @@ namespace TauCode.Parsing.ParsingNodes
 
         protected override bool AcceptsTokenImpl(ILexicalToken token, IParsingResult parsingResult)
         {
-            throw new NotImplementedException();
+            if (token is PunctuationToken punctuationToken)
+            {
+                return this.Punctuation == punctuationToken.Value;
+            }
+
+            return false;
         }
     }
 }

@@ -2,9 +2,14 @@
 	:name "main"
 
 	(sequence
-		:name "create"
+		;:name "create"
 
-		("CREATE" :is-entrance t)
+		(idle
+			:name "root-node"
+			:is-entrance t
+			:links-to ("end-of-clause"))
+
+		("CREATE" :name "create")
 
 		(alternatives
 			:name "create-alternatives"
@@ -13,7 +18,9 @@
 			(group-ref :group-path "../../create-index/")
 		)
 
-		(end :is-exit t)
+		(end
+			:name "end-of-clause"
+			:is-exit t)
 	)
 
 	(sequence
@@ -21,7 +28,7 @@
 
 		("TABLE" :name "do-create-table" :is-entrance t)
 		(identifier :name "table-name")
-		("(")
+		("(" :name "table-opening")
 		(group-ref
 			:group-path "../column-def/"
 			:name "column-definition-ref"
@@ -164,10 +171,14 @@
 	(sequence
 		:name "create-index"
 
-		(optional :is-entrance t
-			("UNIQUE" :name "do-create-unique-index")
+		(alternatives :is-entrance t
+			(sequence
+				("UNIQUE" :is-entrance t)
+				("INDEX" :name "do-create-unique-index" :is-exit t)
+			)
+			("INDEX" :name "do-create-non-unique-index")
 		)
-		("INDEX" :name "do-create-index")
+
 		(identifier :name "index-name")
 		("ON")
 		(identifier :name "index-table-name")

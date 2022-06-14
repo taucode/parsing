@@ -1,19 +1,24 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using TauCode.Parsing.Graphs.Molds;
-using TauCode.Parsing.Graphs.Molds.Impl;
+using TauCode.Parsing.Graphs.Molding;
+using TauCode.Parsing.Graphs.Molding.Impl;
 using TauCode.Parsing.TinyLisp.Data;
 
 namespace TauCode.Parsing.Graphs.Reading.Impl
 {
-    // todo clean, regions
     public class SplitterElementReader : GroupElementReader
     {
+        #region ctor
+
         public SplitterElementReader(IGraphScriptReader scriptReader)
             : base(scriptReader)
         {
         }
+
+        #endregion
+
+        #region Overridden
 
         protected override void CustomizeContent(IScriptElementMold scriptElementMold, Element element)
         {
@@ -82,5 +87,7 @@ namespace TauCode.Parsing.Graphs.Reading.Impl
                 }
             }
         }
+
+        #endregion
     }
 }

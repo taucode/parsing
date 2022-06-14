@@ -1,13 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using TauCode.Parsing.Graphs.Molds;
+using TauCode.Parsing.Exceptions;
+using TauCode.Parsing.Graphs.Molding;
 using TauCode.Parsing.TinyLisp;
 using TauCode.Parsing.TinyLisp.Data;
 
 namespace TauCode.Parsing.Graphs.Reading.Impl
 {
-    // todo clean
     public class GraphScriptReader : IGraphScriptReader
     {
         #region Constants & Invariants
@@ -77,15 +77,10 @@ namespace TauCode.Parsing.Graphs.Reading.Impl
 
                     case "GROUP-REF":
                         return _groupRefReader;
-
-                    default:
-                        throw new NotImplementedException();
                 }
             }
-            else
-            {
-                throw new NotImplementedException();
-            }
+
+            throw new ReadingException($"Unexpected element to read: '{car}'.");
         }
 
         public virtual IGroupMold ReadScript(ReadOnlyMemory<char> script)
@@ -93,11 +88,13 @@ namespace TauCode.Parsing.Graphs.Reading.Impl
             var tokens = _lexer.Tokenize(script);
             var scriptElement = _lispReader.Read(tokens);
 
-            // todo: can throw
-            var groupElement = scriptElement.Single();
+            if (scriptElement.Count != 1)
+            {
+                throw new ReadingException("Script should contain exactly one group at the top level.");
+            }
 
-            var groupReader = this.ResolveElementReader(groupElement.GetCar().AsElement<Atom>()); // todo: can throw
-            // todo: check that groupReader is really group reader
+            var groupElement = scriptElement.Single();
+            var groupReader = this.ResolveElementReader(groupElement.GetCar<Atom>());
             var group = groupReader.Read(null, groupElement);
 
             if (group is IGroupMold realGroup)
@@ -105,12 +102,7 @@ namespace TauCode.Parsing.Graphs.Reading.Impl
                 return realGroup;
             }
 
-            throw new NotImplementedException();
-
-
-
-            //var group = this.ReadGroup(null, groupElement);
-            //return group;
+            throw new ReadingException("Could not read script.");
         }
 
         #endregion

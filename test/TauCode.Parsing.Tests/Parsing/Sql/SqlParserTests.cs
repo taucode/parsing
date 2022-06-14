@@ -7,18 +7,16 @@ using TauCode.Extensions;
 using TauCode.Parsing.Exceptions;
 using TauCode.Parsing.Graphs.Building;
 using TauCode.Parsing.Graphs.Building.Impl;
-using TauCode.Parsing.Graphs.Molds;
 using TauCode.Parsing.Graphs.Reading;
-using TauCode.Parsing.LexicalTokenProducers;
-using TauCode.Parsing.LexicalTokens;
-using TauCode.Parsing.ParsingNodes;
+using TauCode.Parsing.Nodes;
 using TauCode.Parsing.Tests.Parsing.Sql.Data;
 using TauCode.Parsing.Tests.Parsing.Sql.Producers;
 using TauCode.Parsing.TinyLisp;
+using TauCode.Parsing.TokenProducers;
+using TauCode.Parsing.Tokens;
 
 namespace TauCode.Parsing.Tests.Parsing.Sql;
 
-// todo clean
 [TestFixture]
 public class SqlParserTests
 {
@@ -49,17 +47,13 @@ public class SqlParserTests
             .Verbose()
             .WriteTo
             .TextWriter(_writer)
-            .CreateLogger();
-
-        TodoLogKeeper.Log = _writer;
+            .CreateLogger();        
     }
 
     [Test]
     public void SqlParser_ValidInput_Parses()
     {
         // Arrange
-
-            
         var sqlGrammar = this.GetType().Assembly.GetResourceText("sql-grammar-smart.lisp", true);
         IGraphScriptReader scriptReader = new SqlGraphScriptReader();
         var graphMold = scriptReader.ReadScript(sqlGrammar.AsMemory());
@@ -73,21 +67,6 @@ public class SqlParserTests
             Root = (IdleNode)graph.Single(x => x.Name == "root-node"),
             Logger = _logger,
         };
-
-        //ITreeBuilder builder = new TreeBuilder();
-        //var root = builder.Build(nodeFactory, list);
-
-        //            IParser parser = new Parser
-        //            {
-        //                Root = root,
-        //            };
-
-        //            var allSqlNodes = root.FetchTree();
-
-        //            var exactTextNodes = allSqlNodes
-        //                .Where(x => x is ExactTextNode)
-        //                .Cast<ExactTextNode>()
-        //                .ToList();
 
         #region assign job to nodes
 
@@ -108,10 +87,6 @@ public class SqlParserTests
             sqlParsingResult.ReplaceCreateClausePlaceholderWithCreateTableInfo();
 
             parsingResult.IncreaseVersion();
-
-            //throw new NotImplementedException();
-            //var tableInfo = new TableInfo();
-            //accumulator.AddResult(tableInfo);
         };
 
         var tableName = (ActionNode)graph.Single(x => x.Name == "table-name");
@@ -122,9 +97,6 @@ public class SqlParserTests
             tableInfo.Name = ((TextToken)token).Text;
 
             parsingResult.IncreaseVersion();
-
-            //var tableInfo = accumulator.GetLastResult<TableInfo>();
-            //tableInfo.Name = ((TextToken)token).Text;
         };
 
         var tableOpening = (ActionNode)graph.Single(x => x.Name == "table-opening");
@@ -376,15 +348,6 @@ public class SqlParserTests
         };
 
         #endregion
-
-        //            var objectNameTokens = allSqlNodes
-        //                .Where(x =>
-        //                    x is TextNode textNode &&
-        //                    x.Name.EndsWith("-name", StringComparison.InvariantCultureIgnoreCase))
-        //                .Cast<TextNode>()
-        //                .ToList();
-
-        // todo: some clauses with ending ';'
 
         var sql =
             @"

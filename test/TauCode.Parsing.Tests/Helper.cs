@@ -165,5 +165,13 @@ namespace TauCode.Parsing.Tests
         internal static bool IsInlineWhiteSpace(this char c) => c.IsIn(' ', '\t');
 
         internal static bool IsCaretControl(this char c) => c.IsIn('\r', '\n');
+
+        // todo: should be part of TauCode.Data.Graphs
+        //internal static IArc DrawArcTo(this IVertex tail, IVertex head)
+        //{
+        //    var arc = new Arc();
+        //    arc.Connect(tail, head);
+        //    return arc;
+        //}
     }
 }

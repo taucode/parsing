@@ -1,6 +1,6 @@
 ﻿using System;
-using TauCode.Parsing.Graphs.Molds;
-using TauCode.Parsing.Graphs.Molds.Impl;
+using TauCode.Parsing.Graphs.Molding;
+using TauCode.Parsing.Graphs.Molding.Impl;
 using TauCode.Parsing.Graphs.Reading;
 using TauCode.Parsing.Graphs.Reading.Impl;
 using TauCode.Parsing.TinyLisp.Data;
@@ -28,14 +28,11 @@ public class OptionalElementReader : GroupElementReader
         var optionalEntrance = new VertexMold(groupMold, Symbol.Create("idle"))
         {
             IsEntrance = true,
-
-            // todo: add tool-generated name
         };
 
         var optionalExit = new VertexMold(groupMold, Symbol.Create("idle"))
         {
             IsExit = true,
-            // todo: add tool-generated name
         };
 
         optionalEntrance.AddLinkTo(linkable.GetEntranceVertex());

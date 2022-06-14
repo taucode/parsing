@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
-using TauCode.Parsing.LexicalTokens;
-using TauCode.Parsing.ParsingNodes;
+using TauCode.Parsing.Nodes;
 using TauCode.Parsing.Tests.Parsing.Cli.Result;
+using TauCode.Parsing.Tokens;
 
 namespace TauCode.Parsing.Tests.Parsing.Cli.Nodes;
 
@@ -28,6 +28,8 @@ public class KeyNode : ActionNode
 
         return false;
     }
+
+    protected override string GetDataTag() => $"Alias: '{this.Alias}'";
 
     private static void ActionImpl(ActionNode node, ILexicalToken token, IParsingResult parsingResult)
     {

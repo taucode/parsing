@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Linq;
 using NUnit.Framework;
-using TauCode.Parsing.LexicalTokenProducers;
-using TauCode.Parsing.LexicalTokens;
+using TauCode.Parsing.TokenProducers;
+using TauCode.Parsing.Tokens;
 
 namespace TauCode.Parsing.Tests.Parsing.Cli;
 

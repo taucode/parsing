@@ -1,6 +1,4 @@
-﻿using Serilog;
-
-namespace TauCode.Parsing
+﻿namespace TauCode.Parsing
 {
     public interface IParsingResult
     {

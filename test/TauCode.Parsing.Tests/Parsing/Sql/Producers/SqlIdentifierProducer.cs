@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using TauCode.Parsing.Exceptions;
-using TauCode.Parsing.LexicalTokens;
+using TauCode.Parsing.Tokens;
 
 namespace TauCode.Parsing.Tests.Parsing.Sql.Producers
 {
@@ -53,7 +53,7 @@ namespace TauCode.Parsing.Tests.Parsing.Sql.Producers
                     {
                         if (openingDelimiter.HasValue)
                         {
-                            this.ThrowUnclosedIdentifierException(context.Position);
+                            ThrowUnclosedIdentifierException(context.Position);
                         }
                         break;
                     }
@@ -87,17 +87,17 @@ namespace TauCode.Parsing.Tests.Parsing.Sql.Producers
                                 }
                                 else
                                 {
-                                    this.ThrowUnclosedIdentifierException(index);
+                                    ThrowUnclosedIdentifierException(index);
                                 }
                             }
                             else
                             {
-                                throw new ParsingException($"Unexpected delimiter: '{c}'.", index);
+                                throw new LexingException($"Unexpected delimiter: '{c}'.", index);
                             }
                         }
                         else
                         {
-                            throw new ParsingException($"Unexpected delimiter: '{c}'.", index);
+                            throw new LexingException($"Unexpected delimiter: '{c}'.", index);
                         }
                     }
                 }
@@ -106,9 +106,9 @@ namespace TauCode.Parsing.Tests.Parsing.Sql.Producers
             return null;
         }
 
-        private void ThrowUnclosedIdentifierException(int position)
+        private static void ThrowUnclosedIdentifierException(int position)
         {
-            throw new ParsingException("Unclosed identifier.", position);
+            throw new LexingException("Unclosed identifier.", position);
         }
     }
 }

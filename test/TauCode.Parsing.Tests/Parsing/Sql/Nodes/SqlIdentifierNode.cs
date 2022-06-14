@@ -3,8 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using TauCode.Parsing.LexicalTokens;
-using TauCode.Parsing.ParsingNodes;
+using TauCode.Parsing.Nodes;
+using TauCode.Parsing.Tokens;
 
 namespace TauCode.Parsing.Tests.Parsing.Sql.Nodes
 {

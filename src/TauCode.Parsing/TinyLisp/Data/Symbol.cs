@@ -45,7 +45,7 @@ namespace TauCode.Parsing.TinyLisp.Data
             return false;
         }
 
-        public override int GetHashCode() => this.Name.GetHashCode();
+        protected override int GetHashCodeImpl() => this.Name.GetHashCode();
 
         public static Symbol Create(string name)
         {

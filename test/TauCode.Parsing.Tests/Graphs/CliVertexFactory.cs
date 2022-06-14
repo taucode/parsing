@@ -6,27 +6,14 @@ using System.Threading.Tasks;
 using TauCode.Data.Graphs;
 using TauCode.Extensions;
 using TauCode.Parsing.Graphs.Building;
-using TauCode.Parsing.Graphs.Molds;
-using TauCode.Parsing.ParsingNodes;
+using TauCode.Parsing.Graphs.Molding;
+using TauCode.Parsing.Nodes;
 using TauCode.Parsing.Tests.Parsing.Cli.Nodes;
 
 namespace TauCode.Parsing.Tests.Graphs;
 
-// todo clean
 public class CliVertexFactory : IVertexFactory
 {
-    //public bool Accepts(IVertexMold vertexMold)
-    //{
-    //    var accepts = vertexMold.Type.IsIn(
-    //        "term",
-    //        "idle",
-    //        "end",
-    //        "key",
-    //        "key-value");
-
-    //    return accepts;
-    //}
-
     public IVertex Create(IVertexMold vertexMold)
     {
         string alias;

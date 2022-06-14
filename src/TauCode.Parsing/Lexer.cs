@@ -3,11 +3,12 @@ using System.Collections.Generic;
 using System.Linq;
 using TauCode.Parsing.Exceptions;
 
-// todo regions
 namespace TauCode.Parsing
 {
     public class Lexer : ILexer
     {
+        #region ILexer Members
+
         public IEnumerable<ILexicalTokenProducer> Producers { get; set; }
 
         public bool IgnoreEmptyTokens { get; set; } = true;
@@ -40,8 +41,8 @@ namespace TauCode.Parsing
                     {
                         if (positionBeforeProduce != context.Position)
                         {
-                            throw new ParsingException(
-                                "Internal error: token producer returned 'null', but context position has advanced.", 
+                            throw new LexingException(
+                                "Internal error: token producer returned 'null', but context position has advanced.",
                                 positionBeforeProduce);
                         }
 
@@ -78,7 +79,7 @@ namespace TauCode.Parsing
                 }
                 else
                 {
-                    throw Helper.CreateException(ParsingErrorTag.CannotTokenize, context.Position);
+                    throw LexingHelper.CreateException(LexingErrorTag.CannotTokenize, context.Position);
                 }
             }
 
@@ -88,5 +89,7 @@ namespace TauCode.Parsing
         public Action<LexingContext, ILexicalTokenProducer> OnBeforeTokenProduced { get; set; }
 
         public Action<LexingContext, ILexicalToken> OnAfterTokenProduced { get; set; }
+
+        #endregion
     }
 }

@@ -56,7 +56,7 @@ namespace TauCode.Parsing.Tests.TinyLisp
             var ex = Assert.Throws<ArgumentNullException>(() => element.GetSingleKeywordArgument(":arg"));
 
             // Assert
-            Assert.That(ex.ParamName, Is.EqualTo("shouldBePseudoList"));
+            Assert.That(ex.ParamName, Is.EqualTo("element"));
         }
 
         [Test]
@@ -70,8 +70,8 @@ namespace TauCode.Parsing.Tests.TinyLisp
 
             // Assert
             Assert.That(ex.Message,
-                Does.StartWith("Argument is not of type 'TauCode.Parsing.TinyLisp.Data.PseudoList'."));
-            Assert.That(ex.ParamName, Is.EqualTo("shouldBePseudoList"));
+                Does.StartWith("'element' is expected to be of type 'TauCode.Parsing.TinyLisp.Data.PseudoList'."));
+            Assert.That(ex.ParamName, Is.EqualTo("element"));
         }
 
         [Test]
@@ -93,7 +93,11 @@ namespace TauCode.Parsing.Tests.TinyLisp
         public void GetSingleKeywordArgument_ArgumentIsNotKeyword_ThrowsArgumentException(string badKeywordName)
         {
             // Arrange
-            Element element = new PseudoList();
+            Element element = new PseudoList
+            {
+
+                Symbol.Create("a"),
+            };
 
             // Act
             var ex = Assert.Throws<ArgumentException>(() => element.GetSingleKeywordArgument(badKeywordName));
@@ -133,12 +137,12 @@ namespace TauCode.Parsing.Tests.TinyLisp
             var pseudoList = reader.Read(tokens).Single().AsPseudoList();
 
             // Act
-            var ex = Assert.Throws<ParsingException>(() => pseudoList.GetSingleKeywordArgument(":non-existing-key"));
+            var ex = Assert.Throws<TinyLispException>(() => pseudoList.GetSingleKeywordArgument(":non-existing-key"));
 
             // Assert
             Assert.That(
                 ex.Message,
-                Does.StartWith("TinyLisp: no argument for keyword ':non-existing-key'."));
+                Does.StartWith("No argument for keyword ':non-existing-key'."));
         }
 
         [Test]
@@ -156,13 +160,13 @@ namespace TauCode.Parsing.Tests.TinyLisp
             var pseudoList = reader.Read(tokens).Single().AsPseudoList();
 
             // Act
-            var ex = Assert.Throws<ParsingException>(() =>
+            var ex = Assert.Throws<TinyLispException>(() =>
                 pseudoList.GetSingleKeywordArgument(":your-key", absenceIsAllowed));
 
             // Assert
             Assert.That(
                 ex.Message,
-                Does.StartWith("TinyLisp: keyword ':your-key' was found, but next element is a keyword too."));
+                Does.StartWith("Keyword ':your-key' was found, but next element is a keyword too."));
         }
 
         [Test]
@@ -180,13 +184,13 @@ namespace TauCode.Parsing.Tests.TinyLisp
             var pseudoList = reader.Read(tokens).Single().AsPseudoList();
 
             // Act
-            var ex = Assert.Throws<ParsingException>(() =>
+            var ex = Assert.Throws<TinyLispException>(() =>
                 pseudoList.GetSingleKeywordArgument(":your-key", absenceIsAllowed));
 
             // Assert
             Assert.That(
                 ex.Message,
-                Does.StartWith("TinyLisp: keyword ':your-key' was found, but at the end of the list."));
+                Does.StartWith("Keyword ':your-key' was found, but at the end of the list."));
         }
 
         [Test]
@@ -203,13 +207,13 @@ namespace TauCode.Parsing.Tests.TinyLisp
             var pseudoList = reader.Read(tokens).Single().AsPseudoList();
 
             // Act
-            var ex = Assert.Throws<ParsingException>(() =>
+            var ex = Assert.Throws<TinyLispException>(() =>
                 pseudoList.GetSingleKeywordArgument<Symbol>(":your-key", absenceIsAllowed));
 
             // Assert
             Assert.That(
                 ex.Message,
-                Does.StartWith("TinyLisp: argument for ':your-key' was found, but it appears to be of type 'TauCode.Parsing.TinyLisp.Data.StringAtom' instead of expected type 'TauCode.Parsing.TinyLisp.Data.Symbol'."));
+                Does.StartWith("Argument for ':your-key' was found, but it appears to be of type 'TauCode.Parsing.TinyLisp.Data.StringAtom' instead of expected type 'TauCode.Parsing.TinyLisp.Data.Symbol'."));
         }
 
         [Test]
@@ -267,11 +271,11 @@ namespace TauCode.Parsing.Tests.TinyLisp
             var pseudoList = reader.Read(tokens).Single().AsPseudoList();
 
             // Act
-            var ex = Assert.Throws<ParsingException>(() =>
+            var ex = Assert.Throws<TinyLispException>(() =>
                 pseudoList.GetAllKeywordArguments(":non-existing-key", false));
 
             // Assert
-            Assert.That(ex.Message, Does.StartWith("TinyLisp: no argument for keyword ':non-existing-key'."));
+            Assert.That(ex.Message, Does.StartWith("No argument for keyword ':non-existing-key'."));
         }
 
         [Test]
@@ -324,7 +328,7 @@ namespace TauCode.Parsing.Tests.TinyLisp
             var ex = Assert.Throws<ArgumentNullException>(() => pseudoList.GetAllKeywordArguments(":key"));
 
             // Assert
-            Assert.That(ex.ParamName, Is.EqualTo("shouldBePseudoList"));
+            Assert.That(ex.ParamName, Is.EqualTo("element"));
         }
 
         [Test]
@@ -338,8 +342,8 @@ namespace TauCode.Parsing.Tests.TinyLisp
 
             // Assert
             Assert.That(ex.Message,
-                Does.StartWith("Argument is not of type 'TauCode.Parsing.TinyLisp.Data.PseudoList'."));
-            Assert.That(ex.ParamName, Is.EqualTo("shouldBePseudoList"));
+                Does.StartWith("'element' is expected to be of type 'TauCode.Parsing.TinyLisp.Data.PseudoList'."));
+            Assert.That(ex.ParamName, Is.EqualTo("element"));
         }
 
         [Test]
@@ -448,88 +452,13 @@ namespace TauCode.Parsing.Tests.TinyLisp
             var pseudoList = reader.Read(tokens).Single().AsPseudoList();
 
             // Act
-            var ex = Assert.Throws<ParsingException>(() => pseudoList.GetSingleArgumentAsBool(":key"));
+            var ex = Assert.Throws<TinyLispException>(() => pseudoList.GetSingleArgumentAsBool(":key"));
 
             // Assert
             var wrongItem = reader.Read(_lexer.Tokenize(badItem.AsMemory())).Single().ToString();
             Assert.That(
                 ex.Message,
-                Does.StartWith($"TinyLisp: keyword ':key' was found, but it appeared to be '{wrongItem}' instead of NIL or T."));
-        }
-
-        [Test]
-        [TestCase("(defun f (x) (* x x))", "DEFUN")]
-        [TestCase("(nil t)", "NIL")]
-        [TestCase("(t nil)", "T")]
-        public void GetCarSymbolName_HappyPath_ReturnsExpectedResult(string form, string expectedCar)
-        {
-            // Arrange
-            
-            var tokens = _lexer.Tokenize(form.AsMemory());
-            var reader = new TinyLispPseudoReader();
-
-            var pseudoList = reader.Read(tokens).Single().AsPseudoList();
-
-            // Act
-            var car = pseudoList.GetCarSymbolName();
-
-            // Assert
-            Assert.That(car, Is.EqualTo(expectedCar));
-        }
-
-        [Test]
-        public void GetCarSymbolName_ArgumentIsNull_ThrowsArgumentNullException()
-        {
-            // Arrange
-            PseudoList pseudoList = null;
-
-            // Act
-            var ex = Assert.Throws<ArgumentNullException>(() => pseudoList.GetCarSymbolName());
-
-            // Assert
-            Assert.That(ex.ParamName, Is.EqualTo("shouldBePseudoList"));
-        }
-
-        [Test]
-        public void GetCarSymbolName_ArgumentIsNotPseudoList_ThrowsArgumentException()
-        {
-            // Arrange
-            var element = Nil.Instance;
-
-            // Act
-            var ex = Assert.Throws<ArgumentException>(() => element.GetCarSymbolName());
-
-            // Assert
-            Assert.That(ex.Message, Does.StartWith("Argument is not of type 'TauCode.Parsing.TinyLisp.Data.PseudoList'."));
-            Assert.That(ex.ParamName, Is.EqualTo("shouldBePseudoList"));
-        }
-
-        [Test]
-        public void GetCarSymbolName_PseudoListIsEmpty_ThrowsArgumentException()
-        {
-            // Arrange
-            var element = new PseudoList();
-
-            // Act
-            var ex = Assert.Throws<ArgumentException>(() => element.GetCarSymbolName());
-
-            // Assert
-            Assert.That(ex.Message, Does.StartWith("PseudoList is empty."));
-            Assert.That(ex.ParamName, Is.EqualTo("shouldBePseudoList"));
-        }
-
-        [Test]
-        public void GetCarSymbolName_CarIsNotSymbol_ThrowsArgumentException()
-        {
-            // Arrange
-            var element = new PseudoList(new[] { new StringAtom("some string"), });
-
-            // Act
-            var ex = Assert.Throws<ArgumentException>(() => element.GetCarSymbolName());
-
-            // Assert
-            Assert.That(ex.Message, Does.StartWith("CAR of PseudoList is not a symbol."));
-            Assert.That(ex.ParamName, Is.EqualTo("shouldBePseudoList"));
+                Does.StartWith($"Keyword ':key' was found, but it appeared to be '{wrongItem}' instead of NIL or T."));
         }
 
         [Test]
@@ -563,7 +492,7 @@ namespace TauCode.Parsing.Tests.TinyLisp
             var ex = Assert.Throws<ArgumentNullException>(() => pseudoList.GetMultipleFreeArgumentSets());
 
             // Assert
-            Assert.That(ex.ParamName, Is.EqualTo("shouldBePseudoList"));
+            Assert.That(ex.ParamName, Is.EqualTo("element"));
         }
 
         [Test]
@@ -576,8 +505,8 @@ namespace TauCode.Parsing.Tests.TinyLisp
             var ex = Assert.Throws<ArgumentException>(() => element.GetMultipleFreeArgumentSets());
 
             // Assert
-            Assert.That(ex.Message, Does.StartWith("Argument is not of type 'TauCode.Parsing.TinyLisp.Data.PseudoList'."));
-            Assert.That(ex.ParamName, Is.EqualTo("shouldBePseudoList"));
+            Assert.That(ex.Message, Does.StartWith("'element' is expected to be of type 'TauCode.Parsing.TinyLisp.Data.PseudoList'."));
+            Assert.That(ex.ParamName, Is.EqualTo("element"));
         }
 
         [Test]
@@ -612,10 +541,10 @@ namespace TauCode.Parsing.Tests.TinyLisp
             var pseudoList = reader.Read(tokens).Single().AsPseudoList();
 
             // Act
-            var ex = Assert.Throws<ParsingException>(() => pseudoList.GetFreeArguments());
+            var ex = Assert.Throws<TinyLispException>(() => pseudoList.GetFreeArguments());
 
             // Assert
-            Assert.That(ex.Message, Does.StartWith("TinyLisp: free arguments not found."));
+            Assert.That(ex.Message, Does.StartWith("Free arguments not found."));
         }
 
         [Test]
@@ -631,10 +560,10 @@ namespace TauCode.Parsing.Tests.TinyLisp
             var pseudoList = reader.Read(tokens).Single().AsPseudoList();
 
             // Act
-            var ex = Assert.Throws<ParsingException>(() => pseudoList.GetFreeArguments());
+            var ex = Assert.Throws<TinyLispException>(() => pseudoList.GetFreeArguments());
 
             // Assert
-            Assert.That(ex.Message, Does.StartWith("TinyLisp: more than one set of free arguments was found."));
+            Assert.That(ex.Message, Does.StartWith("More than one set of free arguments was found."));
         }
     }
 }

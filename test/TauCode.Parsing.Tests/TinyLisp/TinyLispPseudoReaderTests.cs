@@ -3,8 +3,8 @@ using System;
 using System.Linq;
 using TauCode.Extensions;
 using TauCode.Parsing.Exceptions;
-using TauCode.Parsing.LexicalTokens;
 using TauCode.Parsing.TinyLisp;
+using TauCode.Parsing.Tokens;
 
 namespace TauCode.Parsing.Tests.TinyLisp
 {
@@ -76,10 +76,10 @@ namespace TauCode.Parsing.Tests.TinyLisp
             var reader = new TinyLispPseudoReader();
 
             // Act
-            var ex = Assert.Throws<ParsingException>(() => reader.Read(tokens));
+            var ex = Assert.Throws<TinyLispException>(() => reader.Read(tokens));
 
             // Assert
-            Assert.That(ex.Message, Does.StartWith("TinyLisp: unclosed form."));
+            Assert.That(ex.Message, Does.StartWith("Unclosed form."));
             Assert.That(ex.Index, Is.EqualTo(20));
         }
 
@@ -93,10 +93,10 @@ namespace TauCode.Parsing.Tests.TinyLisp
             var reader = new TinyLispPseudoReader();
 
             // Act
-            var ex = Assert.Throws<ParsingException>(() => reader.Read(tokens));
+            var ex = Assert.Throws<TinyLispException>(() => reader.Read(tokens));
 
             // Assert
-            Assert.That(ex.Message, Does.StartWith("TinyLisp: unexpected ')'."));
+            Assert.That(ex.Message, Does.StartWith("Unexpected ')'."));
             Assert.That(ex.Index, Is.EqualTo(17));
         }
 
@@ -114,10 +114,10 @@ namespace TauCode.Parsing.Tests.TinyLisp
             var reader = new TinyLispPseudoReader();
 
             // Act
-            var ex = Assert.Throws<ParsingException>(() => reader.Read(list));
+            var ex = Assert.Throws<TinyLispException>(() => reader.Read(list));
 
             // Assert
-            Assert.That(ex.Message, Does.StartWith("TinyLisp: cannot read token."));
+            Assert.That(ex.Message, Does.StartWith("Cannot read token."));
         }
     }
 }

@@ -64,6 +64,8 @@ namespace TauCode.Parsing.TinyLisp.Data
             return sb.ToString();
         }
 
+        protected override int GetHashCodeImpl() => _elements.GetHashCode();
+
         #endregion
 
         #region IReadOnlyList<Element> Members
@@ -80,7 +82,7 @@ namespace TauCode.Parsing.TinyLisp.Data
 
         #region Public
 
-        public void AddElement(Element element)
+        public void Add(Element element)
         {
             if (element == null)
             {

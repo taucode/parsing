@@ -72,4 +72,8 @@ X   1. Get rid of TauCode.Extensions?
 
 2022-06-08
 ==========
-    1. Variety of exceptions
++   1. Variety of exceptions
+    2. smart CLI
+    3. enrich log; don't forget this.Logger?.Verbose instead of this.Logger.Verbose
+    4. ut all token producers.
+    5. add tool-generated names to nodes created by reader.

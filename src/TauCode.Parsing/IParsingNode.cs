@@ -6,5 +6,6 @@ namespace TauCode.Parsing
     {
         bool AcceptsToken(ILexicalToken token, IParsingResult parsingResult);
         void Act(ILexicalToken token, IParsingResult parsingResult);
+        string GetTag();
     }
 }

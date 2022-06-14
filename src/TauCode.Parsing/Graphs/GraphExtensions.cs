@@ -3,16 +3,24 @@ using System.Collections.Generic;
 using System.Data;
 using System.Linq;
 using System.Text;
-using TauCode.Parsing.Graphs.Molds;
+using TauCode.Parsing.Graphs.Molding;
 
 namespace TauCode.Parsing.Graphs
 {
-    // todo clean
     public static class GraphExtensions
     {
         public static ILinkableMold ResolvePath(this ILinkableMold linkableMold, string path)
         {
-            // todo checks
+            if (linkableMold == null)
+            {
+                throw new ArgumentNullException(nameof(linkableMold));
+            }
+
+            if (path == null)
+            {
+                throw new ArgumentNullException(nameof(path));
+            }
+
             if (path.StartsWith("/"))
             {
                 throw new NotImplementedException();

@@ -2,8 +2,8 @@
 using System.Linq;
 using NUnit.Framework;
 using TauCode.Parsing.Exceptions;
-using TauCode.Parsing.LexicalTokenProducers;
-using TauCode.Parsing.LexicalTokens;
+using TauCode.Parsing.TokenProducers;
+using TauCode.Parsing.Tokens;
 
 namespace TauCode.Parsing.Tests.Lexing
 {
@@ -58,7 +58,7 @@ namespace TauCode.Parsing.Tests.Lexing
             var input = " \"Unclosed string";
 
             // Act
-            var ex = Assert.Throws<ParsingException>(() => _lexer.Tokenize(input.AsMemory()));
+            var ex = Assert.Throws<LexingException>(() => _lexer.Tokenize(input.AsMemory()));
             
             // Assert
             Assert.That(ex.Message, Does.StartWith("Unclosed string."));
@@ -75,7 +75,7 @@ namespace TauCode.Parsing.Tests.Lexing
             // Arrange
 
             // Act
-            var ex = Assert.Throws<ParsingException>(() => _lexer.Tokenize(input.AsMemory()));
+            var ex = Assert.Throws<LexingException>(() => _lexer.Tokenize(input.AsMemory()));
 
             // Assert
             Assert.That(ex.Message, Does.StartWith("Newline in string."));
@@ -89,7 +89,7 @@ namespace TauCode.Parsing.Tests.Lexing
             // Arrange
 
             // Act
-            var ex = Assert.Throws<ParsingException>(() => _lexer.Tokenize(input.AsMemory()));
+            var ex = Assert.Throws<LexingException>(() => _lexer.Tokenize(input.AsMemory()));
 
             // Assert
             Assert.That(ex.Message, Does.StartWith("Unclosed string."));
@@ -103,7 +103,7 @@ namespace TauCode.Parsing.Tests.Lexing
             // Arrange
 
             // Act
-            var ex = Assert.Throws<ParsingException>(() => _lexer.Tokenize(input.AsMemory()));
+            var ex = Assert.Throws<LexingException>(() => _lexer.Tokenize(input.AsMemory()));
 
             // Assert
             Assert.That(ex.Message, Does.StartWith("Bad escape sequence."));
@@ -121,7 +121,7 @@ namespace TauCode.Parsing.Tests.Lexing
             // Arrange
 
             // Act
-            var ex = Assert.Throws<ParsingException>(() => _lexer.Tokenize(input.AsMemory()));
+            var ex = Assert.Throws<LexingException>(() => _lexer.Tokenize(input.AsMemory()));
 
             // Assert
             Assert.That(ex.Message, Does.StartWith("Bad escape sequence."));

@@ -1,65 +1,31 @@
-﻿using System;
-using System.Text;
+﻿using TauCode.Data.Text;
+using TauCode.Data.Text.TextDataExtractors;
 using TauCode.Parsing.Tokens;
 
 namespace TauCode.Parsing.TokenProducers
 {
-    public class JsonStringProducer : ILexicalTokenProducer
+    public class JsonStringProducer : LexicalTokenProducerBase
     {
-        public ILexicalToken Produce(LexingContext context)
+        private readonly JsonStringExtractor _extractor;
+
+        public JsonStringProducer(TerminatingDelegate terminator = null)
+        {
+            _extractor = new JsonStringExtractor(terminator);
+        }
+
+        protected override ILexicalToken ProduceImpl(LexingContext context)
         {
             var start = context.Position;
-            var input = context.Input.Span[start..];
-            var pos = 0;
 
-            var c = input[0];
-
-            char closingChar;
-
-            if (c == '"' || c == '\'')
-            {
-                closingChar = c;
-            }
-            else
+            var span = context.Input.Span[context.Position..];
+            var extractionResult = _extractor.TryExtract(span, out var value);
+            if (extractionResult.ErrorCode.HasValue)
             {
                 return null;
             }
 
-            pos++; // skip opening delimiter
+            return new StringToken(start, extractionResult.CharsConsumed, value, "JSON");
 
-            var sb = new StringBuilder();
-
-            while (true)
-            {
-                if (pos == input.Length)
-                {
-                    throw LexingHelper.CreateException(LexingErrorTag.UnclosedString, pos);
-                }
-
-                c = input[pos];
-
-                if (c == closingChar)
-                {
-                    pos++;
-                    break;
-                }
-                else if (c == '\\')
-                {
-                    throw new NotImplementedException();
-                }
-                else
-                {
-                    // go on
-                }
-
-                sb.Append(c);
-                pos++;
-            }
-
-            context.Position += pos; // skip closing char
-
-            var token = new StringToken(start, pos, sb.ToString(), "Json");
-            return token;
         }
     }
 }

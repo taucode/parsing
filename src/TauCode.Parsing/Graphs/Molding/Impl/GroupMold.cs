@@ -11,8 +11,14 @@ namespace TauCode.Parsing.Graphs.Molding.Impl
         private readonly List<IScriptElementMold> _allElements;
         private readonly List<ILinkableMold> _linkables;
 
-        private IVertexMold _entranceVertex;
-        private IVertexMold _exitVertex;
+        private bool _entranceVertexIsCached;
+        private IVertexMold _cachedEntranceVertex;
+
+        private bool _exitVertexIsCached;
+        private IVertexMold _cachedExitVertex;
+
+        private bool _fullPathIsCached;
+        private string _cachedFullPath;
 
         #endregion
 
@@ -39,38 +45,11 @@ namespace TauCode.Parsing.Graphs.Molding.Impl
                 throw new ArgumentNullException(nameof(scriptElement));
             }
 
-            this.CheckNotFinalized();
-
-            if (!scriptElement.IsFinalized)
-            {
-                throw new NotImplementedException("error: inner must be finalized.");
-            }
-
             _allElements.Add(scriptElement);
 
             if (scriptElement is ILinkableMold linkable)
             {
                 _linkables.Add(linkable);
-
-                if (linkable.IsEntrance)
-                {
-                    if (_entranceVertex != null)
-                    {
-                        throw new NotImplementedException("error: more than one entrance");
-                    }
-
-                    _entranceVertex = linkable.GetEntranceVertex();
-                }
-
-                if (linkable.IsExit)
-                {
-                    if (_exitVertex != null)
-                    {
-                        throw new NotImplementedException("error: more than one exit");
-                    }
-
-                    _exitVertex = linkable.GetExitVertex();
-                }
             }
         }
 
@@ -80,32 +59,42 @@ namespace TauCode.Parsing.Graphs.Molding.Impl
 
         public override string GetFullPath()
         {
-            this.CheckFinalized();
+            if (_fullPathIsCached)
+            {
+                return _cachedFullPath;
+            }
+
+            string fullPath;
 
             if (this.Owner == null)
             {
                 if (this.Name == null)
                 {
-                    return null;
+                    fullPath = null;
                 }
                 else
                 {
-                    return $"/{this.Name}/";
+                    fullPath = $"/{this.Name}/";
+                }
+            }
+            else
+            {
+                var ownerFullPath = this.Owner.GetFullPath();
+                if (ownerFullPath == null)
+                {
+                    fullPath = null;
+                }
+                else
+                {
+                    fullPath = $"{ownerFullPath}{this.Name}/";
                 }
             }
 
-            var ownerFullPath = this.Owner.GetFullPath();
-            if (ownerFullPath == null)
-            {
-                return null;
-            }
+            _fullPathIsCached = true;
+            _cachedFullPath = fullPath;
 
-            return $"{ownerFullPath}{this.Name}/";
+            return _cachedFullPath;
         }
-
-        protected override IVertexMold GetEntranceVertexImpl() => _entranceVertex;
-
-        protected override IVertexMold GetExitVertexImpl() => _exitVertex;
 
         #endregion
     }

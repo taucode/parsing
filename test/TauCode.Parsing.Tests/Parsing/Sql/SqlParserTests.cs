@@ -1,10 +1,10 @@
 ﻿using NUnit.Framework;
+using Serilog;
 using System;
 using System.IO;
 using System.Linq;
-using Serilog;
+using TauCode.Data.Text;
 using TauCode.Extensions;
-using TauCode.Parsing.Exceptions;
 using TauCode.Parsing.Graphs.Building;
 using TauCode.Parsing.Graphs.Building.Impl;
 using TauCode.Parsing.Graphs.Reading;
@@ -34,10 +34,16 @@ public class SqlParserTests
             Producers = new ILexicalTokenProducer[]
             {
                 new WhiteSpaceProducer(),
-                new WordProducer(),
+                new Int32Producer(IsAcceptableIntegerTerminator),
+                new WordProducer(WordTerminator),
                 new SqlPunctuationProducer(),
-                new IntegerProducer(IsAcceptableIntegerTerminator),
-                new SqlIdentifierProducer(),
+                new SqlIdentifierProducer(SqlHelper.IsReservedWord, WordTerminator)
+                {
+                    Delimiter =
+                        SqlIdentifierDelimiter.None |
+                        SqlIdentifierDelimiter.Brackets |
+                        0,
+                },
             },
         };
 
@@ -47,14 +53,14 @@ public class SqlParserTests
             .Verbose()
             .WriteTo
             .TextWriter(_writer)
-            .CreateLogger();        
+            .CreateLogger();
     }
 
     [Test]
     public void SqlParser_ValidInput_Parses()
     {
         // Arrange
-        var sqlGrammar = this.GetType().Assembly.GetResourceText("sql-grammar-smart.lisp", true);
+        var sqlGrammar = this.GetType().Assembly.GetResourceText("sql-grammar.lisp", true);
         IGraphScriptReader scriptReader = new SqlGraphScriptReader();
         var graphMold = scriptReader.ReadScript(sqlGrammar.AsMemory());
         var vertexFactory = new SqlVertexFactory();
@@ -66,95 +72,112 @@ public class SqlParserTests
         {
             Root = (IdleNode)graph.Single(x => x.Name == "root-node"),
             Logger = _logger,
+            AllowsMultipleExecutions = true,
         };
 
         #region assign job to nodes
 
         // table
-        var create = (ActionNode)graph.Single(x => x.Name == "create");
-        create.Action = (node, token, parsingResult) =>
+        var createNode = (ActionNode)graph.Single(x => x.Name == "create");
+        createNode.Action = (node, parsingContext) =>
         {
+            var parsingResult = parsingContext.ParsingResult;
             var sqlParsingResult = (SqlParsingResult)parsingResult;
             sqlParsingResult.AddCreateClausePlaceholder();
 
             parsingResult.IncreaseVersion();
         };
 
-        var createTable = (ActionNode)graph.Single(x => x.Name == "do-create-table");
-        createTable.Action = (node, token, parsingResult) =>
+        var createTableNode = (ActionNode)graph.Single(x => x.Name == "do-create-table");
+        createTableNode.Action = (node, parsingContext) =>
         {
+            var parsingResult = parsingContext.ParsingResult;
             var sqlParsingResult = (SqlParsingResult)parsingResult;
             sqlParsingResult.ReplaceCreateClausePlaceholderWithCreateTableInfo();
 
             parsingResult.IncreaseVersion();
         };
 
-        var tableName = (ActionNode)graph.Single(x => x.Name == "table-name");
-        tableName.Action = (node, token, parsingResult) =>
+        var tableNameNode = (ActionNode)graph.Single(x => x.Name == "table-name");
+        tableNameNode.Action = (node, parsingContext) =>
         {
+            var parsingResult = parsingContext.ParsingResult;
+            var token = parsingContext.GetCurrentToken();
+
             var sqlParsingResult = (SqlParsingResult)parsingResult;
             var tableInfo = sqlParsingResult.GetLastClause<TableInfo>();
-            tableInfo.Name = ((TextToken)token).Text;
+
+            tableInfo.Name = GetSqlNameFromToken(token);
 
             parsingResult.IncreaseVersion();
         };
 
-        var tableOpening = (ActionNode)graph.Single(x => x.Name == "table-opening");
-        tableOpening.Action = (node, token, parsingResult) =>
+        var tableOpeningNode = (ActionNode)graph.Single(x => x.Name == "table-opening");
+        tableOpeningNode.Action = (node, parsingContext) =>
         {
+            var parsingResult = parsingContext.ParsingResult;
             parsingResult.IncreaseVersion();
         };
 
-        var columnName = (ActionNode)graph.Single(x => x.Name == "column-name");
-        columnName.Action = (node, token, parsingResult) =>
+        var columnNameNode = (ActionNode)graph.Single(x => x.Name == "column-name");
+        columnNameNode.Action = (node, parsingContext) =>
         {
+            var parsingResult = parsingContext.ParsingResult;
+            var token = parsingContext.GetCurrentToken();
             var sqlParsingResult = (SqlParsingResult)parsingResult;
             var tableInfo = sqlParsingResult.GetLastClause<TableInfo>();
             var columnInfo = new ColumnInfo
             {
-                Name = ((TextToken)token).Text,
+                Name = GetSqlNameFromToken(token),
             };
             tableInfo.Columns.Add(columnInfo);
 
             parsingResult.IncreaseVersion();
         };
 
-        var typeName = (ActionNode)graph.Single(x => x.Name == "type-name");
-        typeName.Action = (node, token, parsingResult) =>
+        var typeNameNode = (ActionNode)graph.Single(x => x.Name == "type-name");
+        typeNameNode.Action = (node, parsingContext) =>
         {
+            var parsingResult = parsingContext.ParsingResult;
+            var token = parsingContext.GetCurrentToken();
             var sqlParsingResult = (SqlParsingResult)parsingResult;
             var tableInfo = sqlParsingResult.GetLastClause<TableInfo>();
             var columnInfo = tableInfo.Columns.Last();
-            columnInfo.TypeName = ((TextToken)token).Text;
+            columnInfo.TypeName = GetSqlNameFromToken(token);
 
             parsingResult.IncreaseVersion();
         };
 
-        var precision = (ActionNode)graph.Single(x => x.Name == "precision");;
-        precision.Action = (node, token, parsingResult) =>
+        var precisionNode = (ActionNode)graph.Single(x => x.Name == "precision"); ;
+        precisionNode.Action = (node, parsingContext) =>
         {
+            var parsingResult = parsingContext.ParsingResult;
+            var token = parsingContext.GetCurrentToken();
             var sqlParsingResult = (SqlParsingResult)parsingResult;
             var tableInfo = sqlParsingResult.GetLastClause<TableInfo>();
             var columnInfo = tableInfo.Columns.Last();
-            columnInfo.Precision = ((IntegerToken)token).Value.ToString().ToInt32();
+            columnInfo.Precision = ((Int32Token)token).Value.ToString().ToInt32();
 
             parsingResult.IncreaseVersion();
         };
 
-        var scale = (ActionNode)graph.Single(x => x.Name == "scale");
-        scale.Action = (node, token, parsingResult) =>
+        var scaleNode = (ActionNode)graph.Single(x => x.Name == "scale");
+        scaleNode.Action = (node, parsingContext) =>
         {
+            var parsingResult = parsingContext.ParsingResult;
+            var token = parsingContext.GetCurrentToken();
             var sqlParsingResult = (SqlParsingResult)parsingResult;
             var tableInfo = sqlParsingResult.GetLastClause<TableInfo>();
             var columnInfo = tableInfo.Columns.Last();
-            columnInfo.Scale = ((IntegerToken)token).Value.ToString().ToInt32();
+            columnInfo.Scale = ((Int32Token)token).Value.ToString().ToInt32();
 
             parsingResult.IncreaseVersion();
         };
 
-        var nullToken = (ActionNode)graph.Single(x => x.Name == "null");
-        nullToken.Action = (node, token, parsingResult) =>
+        var nullTokenNode = (ActionNode)graph.Single(x => x.Name == "null");
+        nullTokenNode.Action = (node, parsingContext) =>
         {
+            var parsingResult = parsingContext.ParsingResult;
             var sqlParsingResult = (SqlParsingResult)parsingResult;
             var tableInfo = sqlParsingResult.GetLastClause<TableInfo>();
             var columnInfo = tableInfo.Columns.Last();
@@ -163,9 +186,10 @@ public class SqlParserTests
             parsingResult.IncreaseVersion();
         };
 
-        var notNullToken = (ActionNode)graph.Single(x => x.Name == "not-null");;
-        notNullToken.Action = (node, token, parsingResult) =>
+        var notNullTokenNode = (ActionNode)graph.Single(x => x.Name == "not-null"); ;
+        notNullTokenNode.Action = (node, parsingContext) =>
         {
+            var parsingResult = parsingContext.ParsingResult;
             var sqlParsingResult = (SqlParsingResult)parsingResult;
             var tableInfo = sqlParsingResult.GetLastClause<TableInfo>();
             var columnInfo = tableInfo.Columns.Last();
@@ -174,19 +198,22 @@ public class SqlParserTests
             parsingResult.IncreaseVersion();
         };
 
-        var constraintName = (ActionNode)graph.Single(x => x.Name == "constraint-name");
-        constraintName.Action = (node, token, parsingResult) =>
+        var constraintNameNode = (ActionNode)graph.Single(x => x.Name == "constraint-name");
+        constraintNameNode.Action = (node, parsingContext) =>
         {
+            var parsingResult = parsingContext.ParsingResult;
+            var token = parsingContext.GetCurrentToken();
             var sqlParsingResult = (SqlParsingResult)parsingResult;
             var tableInfo = sqlParsingResult.GetLastClause<TableInfo>();
-            tableInfo.LastConstraintName = ((TextToken)token).Text;
+            tableInfo.LastConstraintName = GetSqlNameFromToken(token);
 
             parsingResult.IncreaseVersion();
         };
 
-        var pk = (ActionNode)graph.Single(x => x.Name == "do-primary-key");
-        pk.Action = (node, token, parsingResult) =>
+        var pkNode = (ActionNode)graph.Single(x => x.Name == "do-primary-key");
+        pkNode.Action = (node, parsingContext) =>
         {
+            var parsingResult = parsingContext.ParsingResult;
             var sqlParsingResult = (SqlParsingResult)parsingResult;
             var tableInfo = sqlParsingResult.GetLastClause<TableInfo>();
             tableInfo.PrimaryKey = new PrimaryKeyInfo
@@ -197,39 +224,48 @@ public class SqlParserTests
             parsingResult.IncreaseVersion();
         };
 
-        var pkColumnName = (ActionNode)graph.Single(x => x.Name == "pk-column-name");
-        pkColumnName.Action = (node, token, parsingResult) =>
+        var pkColumnNameNode = (ActionNode)graph.Single(x => x.Name == "pk-column-name");
+        pkColumnNameNode.Action = (node, parsingContext) =>
         {
+            var parsingResult = parsingContext.ParsingResult;
+            var token = parsingContext.GetCurrentToken();
+
             var sqlParsingResult = (SqlParsingResult)parsingResult;
             var tableInfo = sqlParsingResult.GetLastClause<TableInfo>();
             var primaryKey = tableInfo.PrimaryKey;
             var indexColumn = new IndexColumnInfo
             {
-                ColumnName = ((TextToken)token).Text,
+                ColumnName = GetSqlNameFromToken(token),
             };
             primaryKey.Columns.Add(indexColumn);
 
             parsingResult.IncreaseVersion();
         };
 
-        var pkColumnAscOrDesc = (ActionNode)graph.Single(x => x.Name == "pk-asc-or-desc");
-        pkColumnAscOrDesc.Action = (node, token, parsingResult) =>
+        var pkColumnAscOrDescNode = (ActionNode)graph.Single(x => x.Name == "pk-asc-or-desc");
+        pkColumnAscOrDescNode.Action = (node, parsingContext) =>
         {
+            var parsingResult = parsingContext.ParsingResult;
+            var token = parsingContext.GetCurrentToken();
+
             var sqlParsingResult = (SqlParsingResult)parsingResult;
             var tableInfo = sqlParsingResult.GetLastClause<TableInfo>();
             var primaryKey = tableInfo.PrimaryKey;
             var indexColumn = primaryKey.Columns.Last();
 
             indexColumn.SortDirection = Enum.Parse<SortDirection>(
-                ((TextToken)token).Text.ToLowerInvariant(),
+                ((TextTokenBase)token).Text.ToLowerInvariant(),
                 true);
 
             parsingResult.IncreaseVersion();
         };
 
-        var fk = (ActionNode)graph.Single(x => x.Name == "do-foreign-key");;
-        fk.Action = (node, token, parsingResult) =>
+        var fkNode = (ActionNode)graph.Single(x => x.Name == "do-foreign-key"); ;
+        fkNode.Action = (node, parsingContext) =>
         {
+            var parsingResult = parsingContext.ParsingResult;
+            var token = parsingContext.GetCurrentToken();
+
             var sqlParsingResult = (SqlParsingResult)parsingResult;
             var tableInfo = sqlParsingResult.GetLastClause<TableInfo>();
             var foreignKey = new ForeignKeyInfo
@@ -241,46 +277,58 @@ public class SqlParserTests
             parsingResult.IncreaseVersion();
         };
 
-        var fkTableName = (ActionNode)graph.Single(x => x.Name == "fk-referenced-table-name");
-        fkTableName.Action = (node, token, parsingResult) =>
+        var fkTableNameNode = (ActionNode)graph.Single(x => x.Name == "fk-referenced-table-name");
+        fkTableNameNode.Action = (node, parsingContext) =>
         {
+            var parsingResult = parsingContext.ParsingResult;
+            var token = parsingContext.GetCurrentToken();
+
             var sqlParsingResult = (SqlParsingResult)parsingResult;
             var tableInfo = sqlParsingResult.GetLastClause<TableInfo>();
             var foreignKey = tableInfo.ForeignKeys.Last();
-            var foreignKeyTableName = ((TextToken)token).Text;
+            var foreignKeyTableName = GetSqlNameFromToken(token);
             foreignKey.ReferencedTableName = foreignKeyTableName;
 
             parsingResult.IncreaseVersion();
         };
 
-        var fkColumnName = (ActionNode)graph.Single(x => x.Name == "fk-column-name");
-        fkColumnName.Action = (node, token, parsingResult) =>
+        var fkColumnNameNode = (ActionNode)graph.Single(x => x.Name == "fk-column-name");
+        fkColumnNameNode.Action = (node, parsingContext) =>
         {
+            var parsingResult = parsingContext.ParsingResult;
+            var token = parsingContext.GetCurrentToken();
+
             var sqlParsingResult = (SqlParsingResult)parsingResult;
             var tableInfo = sqlParsingResult.GetLastClause<TableInfo>();
             var foreignKey = tableInfo.ForeignKeys.Last();
-            var foreignKeyColumnName = ((TextToken)token).Text;
+            var foreignKeyColumnName = GetSqlNameFromToken(token);
             foreignKey.ColumnNames.Add(foreignKeyColumnName);
 
             parsingResult.IncreaseVersion();
         };
 
-        var fkReferencedColumnName = (ActionNode)graph.Single(x => x.Name == "fk-referenced-column-name");
-        fkReferencedColumnName.Action = (node, token, parsingResult) =>
+        var fkReferencedColumnNameNode = (ActionNode)graph.Single(x => x.Name == "fk-referenced-column-name");
+        fkReferencedColumnNameNode.Action = (node, parsingContext) =>
         {
+            var parsingResult = parsingContext.ParsingResult;
+            var token = parsingContext.GetCurrentToken();
+
             var sqlParsingResult = (SqlParsingResult)parsingResult;
             var tableInfo = sqlParsingResult.GetLastClause<TableInfo>();
             var foreignKey = tableInfo.ForeignKeys.Last();
-            var foreignKeyReferencedColumnName = ((TextToken)token).Text;
+            var foreignKeyReferencedColumnName = GetSqlNameFromToken(token);
             foreignKey.ReferencedColumnNames.Add(foreignKeyReferencedColumnName);
 
             parsingResult.IncreaseVersion();
         };
 
         // index
-        var createUniqueIndex = (ActionNode)graph.Single(x => x.Name == "do-create-unique-index");
-        createUniqueIndex.Action = (node, token, parsingResult) =>
+        var createUniqueIndexNode = (ActionNode)graph.Single(x => x.Name == "do-create-unique-index");
+        createUniqueIndexNode.Action = (node, parsingContext) =>
         {
+            var parsingResult = parsingContext.ParsingResult;
+            var token = parsingContext.GetCurrentToken();
+
             var sqlParsingResult = (SqlParsingResult)parsingResult;
             sqlParsingResult.ReplaceCreateClausePlaceholderWithCreateIndexInfo();
             var index = sqlParsingResult.GetLastClause<IndexInfo>();
@@ -289,9 +337,12 @@ public class SqlParserTests
             sqlParsingResult.IncreaseVersion();
         };
 
-        var createIndex = (ActionNode)graph.Single(x => x.Name == "do-create-non-unique-index");
-        createIndex.Action = (node, token, parsingResult) =>
+        var createIndexNode = (ActionNode)graph.Single(x => x.Name == "do-create-non-unique-index");
+        createIndexNode.Action = (node, parsingContext) =>
         {
+            var parsingResult = parsingContext.ParsingResult;
+            var token = parsingContext.GetCurrentToken();
+
             var sqlParsingResult = (SqlParsingResult)parsingResult;
             sqlParsingResult.ReplaceCreateClausePlaceholderWithCreateIndexInfo();
             var index = sqlParsingResult.GetLastClause<IndexInfo>();
@@ -300,48 +351,60 @@ public class SqlParserTests
             sqlParsingResult.IncreaseVersion();
         };
 
-        var indexName = (ActionNode)graph.Single(x => x.Name == "index-name");;
-        indexName.Action = (node, token, parsingResult) =>
+        var indexNameNode = (ActionNode)graph.Single(x => x.Name == "index-name"); ;
+        indexNameNode.Action = (node, parsingContext) =>
         {
+            var parsingResult = parsingContext.ParsingResult;
+            var token = parsingContext.GetCurrentToken();
+
             var sqlParsingResult = (SqlParsingResult)parsingResult;
             var index = sqlParsingResult.GetLastClause<IndexInfo>();
-            index.Name = ((TextToken)token).Text;
+            index.Name = GetSqlNameFromToken(token);
 
             sqlParsingResult.IncreaseVersion();
         };
 
-        var indexTableName = (ActionNode)graph.Single(x => x.Name == "index-table-name");
-        indexTableName.Action = (node, token, parsingResult) =>
+        var indexTableNameNode = (ActionNode)graph.Single(x => x.Name == "index-table-name");
+        indexTableNameNode.Action = (node, parsingContext) =>
         {
+            var parsingResult = parsingContext.ParsingResult;
+            var token = parsingContext.GetCurrentToken();
+
             var sqlParsingResult = (SqlParsingResult)parsingResult;
             var index = sqlParsingResult.GetLastClause<IndexInfo>();
-            index.TableName = ((TextToken)token).Text;
+            index.TableName = GetSqlNameFromToken(token);
 
             sqlParsingResult.IncreaseVersion();
         };
 
-        var indexColumnName = (ActionNode)graph.Single(x => x.Name == "index-column-name");
-        indexColumnName.Action = (node, token, parsingResult) =>
+        var indexColumnNameNode = (ActionNode)graph.Single(x => x.Name == "index-column-name");
+        indexColumnNameNode.Action = (node, parsingContext) =>
         {
+            var parsingResult = parsingContext.ParsingResult;
+            var token = parsingContext.GetCurrentToken();
+
             var sqlParsingResult = (SqlParsingResult)parsingResult;
             var index = sqlParsingResult.GetLastClause<IndexInfo>();
             var columnInfo = new IndexColumnInfo
             {
-                ColumnName = ((TextToken)token).Text,
+                ColumnName = GetSqlNameFromToken(token),
             };
             index.Columns.Add(columnInfo);
 
             sqlParsingResult.IncreaseVersion();
         };
 
-        var indexColumnAscOrDesc = (ActionNode)graph.Single(x => x.Name == "index-column-asc-or-desc");
-        indexColumnAscOrDesc.Action = (node, token, parsingResult) =>
+        var indexColumnAscOrDescNode = (ActionNode)graph.Single(x => x.Name == "index-column-asc-or-desc");
+        indexColumnAscOrDescNode.Action = (node, parsingContext) =>
         {
+            var parsingResult = parsingContext.ParsingResult;
+            var token = parsingContext.GetCurrentToken();
+
             var sqlParsingResult = (SqlParsingResult)parsingResult;
             var index = sqlParsingResult.GetLastClause<IndexInfo>();
             var columnInfo = index.Columns.Last();
             columnInfo.SortDirection = Enum.Parse<SortDirection>(
-                ((TextToken)token).Text.ToLowerInvariant(),
+                ((TextTokenBase)token).Text.ToLowerInvariant(),
                 true);
 
             sqlParsingResult.IncreaseVersion();
@@ -385,6 +448,7 @@ public class SqlParserTests
         }
         catch (Exception e)
         {
+            // todo
             var log = _writer.ToString();
             throw;
         }
@@ -533,8 +597,10 @@ public class SqlParserTests
         Assert.That(indexColumnInfo.SortDirection, Is.EqualTo(SortDirection.Asc));
     }
 
-    private bool IsAcceptableIntegerTerminator(char c)
+    private bool IsAcceptableIntegerTerminator(ReadOnlySpan<char> span, int index)
     {
+        var c = span[index];
+
         if (c.IsInlineWhiteSpaceOrCaretControl())
         {
             return true;
@@ -547,4 +613,47 @@ public class SqlParserTests
 
         return false;
     }
+
+    private bool WordTerminator(ReadOnlySpan<char> input, int pos)
+    {
+        var c = input[pos];
+
+        var result =
+            c.IsInlineWhiteSpaceOrCaretControl() ||
+            c.IsIn('(', ')', ',') ||
+            false;
+
+        return result;
+    }
+
+    // todo: wordToken cannot start with digit
+
+    private static string GetSqlNameFromToken(ILexicalToken token)
+    {
+        if (token is WordToken wordToken)
+        {
+            return wordToken.Text;
+        }
+        else if (token is SqlIdentifierToken sqlIdentifierToken)
+        {
+            return sqlIdentifierToken.Value.Value;
+        }
+
+        throw new Exception("Not an SQL name token");
+    }
+
+    //if (token is WordToken wordToken)
+    //{
+    //    tableName = wordToken.Text;
+    //}
+    //else if (token is SqlIdentifierToken sqlIdentifierToken)
+    //{
+    //    tableName = sqlIdentifierToken.Value.Value;
+    //}
+    //else
+    //{
+    //    throw new Exception();
+    //}
+
+
 }

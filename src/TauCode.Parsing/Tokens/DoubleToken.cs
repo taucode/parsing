@@ -2,7 +2,7 @@
 
 namespace TauCode.Parsing.Tokens
 {
-    public class DoubleToken : TextToken
+    public class DoubleToken : ValueTokenBase<double>
     {
         public DoubleToken(
             int position,
@@ -11,11 +11,9 @@ namespace TauCode.Parsing.Tokens
             : base(
                 position,
                 consumedLength,
+                value,
                 value.ToString(CultureInfo.InvariantCulture))
         {
-            this.Value = value;
         }
-
-        public double Value { get; }
     }
 }

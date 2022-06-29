@@ -1,6 +1,11 @@
 ﻿namespace TauCode.Parsing
 {
-    internal static class ParsingHelper
+    public static class ParsingHelper
     {
+        public static ILexicalToken GetCurrentToken(this ParsingContext parsingContext)
+        {
+            // todo checks
+            return parsingContext.Tokens[parsingContext.Position];
+        }
     }
 }

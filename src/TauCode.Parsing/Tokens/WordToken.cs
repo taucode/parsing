@@ -1,9 +1,15 @@
 ﻿namespace TauCode.Parsing.Tokens
 {
-    public class WordToken : TextToken
+    public class WordToken : TextTokenBase
     {
-        public WordToken(int position, int consumedLength, string text)
-            : base(position, consumedLength, text)
+        public WordToken(
+            int position,
+            int consumedLength,
+            string text)
+            : base(
+                position,
+                consumedLength,
+                text)
         {
         }
     }

@@ -1,7 +1,7 @@
-﻿using System;
+﻿using Serilog;
+using System;
 using System.Collections.Generic;
 using System.Linq;
-using Serilog;
 using TauCode.Parsing.Exceptions;
 using TauCode.Parsing.Nodes;
 
@@ -27,6 +27,8 @@ namespace TauCode.Parsing
 
         #region IParser Members
 
+        public bool AllowsMultipleExecutions { get; set; }
+
         public ILogger Logger { get; set; }
 
         public IParsingNode Root
@@ -39,11 +41,11 @@ namespace TauCode.Parsing
             }
         }
 
-        public void Parse(IReadOnlyList<ILexicalToken> tokens, IParsingResult parsingResult)
+        public void Parse(IList<ILexicalToken> tokens, IParsingResult parsingResult)
         {
             // todo: skip empty tokens (and ut)
 
-            var context = new ParsingContext(tokens);
+            var context = new ParsingContext(tokens, parsingResult);
             var currentNodes = this.GetInitialNodes(this.Root);
 
             var gotEndNode = false;
@@ -63,12 +65,11 @@ namespace TauCode.Parsing
                     }
                 }
 
-                var currentToken = context.Tokens[context.Position];
 
-                this.Logger?.Verbose($"Position: {context.Position} Current Token: {currentToken}");
-
+                // todo log
                 IParsingNode realWinner = null; // 'real' means it is not an EndNode
                 gotEndNode = false;
+                FallbackNode fallbackNode = null;
 
                 foreach (var currentNode in currentNodes)
                 {
@@ -83,7 +84,15 @@ namespace TauCode.Parsing
                         continue;
                     }
 
-                    var accepts = currentNode.AcceptsToken(currentToken, parsingResult);
+                    if (currentNode is FallbackNode someFallbackNode)
+                    {
+                        fallbackNode = someFallbackNode;
+                        continue;
+                    }
+
+                    var accepts = currentNode.Accepts(context);
+                    // todo: check position is not touched.
+
                     if (accepts)
                     {
                         if (realWinner == null)
@@ -94,6 +103,8 @@ namespace TauCode.Parsing
                         else
                         {
                             // we've got concurrency
+                            var currentToken = context.GetCurrentToken();
+
                             throw new ParsingException(
                                 "Parsing node concurrency occurred.",
                                 new List<IParsingNode>
@@ -108,6 +119,8 @@ namespace TauCode.Parsing
 
                 if (realWinner == null)
                 {
+                    fallbackNode?.Act(context);
+
                     if (gotEndNode)
                     {
                         // ok, nobody accepted but end node => current clause is over, let's start from beginning
@@ -115,6 +128,11 @@ namespace TauCode.Parsing
                         {
                             // will we ever get here?!
                             throw new NotImplementedException();
+                        }
+
+                        if (!this.AllowsMultipleExecutions)
+                        {
+                            throw new ParsingException("End of clause expected.", null, context.GetCurrentToken());
                         }
 
                         gotEndNode = false;
@@ -126,13 +144,18 @@ namespace TauCode.Parsing
                     throw new ParsingException(
                         "Unexpected token.",
                         currentNodes,
-                        currentToken);
+                        context.GetCurrentToken());
                 }
 
                 var versionBeforeAct = parsingResult.Version;
+                var positionBeforeAct = context.Position;
 
-                realWinner.Act(currentToken, parsingResult);
+                realWinner.Act(context);
 
+                if (positionBeforeAct != context.Position)
+                {
+                    throw new NotImplementedException(); // node must not touch position
+                }
                 var versionAfterAct = parsingResult.Version;
 
                 if (versionAfterAct != versionBeforeAct + 1)

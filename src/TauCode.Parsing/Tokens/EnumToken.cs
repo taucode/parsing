@@ -1,30 +1,17 @@
 ﻿namespace TauCode.Parsing.Tokens
 {
-    public class EnumToken<TEnum> : LexicalTokenBase where TEnum : struct
+    public class EnumToken<TEnum> : ValueTokenBase<TEnum> where TEnum : struct
     {
-        #region Constructor
-
         public EnumToken(
             int position,
             int consumedLength,
             TEnum value)
-            : base(position, consumedLength)
+            : base(
+                position,
+                consumedLength,
+                value,
+                value.ToString())
         {
-            this.Value = value;
         }
-
-        #endregion
-
-        #region Public
-
-        public TEnum Value { get; }
-
-        #endregion
-
-        #region Overridden
-
-        public override string ToString() => this.Value.ToString();
-
-        #endregion
     }
 }

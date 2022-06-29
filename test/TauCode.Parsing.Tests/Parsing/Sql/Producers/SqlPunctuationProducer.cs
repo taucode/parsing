@@ -14,7 +14,6 @@ namespace TauCode.Parsing.Tests.Parsing.Sql.Producers
             if (c.IsIn('(', ')', ','))
             {
                 var index = context.Position;
-                context.Position++;
                 return new PunctuationToken(index, 1, text[index]);
             }
 

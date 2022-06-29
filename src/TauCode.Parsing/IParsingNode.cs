@@ -4,8 +4,9 @@ namespace TauCode.Parsing
 {
     public interface IParsingNode : IVertex
     {
-        bool AcceptsToken(ILexicalToken token, IParsingResult parsingResult);
-        void Act(ILexicalToken token, IParsingResult parsingResult);
+        ILexicalTokenConverter TokenConverter { get; set; }
+        bool Accepts(ParsingContext parsingContext);
+        void Act(ParsingContext parsingContext);
         string GetTag();
     }
 }

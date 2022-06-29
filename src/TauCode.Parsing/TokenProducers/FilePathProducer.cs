@@ -1,62 +1,30 @@
-﻿using TauCode.Extensions;
+﻿using TauCode.Data.Text;
+using TauCode.Data.Text.TextDataExtractors;
 using TauCode.Parsing.Tokens;
 
 namespace TauCode.Parsing.TokenProducers
 {
-    public class FilePathProducer : ILexicalTokenProducer
+    public class FilePathProducer : LexicalTokenProducerBase
     {
-        public ILexicalToken Produce(LexingContext context)
+        private readonly FilePathExtractor _extractor;
+
+        public FilePathProducer(TerminatingDelegate terminator = null)
+        {
+            _extractor = new FilePathExtractor(terminator);
+        }
+
+        protected override ILexicalToken ProduceImpl(LexingContext context)
         {
             var start = context.Position;
-            var input = context.Input.Span[start..];
-            var pos = 0;
+            var span = context.Input.Span[context.Position..];
 
-            while (true)
-            {
-                if (pos == input.Length)
-                {
-                    break;
-                }
-
-                var c = input[pos];
-
-                if (c.IsInlineWhiteSpaceOrCaretControl())
-                {
-                    break;
-                }
-                else if (c.IsIn('?', '*'))
-                {
-                    return null;
-                }
-                else if (c == ':')
-                {
-                    if (pos == 1)
-                    {
-                        // ok
-                    }
-                    else
-                    {
-                        return null;
-                    }
-                }
-                else
-                {
-                    // ok
-                }
-
-                pos++;
-            }
-
-            if (pos == 0)
+            var extractionResult = _extractor.TryExtract(span, out var value);
+            if (extractionResult.ErrorCode.HasValue)
             {
                 return null;
             }
 
-            var path = input[..pos].ToString();
-            context.Position += pos;
-
-            var token = new FilePathToken(start, pos, path);
-            return token;
+            return new FilePathToken(start, extractionResult.CharsConsumed, value);
         }
     }
 }

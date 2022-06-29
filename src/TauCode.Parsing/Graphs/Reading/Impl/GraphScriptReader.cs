@@ -29,7 +29,9 @@ namespace TauCode.Parsing.Graphs.Reading.Impl
         private readonly IScriptElementReader _sequenceReader;
         private readonly IScriptElementReader _splitterReader;
         private readonly IScriptElementReader _vertexReader;
-        private readonly IScriptElementReader _groupRefReader;
+        //private readonly IScriptElementReader _groupRefReader;
+        private readonly IScriptElementReader _refReader;
+        private readonly IScriptElementReader _arcReader;
 
         #endregion
 
@@ -40,18 +42,14 @@ namespace TauCode.Parsing.Graphs.Reading.Impl
             _lexer = new TinyLispLexer();
             _lispReader = new TinyLispPseudoReader();
 
-            _groupReader = new GroupElementReader(this);
-            _sequenceReader = new SequenceElementReader(this);
-            _splitterReader = new SplitterElementReader(this);
-            _vertexReader = new VertexElementReader(this);
-            _groupRefReader = new GroupRefElementReader(this);
+            _groupReader = new GroupReader(this);
+            _sequenceReader = new SequenceReader(this);
+            _splitterReader = new SplitterReader(this);
+            _vertexReader = new VertexReader(this);
+            _refReader = new RefReader(this);
+            //_groupRefReader = new GroupRefReader(this);
+            _arcReader = new ArcReader(this);
         }
-
-        #endregion
-
-        #region Protected
-
-
 
         #endregion
 
@@ -75,8 +73,14 @@ namespace TauCode.Parsing.Graphs.Reading.Impl
                     case "VERTEX":
                         return _vertexReader;
 
-                    case "GROUP-REF":
-                        return _groupRefReader;
+                    case "REF":
+                        return _refReader;
+
+                    //case "GROUP-REF":
+                    //    return _groupRefReader;
+
+                    case "ARC":
+                        return _arcReader;
                 }
             }
 

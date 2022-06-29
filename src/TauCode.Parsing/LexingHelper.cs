@@ -1,11 +1,25 @@
 ﻿using System;
+using System.Collections.Generic;
 using TauCode.Extensions;
 using TauCode.Parsing.Exceptions;
 
 namespace TauCode.Parsing
 {
-    internal static class LexingHelper
+    public static class LexingHelper
     {
+        private static readonly HashSet<char> ProhibitedFilePathChars = new HashSet<char>
+        {
+            '<',
+            '>',
+            ':',
+            '"',
+            '/',
+            '\\',
+            '|',
+            '?',
+            '*',
+        };
+
         internal static bool IsLatinLetterInternal(this char c)
         {
             if (c >= 'a' && c <= 'z')

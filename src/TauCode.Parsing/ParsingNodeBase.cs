@@ -10,8 +10,8 @@ namespace TauCode.Parsing
     {
         #region Abstract
 
-        protected abstract bool AcceptsTokenImpl(ILexicalToken token, IParsingResult parsingResult);
-        protected abstract void ActImpl(ILexicalToken token, IParsingResult parsingResult);
+        protected abstract bool AcceptsImpl(ParsingContext parsingContext);
+        protected abstract void ActImpl(ParsingContext parsingContext);
 
         /// <summary>
         /// Returns readable tag of node's data, if there is any. Mostly for debug purposes.
@@ -23,35 +23,27 @@ namespace TauCode.Parsing
 
         #region IParsingNode Members
 
-        public bool AcceptsToken(ILexicalToken token, IParsingResult parsingResult)
+        public virtual ILexicalTokenConverter TokenConverter { get; set; }
+
+        public bool Accepts(ParsingContext parsingContext)
         {
-            if (token == null)
+            if (parsingContext == null)
             {
-                throw new ArgumentNullException(nameof(token));
+                throw new ArgumentNullException(nameof(parsingContext));
             }
 
-            if (parsingResult == null)
-            {
-                throw new ArgumentNullException(nameof(parsingResult));
-            }
-
-            var result = this.AcceptsTokenImpl(token, parsingResult);
+            var result = this.AcceptsImpl(parsingContext);
             return result;
         }
 
-        public void Act(ILexicalToken token, IParsingResult parsingResult)
+        public void Act(ParsingContext parsingContext)
         {
-            if (token == null)
+            if (parsingContext == null)
             {
-                throw new ArgumentNullException(nameof(token));
+                throw new ArgumentNullException(nameof(parsingContext));
             }
 
-            if (parsingResult == null)
-            {
-                throw new ArgumentNullException(nameof(parsingResult));
-            }
-
-            this.ActImpl(token, parsingResult);
+            this.ActImpl(parsingContext);
         }
 
         /// <summary>

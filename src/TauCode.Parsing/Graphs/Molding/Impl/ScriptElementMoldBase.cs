@@ -5,12 +5,12 @@ using TauCode.Parsing.TinyLisp.Data;
 
 namespace TauCode.Parsing.Graphs.Molding.Impl
 {
+    // todo clean
     public abstract class ScriptElementMoldBase : IScriptElementMold
     {
         #region Fields
 
         private readonly Dictionary<string, object> _keywordValues;
-        private string _name;
 
         #endregion
 
@@ -31,22 +31,12 @@ namespace TauCode.Parsing.Graphs.Molding.Impl
 
         public Atom Car { get; }
 
-        public string Name
-        {
-            get => _name;
-            set
-            {
-                this.CheckNotFinalized();
-                _name = value;
-            }
-        }
+        public string Name { get; set; }
 
         public Element LispElement { get; internal set; } // todo: get rid of.
 
         public void SetKeywordValue(string keyword, object value)
         {
-            this.CheckNotFinalized();
-
             if (keyword == null)
             {
                 throw new ArgumentNullException(nameof(keyword));
@@ -93,7 +83,7 @@ namespace TauCode.Parsing.Graphs.Molding.Impl
 
         public bool RemoveKeyword(string keyword)
         {
-            this.CheckNotFinalized();
+            //this.CheckNotFinalized();
 
             if (keyword == null)
             {
@@ -105,46 +95,9 @@ namespace TauCode.Parsing.Graphs.Molding.Impl
 
         public virtual void ProcessKeywords()
         {
-            this.CheckNotFinalized();
+            //this.CheckNotFinalized();
 
-            this.Name = (string)this.GetKeywordValue(":NAME");
-        }
-
-        public bool IsFinalized { get; private set; }
-
-        public void ValidateAndFinalize()
-        {
-            this.CheckNotFinalized();
-
-            this.ValidateAndFinalizeImpl();
-
-            this.IsFinalized = true;
-        }
-
-
-        #endregion
-
-        #region Protected
-
-        protected void CheckNotFinalized()
-        {
-            if (this.IsFinalized)
-            {
-                throw new NotImplementedException("error: finalized.");
-            }
-        }
-
-        protected void CheckFinalized()
-        {
-            if (!this.IsFinalized)
-            {
-                throw new NotImplementedException("error: not finalized.");
-            }
-        }
-
-        protected virtual void ValidateAndFinalizeImpl()
-        {
-            // idle
+            this.Name = this.GetKeywordValue<string>(":NAME", null);
         }
 
         #endregion

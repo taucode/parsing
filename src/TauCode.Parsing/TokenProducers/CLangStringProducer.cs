@@ -1,149 +1,30 @@
-﻿using System.Collections.Generic;
-using System.Globalization;
-using System.Linq;
-using System.Text;
+﻿using TauCode.Data.Text;
+using TauCode.Data.Text.TextDataExtractors;
 using TauCode.Parsing.Tokens;
 
 namespace TauCode.Parsing.TokenProducers
 {
-    public class CLangStringProducer : ILexicalTokenProducer
+    public class CLangStringProducer : LexicalTokenProducerBase
     {
-        private static readonly string[] ReplacementStrings =
+        private readonly CLangStringExtractor _extractor;
+
+        public CLangStringProducer(TerminatingDelegate terminator = null)
         {
-            "\"\"",
-            "\\\\",
-            "0\0",
-            "a\a",
-            "b\b",
-            "f\f",
-            "n\n",
-            "r\r",
-            "t\t",
-            "v\v",
-        };
-
-        private static readonly Dictionary<char, char> Replacements;
-
-        private static char? GetReplacement(char escape)
-        {
-            if (Replacements.TryGetValue(escape, out var replacement))
-            {
-                return replacement;
-            }
-
-            return null;
+            _extractor = new CLangStringExtractor(terminator);
         }
 
-        static CLangStringProducer()
+        protected override ILexicalToken ProduceImpl(LexingContext context)
         {
-            Replacements = ReplacementStrings
-                .ToDictionary(
-                    x => x.First(),
-                    x => x.Skip(1).Single());
-        }
+            var start = context.Position;
 
-        public ILexicalToken Produce(LexingContext context)
-        {
-            var text = context.Input.Span;
-            var length = text.Length;
-
-            var c = text[context.Position];
-
-            if (c == '"')
+            var span = context.Input.Span[context.Position..];
+            var extractionResult = _extractor.TryExtract(span, out var value);
+            if (extractionResult.ErrorCode.HasValue)
             {
-                var start = context.Position;
-                var pos = start + 1; // skip '"'
-
-                var sb = new StringBuilder();
-
-                while (true)
-                {
-                    if (pos == length)
-                    {
-                        throw LexingHelper.CreateException(LexingErrorTag.UnclosedString, pos);
-                    }
-
-                    c = text[pos];
-
-                    if (c.IsCaretControl())
-                    {
-                        throw LexingHelper.CreateException(LexingErrorTag.NewLineInString, pos);
-                    }
-
-                    if (c == '\\')
-                    {
-                        if (pos + 1 == length)
-                        {
-                            throw LexingHelper.CreateException(LexingErrorTag.UnclosedString, length);
-                        }
-
-                        var nextChar = text[pos + 1];
-                        if (nextChar == 'u')
-                        {
-                            var remaining = length - (pos + 1);
-                            if (remaining < 5)
-                            {
-                                throw LexingHelper.CreateException(LexingErrorTag.BadEscape, pos);
-                            }
-
-                            var hexNumString = text.Slice(pos + 2, 4);
-                            var codeParsed = int.TryParse(
-                                hexNumString,
-                                NumberStyles.HexNumber,
-                                CultureInfo.InvariantCulture,
-                                out var code);
-
-                            if (!codeParsed)
-                            {
-                                throw LexingHelper.CreateException(LexingErrorTag.BadEscape, pos);
-                            }
-
-                            var unescapedChar = (char)code;
-                            sb.Append(unescapedChar);
-
-                            pos += 6;
-                            continue;
-                        }
-                        else
-                        {
-                            var replacement = GetReplacement(nextChar);
-                            if (replacement.HasValue)
-                            {
-                                sb.Append(replacement);
-                                pos += 2;
-                                continue;
-                            }
-                            else
-                            {
-                                throw LexingHelper.CreateException(LexingErrorTag.BadEscape, pos);
-                            }
-                        }
-                    }
-
-                    pos++;
-
-                    if (c == '"')
-                    {
-                        break;
-                    }
-
-                    sb.Append(c);
-                }
-
-                var delta = pos - start;
-                var str = sb.ToString();
-
-                var token = new StringToken(
-                    start,
-                    delta,
-                    str,
-                    "C");
-
-                context.Position += delta;
-                return token;
+                return null;
             }
 
-            return null;
+            return new StringToken(start, extractionResult.CharsConsumed, value, "CLang");
         }
     }
 }

@@ -2,6 +2,7 @@
 
 namespace TauCode.Parsing.TinyLisp.TokenProducers
 {
+    // todo: iemptyTokenProducer
     public class TinyLispCommentProducer : ILexicalTokenProducer
     {
         public ILexicalToken Produce(LexingContext context)
@@ -20,15 +21,15 @@ namespace TauCode.Parsing.TinyLisp.TokenProducers
                 {
                     if (index == length)
                     {
-                        context.Position += index - initialIndex;
-                        return EmptyToken.Instance;
+                        var delta = index - initialIndex;
+                        return new EmptyToken(initialIndex, delta);
                     }
 
                     c = text[index];
                     if (c.IsCaretControl())
                     {
-                        context.Position += index - initialIndex;
-                        return EmptyToken.Instance;
+                        var delta = index - initialIndex;
+                        return new EmptyToken(initialIndex, delta);
                     }
 
                     index++;

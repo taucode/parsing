@@ -1,9 +1,8 @@
-﻿using System;
-using TauCode.Data;
+﻿using TauCode.Data.Text;
 
 namespace TauCode.Parsing.Tokens
 {
-    public class EmailAddressToken : TextToken
+    public class EmailAddressToken : ValueTokenBase<EmailAddress>
     {
         public EmailAddressToken(
             int position,
@@ -12,11 +11,9 @@ namespace TauCode.Parsing.Tokens
             : base(
                 position,
                 consumedLength,
-                (emailAddress ?? throw new ArgumentNullException(nameof(emailAddress))).ToString())
+                emailAddress,
+                emailAddress.ToString())
         {
-            this.EmailAddress = emailAddress;
         }
-
-        public EmailAddress EmailAddress { get; }
     }
 }

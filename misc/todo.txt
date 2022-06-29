@@ -30,8 +30,8 @@ x   3. Only \SpecialString and "<some_exact_special_string>" want ':Some_Class' 
 2019-12-02
 ==========
 +   1. Node factory.
-todo2. Symbols vs integers: +1599, +1599+, +, -, etc.
-todo3. TinyLisp: ratios and doubles.
+    2. Symbols vs integers: +1599, +1599+, +, -, etc.
+    3. TinyLisp: ratios and doubles.
 +   4. SQLite test lexer remastered.
 +   5. ILexingEnvironment: IsSpace, IsLineBreak
 +   6. Get rid of 'lexizing'. Use 'lexing'.
@@ -42,9 +42,9 @@ todo3. TinyLisp: ratios and doubles.
 
 2020-01-12
 ==========
-    1. Lexize C lang string
-    2. Lexize C# verbatim string
-    3. Lexize C# $ string.
++   1. Lexize C lang string
+x   2. Lexize C# verbatim string
+x   3. Lexize C# $ string.
 +   4. Remove all 'alpha' which is a 'todo' actually.
 +   5. Remove all 'gamma' which is a 'todo' actually.
 
@@ -54,7 +54,7 @@ todo3. TinyLisp: ratios and doubles.
 
 2020-12-06
 ==========
-X   1. Get rid of TauCode.Extensions?
+x   1. Get rid of TauCode.Extensions?
 
 2021-04-29
 ==========
@@ -66,8 +66,8 @@ X   1. Get rid of TauCode.Extensions?
 
 2021-05-09
 ==========
-    1. Take advantage of StringSegment, Span<T>, ReadOnlySpan<T>, etc.
-    2. IToken: add property:
++   1. Take advantage of StringSegment, Span<T>, ReadOnlySpan<T>, etc.
+x   2. IToken: add property:
        public StringSegment ConsumedText { get; }
 
 2022-06-08
@@ -77,3 +77,15 @@ X   1. Get rid of TauCode.Extensions?
     3. enrich log; don't forget this.Logger?.Verbose instead of this.Logger.Verbose
     4. ut all token producers.
     5. add tool-generated names to nodes created by reader.
+
+2022-07-10
+==========
+    1. '::' with terminating char ':', extracted as '::' (ignores terminator)
+    2. john@[IPv6:::
+    3. john@[127.0.0.1
+    4. john@[IPv6:::]; where ';' is terminator
+    5. same as 4. for IPv4
+
+2022-07-21
+==========
+    1. Remove redundant misc files not related to this solution (test-ipv6-regex.pl etc)

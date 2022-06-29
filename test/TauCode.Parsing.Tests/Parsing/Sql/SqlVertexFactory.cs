@@ -1,12 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Runtime.CompilerServices;
-using System.Text;
-using System.Threading.Tasks;
 using TauCode.Data.Graphs;
 using TauCode.Parsing.Graphs.Building;
-using TauCode.Parsing.Graphs.Building.Impl;
 using TauCode.Parsing.Graphs.Molding;
 using TauCode.Parsing.Nodes;
 using TauCode.Parsing.Tests.Parsing.Sql.Nodes;
@@ -29,7 +25,7 @@ public class SqlVertexFactory : IVertexFactory
             }
             else
             {
-                result = new ExactWordNode(value, false);
+                result = new ExactWordNode(value, true);
             }
         }
         else if (vertexMold.Car is Symbol symbol)
@@ -49,7 +45,7 @@ public class SqlVertexFactory : IVertexFactory
                     break;
 
                 case "INTEGER":
-                    result = new IntegerNode();
+                    result = new Int32Node();
                     break;
 
                 case "STRING":
@@ -57,7 +53,7 @@ public class SqlVertexFactory : IVertexFactory
                     break;
 
                 case "MULTI-WORD":
-                    result = new MultiWordNode((List<string>)vertexMold.GetKeywordValue(":VALUES"), false);
+                    result = new MultiWordNode((List<string>)vertexMold.GetKeywordValue(":VALUES"), true);
                     break;
 
                 default:
@@ -78,8 +74,9 @@ public class SqlVertexFactory : IVertexFactory
         return result;
     }
 
-    private static void IdleAction(ActionNode node, ILexicalToken token, IParsingResult parsingResult)
+    private static void IdleAction(ActionNode node, ParsingContext parsingContext)
     {
+        var parsingResult = parsingContext.ParsingResult;
         SqlParsingResult sqlParsingResult = (SqlParsingResult)parsingResult;
         sqlParsingResult.IncreaseVersion();
     }

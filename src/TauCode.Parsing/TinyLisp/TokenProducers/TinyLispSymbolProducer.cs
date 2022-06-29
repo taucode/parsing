@@ -71,7 +71,6 @@ namespace TauCode.Parsing.TinyLisp.TokenProducers
                 var delta = index - initialIndex;
                 var str = text.Slice(initialIndex, delta);
                 var symbolToken = new LispSymbolToken(initialIndex, delta, str.ToString());
-                context.Position += delta;
                 return symbolToken;
             }
             else

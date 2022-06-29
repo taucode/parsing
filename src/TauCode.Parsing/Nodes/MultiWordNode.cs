@@ -9,9 +9,9 @@ namespace TauCode.Parsing.Nodes
     public class MultiWordNode : ActionNode
     {
         public MultiWordNode(
-            Action<ActionNode, ILexicalToken, IParsingResult> action,
+            Action<ActionNode, ParsingContext> action,
             IEnumerable<string> values,
-            bool isCaseSensitive)
+            bool ignoreCase)
             : base(action)
         {
             if (values == null)
@@ -26,7 +26,7 @@ namespace TauCode.Parsing.Nodes
                 throw new ArgumentException($"'{nameof(values)}' cannot contain nulls.", nameof(values));
             }
 
-            if (!isCaseSensitive)
+            if (ignoreCase)
             {
                 valueList = valueList
                     .Select(x => x.ToLowerInvariant())
@@ -34,26 +34,28 @@ namespace TauCode.Parsing.Nodes
             }
 
             this.Values = new HashSet<string>(valueList);
-            this.IsCaseSensitive = isCaseSensitive;
+            this.IgnoreCase = ignoreCase;
         }
 
-        public bool IsCaseSensitive { get; }
+        public bool IgnoreCase { get; }
 
         public MultiWordNode(
             IEnumerable<string> values,
-            bool isCaseSensitive)
-            : this(null, values, isCaseSensitive)
+            bool ignoreCase)
+            : this(null, values, ignoreCase)
         {
         }
 
         public HashSet<string> Values { get; }
 
-        protected override bool AcceptsTokenImpl(ILexicalToken token, IParsingResult parsingResult)
+        protected override bool AcceptsImpl(ParsingContext parsingContext)
         {
+            var token = parsingContext.GetCurrentToken();
+
             if (token is WordToken wordToken)
             {
                 var value = wordToken.Text;
-                if (!this.IsCaseSensitive)
+                if (this.IgnoreCase)
                 {
                     value = value.ToLowerInvariant();
                 }

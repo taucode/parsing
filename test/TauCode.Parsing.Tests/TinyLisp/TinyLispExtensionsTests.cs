@@ -5,565 +5,564 @@ using TauCode.Parsing.Exceptions;
 using TauCode.Parsing.TinyLisp;
 using TauCode.Parsing.TinyLisp.Data;
 
-namespace TauCode.Parsing.Tests.TinyLisp
+namespace TauCode.Parsing.Tests.TinyLisp;
+
+[TestFixture]
+public class TinyLispExtensionsTests
 {
-    [TestFixture]
-    public class TinyLispExtensionsTests
+    private ILexer _lexer;
+
+    [SetUp]
+    public void SetUp()
     {
-        private ILexer _lexer;
+        _lexer = new TinyLispLexer();
+    }
 
-        [SetUp]
-        public void SetUp()
+    [Test]
+    public void AsPseudoList_ElementIsNull_ThrowsArgumentNullException()
+    {
+        // Arrange
+        Element element = null;
+
+        // Act
+        var ex = Assert.Throws<ArgumentNullException>(() => element.AsPseudoList());
+
+        // Assert
+        Assert.That(ex.ParamName, Is.EqualTo("element"));
+    }
+
+    [Test]
+    public void AsPseudoList_ArgumentIsNotPseudoList_ThrowsArgumentException()
+    {
+        // Arrange
+
+        // Act
+        var ex = Assert.Throws<ArgumentException>(() => True.Instance.AsPseudoList());
+
+        // Assert
+        Assert.That(ex.Message,
+            Does.StartWith(
+                $"Argument is expected to be of type '{typeof(PseudoList).FullName}', but was of type '{typeof(True).FullName}'."));
+        Assert.That(ex.ParamName, Is.EqualTo("element"));
+    }
+
+    [Test]
+    public void GetSingleKeywordArgument_ElementIsNull_ThrowsArgumentNullException()
+    {
+        // Arrange
+        Element element = null;
+
+        // Act
+        var ex = Assert.Throws<ArgumentNullException>(() => element.GetSingleKeywordArgument(":arg"));
+
+        // Assert
+        Assert.That(ex.ParamName, Is.EqualTo("element"));
+    }
+
+    [Test]
+    public void GetSingleKeywordArgument_ElementIsNotPseudoList_ThrowsArgumentException()
+    {
+        // Arrange
+        Element element = True.Instance;
+
+        // Act
+        var ex = Assert.Throws<ArgumentException>(() => element.GetSingleKeywordArgument(":arg"));
+
+        // Assert
+        Assert.That(ex.Message,
+            Does.StartWith("'element' is expected to be of type 'TauCode.Parsing.TinyLisp.Data.PseudoList'."));
+        Assert.That(ex.ParamName, Is.EqualTo("element"));
+    }
+
+    [Test]
+    public void GetSingleKeywordArgument_ArgumentNameIsNull_ThrowsArgumentNullException()
+    {
+        // Arrange
+        Element element = new PseudoList();
+
+        // Act
+        var ex = Assert.Throws<ArgumentNullException>(() => element.GetSingleKeywordArgument(null));
+
+        // Assert
+        Assert.That(ex.ParamName, Is.EqualTo("argumentName"));
+    }
+
+    [Test]
+    [TestCase("non-keyword")]
+    [TestCase("\"some-string\"")]
+    public void GetSingleKeywordArgument_ArgumentIsNotKeyword_ThrowsArgumentException(string badKeywordName)
+    {
+        // Arrange
+        Element element = new PseudoList
         {
-            _lexer = new TinyLispLexer();
-        }
 
-        [Test]
-        public void AsPseudoList_ElementIsNull_ThrowsArgumentNullException()
-        {
-            // Arrange
-            Element element = null;
+            Symbol.Create("a"),
+        };
 
-            // Act
-            var ex = Assert.Throws<ArgumentNullException>(() => element.AsPseudoList());
+        // Act
+        var ex = Assert.Throws<ArgumentException>(() => element.GetSingleKeywordArgument(badKeywordName));
 
-            // Assert
-            Assert.That(ex.ParamName, Is.EqualTo("element"));
-        }
+        // Assert
+        Assert.That(ex.Message, Does.StartWith($"'{badKeywordName}' is not a valid keyword."));
+        Assert.That(ex.ParamName, Is.EqualTo("argumentName"));
+    }
 
-        [Test]
-        public void AsPseudoList_ArgumentIsNotPseudoList_ThrowsArgumentException()
-        {
-            // Arrange
+    [Test]
+    public void GetSingleKeywordArgument_ArgumentIsAbsentAbsenceAllowed_ReturnsNull()
+    {
+        // Arrange
+        var formText = "(foo one two :key three)";
 
-            // Act
-            var ex = Assert.Throws<ArgumentException>(() => True.Instance.AsPseudoList());
+        var tokens = _lexer.Tokenize(formText.AsMemory());
+        var reader = new TinyLispPseudoReader();
 
-            // Assert
-            Assert.That(ex.Message,
-                Does.StartWith(
-                    $"Argument is expected to be of type '{typeof(PseudoList).FullName}', but was of type '{typeof(True).FullName}'."));
-            Assert.That(ex.ParamName, Is.EqualTo("element"));
-        }
+        var pseudoList = reader.Read(tokens);
 
-        [Test]
-        public void GetSingleKeywordArgument_ElementIsNull_ThrowsArgumentNullException()
-        {
-            // Arrange
-            Element element = null;
+        // Act
+        var notFound = pseudoList.GetSingleKeywordArgument(":non-existing-key", true);
 
-            // Act
-            var ex = Assert.Throws<ArgumentNullException>(() => element.GetSingleKeywordArgument(":arg"));
+        // Assert
+        Assert.That(notFound, Is.Null);
+    }
 
-            // Assert
-            Assert.That(ex.ParamName, Is.EqualTo("element"));
-        }
+    [Test]
+    public void GetSingleKeywordArgument_ArgumentIsAbsentAbsenceNotAllowed_ThrowsTinyLispException()
+    {
+        // Arrange
+        var formText = "(foo one two :key three)";
 
-        [Test]
-        public void GetSingleKeywordArgument_ElementIsNotPseudoList_ThrowsArgumentException()
-        {
-            // Arrange
-            Element element = True.Instance;
+        var tokens = _lexer.Tokenize(formText.AsMemory());
+        var reader = new TinyLispPseudoReader();
 
-            // Act
-            var ex = Assert.Throws<ArgumentException>(() => element.GetSingleKeywordArgument(":arg"));
+        var pseudoList = reader.Read(tokens).Single().AsPseudoList();
 
-            // Assert
-            Assert.That(ex.Message,
-                Does.StartWith("'element' is expected to be of type 'TauCode.Parsing.TinyLisp.Data.PseudoList'."));
-            Assert.That(ex.ParamName, Is.EqualTo("element"));
-        }
+        // Act
+        var ex = Assert.Throws<TinyLispException>(() => pseudoList.GetSingleKeywordArgument(":non-existing-key"));
 
-        [Test]
-        public void GetSingleKeywordArgument_ArgumentNameIsNull_ThrowsArgumentNullException()
-        {
-            // Arrange
-            Element element = new PseudoList();
+        // Assert
+        Assert.That(
+            ex.Message,
+            Does.StartWith("No argument for keyword ':non-existing-key'."));
+    }
 
-            // Act
-            var ex = Assert.Throws<ArgumentNullException>(() => element.GetSingleKeywordArgument(null));
+    [Test]
+    [TestCase(true)]
+    [TestCase(false)]
+    public void GetSingleKeywordArgument_ArgumentNameIsPresentButIsAKeyword_ThrowsTinyLispException(
+        bool absenceIsAllowed)
+    {
+        // Arrange
+        var formText = "(foo one two :key three :your-key :no-luck)";
 
-            // Assert
-            Assert.That(ex.ParamName, Is.EqualTo("argumentName"));
-        }
+        var tokens = _lexer.Tokenize(formText.AsMemory());
+        var reader = new TinyLispPseudoReader();
 
-        [Test]
-        [TestCase("non-keyword")]
-        [TestCase("\"some-string\"")]
-        public void GetSingleKeywordArgument_ArgumentIsNotKeyword_ThrowsArgumentException(string badKeywordName)
-        {
-            // Arrange
-            Element element = new PseudoList
+        var pseudoList = reader.Read(tokens).Single().AsPseudoList();
+
+        // Act
+        var ex = Assert.Throws<TinyLispException>(() =>
+            pseudoList.GetSingleKeywordArgument(":your-key", absenceIsAllowed));
+
+        // Assert
+        Assert.That(
+            ex.Message,
+            Does.StartWith("Keyword ':your-key' was found, but next element is a keyword too."));
+    }
+
+    [Test]
+    [TestCase(true)]
+    [TestCase(false)]
+    public void GetSingleKeywordArgument_ArgumentNameIsPresentButIsAtEnd_ThrowsTinyLispException(
+        bool absenceIsAllowed)
+    {
+        // Arrange
+        var formText = "(foo one two :key three :your-key)";
+
+        var tokens = _lexer.Tokenize(formText.AsMemory());
+        var reader = new TinyLispPseudoReader();
+
+        var pseudoList = reader.Read(tokens).Single().AsPseudoList();
+
+        // Act
+        var ex = Assert.Throws<TinyLispException>(() =>
+            pseudoList.GetSingleKeywordArgument(":your-key", absenceIsAllowed));
+
+        // Assert
+        Assert.That(
+            ex.Message,
+            Does.StartWith("Keyword ':your-key' was found, but at the end of the list."));
+    }
+
+    [Test]
+    [TestCase(true)]
+    [TestCase(false)]
+    public void GetSingleKeywordArgumentGeneric_ArgumentNameIsPresentButArgumentIsOfWrongType_ThrowsTinyLispException(bool absenceIsAllowed)
+    {
+        // Arrange
+        var formText = "(foo one two :key three :your-key \"some string\")";
+
+        var tokens = _lexer.Tokenize(formText.AsMemory());
+        var reader = new TinyLispPseudoReader();
+
+        var pseudoList = reader.Read(tokens).Single().AsPseudoList();
+
+        // Act
+        var ex = Assert.Throws<TinyLispException>(() =>
+            pseudoList.GetSingleKeywordArgument<Symbol>(":your-key", absenceIsAllowed));
+
+        // Assert
+        Assert.That(
+            ex.Message,
+            Does.StartWith("Argument for ':your-key' was found, but it appears to be of type 'TauCode.Parsing.TinyLisp.Data.StringAtom' instead of expected type 'TauCode.Parsing.TinyLisp.Data.Symbol'."));
+    }
+
+    [Test]
+    public void GetAllKeywordArguments_ValidArguments_ReturnsExpectedResult()
+    {
+        // Arrange
+        var formText = "(foo one two :key one two \"three\" :your-key \"some string\")";
+
+        var tokens = _lexer.Tokenize(formText.AsMemory());
+        var reader = new TinyLispPseudoReader();
+
+        var pseudoList = reader.Read(tokens).Single().AsPseudoList();
+
+        // Act
+        var args = pseudoList.GetAllKeywordArguments(":key");
+
+        // Assert
+        CollectionAssert.AreEqual(
+            new Element[]
             {
+                Symbol.Create("one"),
+                Symbol.Create("two"),
+                new StringAtom("three"),
+            },
+            args);
+    }
+
+    [Test]
+    public void GetAllKeywordArguments_NoSuchKeyAbsenceIsAllowed_ReturnsEmptyPseudoList()
+    {
+        // Arrange
+        var formText = "(foo one two :key one two \"three\" :your-key \"some string\")";
+
+        var tokens = _lexer.Tokenize(formText.AsMemory());
+        var reader = new TinyLispPseudoReader();
+
+        var pseudoList = reader.Read(tokens).Single().AsPseudoList();
+
+        // Act
+        var args = pseudoList.GetAllKeywordArguments(":non-existing-key", true);
+
+        // Assert
+        Assert.That(args, Is.Empty);
+    }
+
+    [Test]
+    public void GetAllKeywordArguments_NoSuchKeyAbsenceNotAllowed_ThrowsTinyLispException()
+    {
+        // Arrange
+        var formText = "(foo one two :key one two \"three\" :your-key \"some string\")";
+
+        var tokens = _lexer.Tokenize(formText.AsMemory());
+        var reader = new TinyLispPseudoReader();
+
+        var pseudoList = reader.Read(tokens).Single().AsPseudoList();
+
+        // Act
+        var ex = Assert.Throws<TinyLispException>(() =>
+            pseudoList.GetAllKeywordArguments(":non-existing-key", false));
+
+        // Assert
+        Assert.That(ex.Message, Does.StartWith("No argument for keyword ':non-existing-key'."));
+    }
+
+    [Test]
+    [TestCase(true)]
+    [TestCase(false)]
+    public void GetAllKeywordArguments_KeywordFoundButNextItemIsAlsoKeyword_ReturnsEmptyPseudoList(bool absenceIsAllowed)
+    {
+        // Arrange
+        var formText = "(foo one two :key one two \"three\" :your-key :no-items-for-you \"some string\")";
+
+        var tokens = _lexer.Tokenize(formText.AsMemory());
+        var reader = new TinyLispPseudoReader();
+
+        var pseudoList = reader.Read(tokens).Single().AsPseudoList();
+
+        // Act
+        var args = pseudoList.GetAllKeywordArguments(":your-key");
+
+        // Assert
+        Assert.That(args, Is.Empty);
+    }
+
+    [Test]
+    [TestCase(true)]
+    [TestCase(false)]
+    public void GetAllKeywordArguments_KeywordFoundButAtEnd_ReturnsEmptyPseudoList(bool absenceIsAllowed)
+    {
+        // Arrange
+        var formText = "(foo one two :key one two \"three\" :no-items-for-you \"some string\" :your-key-at-end)";
+
+        var tokens = _lexer.Tokenize(formText.AsMemory());
+        var reader = new TinyLispPseudoReader();
+
+        var pseudoList = reader.Read(tokens).Single().AsPseudoList();
+
+        // Act
+        var args = pseudoList.GetAllKeywordArguments(":your-key-at-end");
+
+        // Assert
+        Assert.That(args, Is.Empty);
+    }
 
-                Symbol.Create("a"),
-            };
-
-            // Act
-            var ex = Assert.Throws<ArgumentException>(() => element.GetSingleKeywordArgument(badKeywordName));
-
-            // Assert
-            Assert.That(ex.Message, Does.StartWith($"'{badKeywordName}' is not a valid keyword."));
-            Assert.That(ex.ParamName, Is.EqualTo("argumentName"));
-        }
-
-        [Test]
-        public void GetSingleKeywordArgument_ArgumentIsAbsentAbsenceAllowed_ReturnsNull()
-        {
-            // Arrange
-            var formText = "(foo one two :key three)";
-            
-            var tokens = _lexer.Tokenize(formText.AsMemory());
-            var reader = new TinyLispPseudoReader();
-
-            var pseudoList = reader.Read(tokens);
-
-            // Act
-            var notFound = pseudoList.GetSingleKeywordArgument(":non-existing-key", true);
-
-            // Assert
-            Assert.That(notFound, Is.Null);
-        }
-
-        [Test]
-        public void GetSingleKeywordArgument_ArgumentIsAbsentAbsenceNotAllowed_ThrowsTinyLispException()
-        {
-            // Arrange
-            var formText = "(foo one two :key three)";
-            
-            var tokens = _lexer.Tokenize(formText.AsMemory());
-            var reader = new TinyLispPseudoReader();
-
-            var pseudoList = reader.Read(tokens).Single().AsPseudoList();
-
-            // Act
-            var ex = Assert.Throws<TinyLispException>(() => pseudoList.GetSingleKeywordArgument(":non-existing-key"));
-
-            // Assert
-            Assert.That(
-                ex.Message,
-                Does.StartWith("No argument for keyword ':non-existing-key'."));
-        }
-
-        [Test]
-        [TestCase(true)]
-        [TestCase(false)]
-        public void GetSingleKeywordArgument_ArgumentNameIsPresentButIsAKeyword_ThrowsTinyLispException(
-            bool absenceIsAllowed)
-        {
-            // Arrange
-            var formText = "(foo one two :key three :your-key :no-luck)";
-            
-            var tokens = _lexer.Tokenize(formText.AsMemory());
-            var reader = new TinyLispPseudoReader();
-
-            var pseudoList = reader.Read(tokens).Single().AsPseudoList();
-
-            // Act
-            var ex = Assert.Throws<TinyLispException>(() =>
-                pseudoList.GetSingleKeywordArgument(":your-key", absenceIsAllowed));
-
-            // Assert
-            Assert.That(
-                ex.Message,
-                Does.StartWith("Keyword ':your-key' was found, but next element is a keyword too."));
-        }
-
-        [Test]
-        [TestCase(true)]
-        [TestCase(false)]
-        public void GetSingleKeywordArgument_ArgumentNameIsPresentButIsAtEnd_ThrowsTinyLispException(
-            bool absenceIsAllowed)
-        {
-            // Arrange
-            var formText = "(foo one two :key three :your-key)";
-            
-            var tokens = _lexer.Tokenize(formText.AsMemory());
-            var reader = new TinyLispPseudoReader();
-
-            var pseudoList = reader.Read(tokens).Single().AsPseudoList();
-
-            // Act
-            var ex = Assert.Throws<TinyLispException>(() =>
-                pseudoList.GetSingleKeywordArgument(":your-key", absenceIsAllowed));
-
-            // Assert
-            Assert.That(
-                ex.Message,
-                Does.StartWith("Keyword ':your-key' was found, but at the end of the list."));
-        }
-
-        [Test]
-        [TestCase(true)]
-        [TestCase(false)]
-        public void GetSingleKeywordArgumentGeneric_ArgumentNameIsPresentButArgumentIsOfWrongType_ThrowsTinyLispException(bool absenceIsAllowed)
-        {
-            // Arrange
-            var formText = "(foo one two :key three :your-key \"some string\")";
-            
-            var tokens = _lexer.Tokenize(formText.AsMemory());
-            var reader = new TinyLispPseudoReader();
-
-            var pseudoList = reader.Read(tokens).Single().AsPseudoList();
-
-            // Act
-            var ex = Assert.Throws<TinyLispException>(() =>
-                pseudoList.GetSingleKeywordArgument<Symbol>(":your-key", absenceIsAllowed));
-
-            // Assert
-            Assert.That(
-                ex.Message,
-                Does.StartWith("Argument for ':your-key' was found, but it appears to be of type 'TauCode.Parsing.TinyLisp.Data.StringAtom' instead of expected type 'TauCode.Parsing.TinyLisp.Data.Symbol'."));
-        }
-
-        [Test]
-        public void GetAllKeywordArguments_ValidArguments_ReturnsExpectedResult()
-        {
-            // Arrange
-            var formText = "(foo one two :key one two \"three\" :your-key \"some string\")";
-            
-            var tokens = _lexer.Tokenize(formText.AsMemory());
-            var reader = new TinyLispPseudoReader();
-
-            var pseudoList = reader.Read(tokens).Single().AsPseudoList();
-
-            // Act
-            var args = pseudoList.GetAllKeywordArguments(":key");
-
-            // Assert
-            CollectionAssert.AreEqual(
-                new Element[]
-                {
-                    Symbol.Create("one"),
-                    Symbol.Create("two"),
-                    new StringAtom("three"),
-                },
-                args);
-        }
-
-        [Test]
-        public void GetAllKeywordArguments_NoSuchKeyAbsenceIsAllowed_ReturnsEmptyPseudoList()
-        {
-            // Arrange
-            var formText = "(foo one two :key one two \"three\" :your-key \"some string\")";
-            
-            var tokens = _lexer.Tokenize(formText.AsMemory());
-            var reader = new TinyLispPseudoReader();
-
-            var pseudoList = reader.Read(tokens).Single().AsPseudoList();
-
-            // Act
-            var args = pseudoList.GetAllKeywordArguments(":non-existing-key", true);
-
-            // Assert
-            Assert.That(args, Is.Empty);
-        }
-
-        [Test]
-        public void GetAllKeywordArguments_NoSuchKeyAbsenceNotAllowed_ThrowsTinyLispException()
-        {
-            // Arrange
-            var formText = "(foo one two :key one two \"three\" :your-key \"some string\")";
-            
-            var tokens = _lexer.Tokenize(formText.AsMemory());
-            var reader = new TinyLispPseudoReader();
-
-            var pseudoList = reader.Read(tokens).Single().AsPseudoList();
-
-            // Act
-            var ex = Assert.Throws<TinyLispException>(() =>
-                pseudoList.GetAllKeywordArguments(":non-existing-key", false));
-
-            // Assert
-            Assert.That(ex.Message, Does.StartWith("No argument for keyword ':non-existing-key'."));
-        }
-
-        [Test]
-        [TestCase(true)]
-        [TestCase(false)]
-        public void GetAllKeywordArguments_KeywordFoundButNextItemIsAlsoKeyword_ReturnsEmptyPseudoList(bool absenceIsAllowed)
-        {
-            // Arrange
-            var formText = "(foo one two :key one two \"three\" :your-key :no-items-for-you \"some string\")";
-            
-            var tokens = _lexer.Tokenize(formText.AsMemory());
-            var reader = new TinyLispPseudoReader();
-
-            var pseudoList = reader.Read(tokens).Single().AsPseudoList();
-
-            // Act
-            var args = pseudoList.GetAllKeywordArguments(":your-key");
-
-            // Assert
-            Assert.That(args, Is.Empty);
-        }
-
-        [Test]
-        [TestCase(true)]
-        [TestCase(false)]
-        public void GetAllKeywordArguments_KeywordFoundButAtEnd_ReturnsEmptyPseudoList(bool absenceIsAllowed)
-        {
-            // Arrange
-            var formText = "(foo one two :key one two \"three\" :no-items-for-you \"some string\" :your-key-at-end)";
-            
-            var tokens = _lexer.Tokenize(formText.AsMemory());
-            var reader = new TinyLispPseudoReader();
-
-            var pseudoList = reader.Read(tokens).Single().AsPseudoList();
-
-            // Act
-            var args = pseudoList.GetAllKeywordArguments(":your-key-at-end");
-
-            // Assert
-            Assert.That(args, Is.Empty);
-        }
-
-        [Test]
-        public void GetAllKeywordArguments_PseudoListIsNull_ThrowsArgumentNullException()
-        {
-            // Arrange
-            PseudoList pseudoList = null;
-
-            // Act
-            var ex = Assert.Throws<ArgumentNullException>(() => pseudoList.GetAllKeywordArguments(":key"));
-
-            // Assert
-            Assert.That(ex.ParamName, Is.EqualTo("element"));
-        }
-
-        [Test]
-        public void GetAllKeywordArguments_FirstArgumentIsNotPseudoList_ThrowsArgumentException()
-        {
-            // Arrange
-            var symbol = Symbol.Create("hello");
-
-            // Act
-            var ex = Assert.Throws<ArgumentException>(() => symbol.GetAllKeywordArguments(":key"));
-
-            // Assert
-            Assert.That(ex.Message,
-                Does.StartWith("'element' is expected to be of type 'TauCode.Parsing.TinyLisp.Data.PseudoList'."));
-            Assert.That(ex.ParamName, Is.EqualTo("element"));
-        }
-
-        [Test]
-        public void GetAllKeywordArguments_ArgumentIsNull_ThrowsArgumentNullException()
-        {
-            // Arrange
-            var formText = "(foo one two :key one two \"three\" :your-key \"some string\")";
-            
-            var tokens = _lexer.Tokenize(formText.AsMemory());
-            var reader = new TinyLispPseudoReader();
-
-            var pseudoList = reader.Read(tokens).Single().AsPseudoList();
-
-            // Act
-            var ex = Assert.Throws<ArgumentNullException>(() => pseudoList.GetAllKeywordArguments(null));
-
-            // Assert
-            Assert.That(ex.ParamName, Is.EqualTo("argumentName"));
-        }
-
-        [Test]
-        [TestCase("non-keyword")]
-        [TestCase("\"some-string\"")]
-        public void GetAllKeywordArguments_ArgumentIsNotKeyword_ThrowsArgumentException(string badKeywordName)
-        {
-            // Arrange
-            var formText = "(foo one two :key one two \"three\" :your-key \"some string\")";
-            
-            var tokens = _lexer.Tokenize(formText.AsMemory());
-            var reader = new TinyLispPseudoReader();
-
-            var pseudoList = reader.Read(tokens).Single().AsPseudoList();
-
-            // Act
-            var ex = Assert.Throws<ArgumentException>(() => pseudoList.GetAllKeywordArguments(badKeywordName));
-
-            // Assert
-            Assert.That(ex.Message, Does.StartWith($"'{badKeywordName}' is not a valid keyword."));
-            Assert.That(ex.ParamName, Is.EqualTo("argumentName"));
-        }
-
-        [Test]
-        public void GetSingleArgumentAsBool_ItemNotFound_ReturnsNull()
-        {
-            // Arrange
-            var formText = "(foo one two :key one two \"three\" :your-key \"some string\")";
-            
-            var tokens = _lexer.Tokenize(formText.AsMemory());
-            var reader = new TinyLispPseudoReader();
-
-            var pseudoList = reader.Read(tokens).Single().AsPseudoList();
-
-            // Act
-            var res = pseudoList.GetSingleArgumentAsBool(":non-existing-key");
-
-            // Assert
-            Assert.That(res, Is.Null);
-        }
-
-        [Test]
-        public void GetSingleArgumentAsBool_ItemIsNil_ReturnsFalse()
-        {
-            // Arrange
-            var formText = "(foo one two :key nil one two \"three\" :your-key \"some string\")";
-            
-            var tokens = _lexer.Tokenize(formText.AsMemory());
-            var reader = new TinyLispPseudoReader();
-
-            var pseudoList = reader.Read(tokens).Single().AsPseudoList();
-
-            // Act
-            var res = pseudoList.GetSingleArgumentAsBool(":key");
-
-            // Assert
-            Assert.That(res, Is.False);
-        }
-
-        [Test]
-        public void GetSingleArgumentAsBool_ItemIsTrue_ReturnsFalse()
-        {
-            // Arrange
-            var formText = "(foo one two :key t one two \"three\" :your-key \"some string\")";
-            
-            var tokens = _lexer.Tokenize(formText.AsMemory());
-            var reader = new TinyLispPseudoReader();
-
-            var pseudoList = reader.Read(tokens).Single().AsPseudoList();
-
-            // Act
-            var res = pseudoList.GetSingleArgumentAsBool(":key");
-
-            // Assert
-            Assert.That(res, Is.True);
-        }
-
-        [Test]
-        [TestCase("some-symbol")]
-        [TestCase("\"a string\"")]
-        public void GetSingleArgumentAsBool_ItemIsOfInvalidType_ThrowsTinyLispException(string badItem)
-        {
-            // Arrange
-            var formText = $"(foo one two :key {badItem} one two \"three\" :your-key \"some string\")";
-
-            var tokens = _lexer.Tokenize(formText.AsMemory());
-            var reader = new TinyLispPseudoReader();
-            var pseudoList = reader.Read(tokens).Single().AsPseudoList();
-
-            // Act
-            var ex = Assert.Throws<TinyLispException>(() => pseudoList.GetSingleArgumentAsBool(":key"));
-
-            // Assert
-            var wrongItem = reader.Read(_lexer.Tokenize(badItem.AsMemory())).Single().ToString();
-            Assert.That(
-                ex.Message,
-                Does.StartWith($"Keyword ':key' was found, but it appeared to be '{wrongItem}' instead of NIL or T."));
-        }
-
-        [Test]
-        [TestCase("(form :a non-free free1 free2 :b :c non-free-2 next-free)", "((free1 free2) (next-free))")]
-        [TestCase("(form free1 :b :c non-free-2 next-free-1 next-free-2)", "((free1) (next-free-1 next-free-2))")]
-        [TestCase("(form free1 :b :c non-free-2)", "((free1))")]
-        public void GetMultipleFreeArgumentSets_HappyPath_ReturnsExpectedResult(string form, string expectedRepresentation)
-        {
-            // Arrange
-            
-            var tokens = _lexer.Tokenize(form.AsMemory());
-            var reader = new TinyLispPseudoReader();
-
-            var pseudoList = reader.Read(tokens).Single().AsPseudoList();
-
-            // Act
-            var list = pseudoList.GetMultipleFreeArgumentSets();
-            var listToPseudoList = new PseudoList(list);
-
-            // Assert
-            Assert.That(listToPseudoList.ToString(), Is.EqualTo(expectedRepresentation).IgnoreCase);
-        }
-
-        [Test]
-        public void GetMultipleFreeArgumentSets_ArgumentIsNull_ThrowsArgumentNullException()
-        {
-            // Arrange
-            PseudoList pseudoList = null;
-
-            // Act
-            var ex = Assert.Throws<ArgumentNullException>(() => pseudoList.GetMultipleFreeArgumentSets());
-
-            // Assert
-            Assert.That(ex.ParamName, Is.EqualTo("element"));
-        }
-
-        [Test]
-        public void GetMultipleFreeArgumentSets_ArgumentIsNotPseudoList_ThrowsArgumentException()
-        {
-            // Arrange
-            var element = Nil.Instance;
-
-            // Act
-            var ex = Assert.Throws<ArgumentException>(() => element.GetMultipleFreeArgumentSets());
-
-            // Assert
-            Assert.That(ex.Message, Does.StartWith("'element' is expected to be of type 'TauCode.Parsing.TinyLisp.Data.PseudoList'."));
-            Assert.That(ex.ParamName, Is.EqualTo("element"));
-        }
-
-        [Test]
-        [TestCase("(form :a non-free :b :c non-free-2 next-free)", "(next-free)")]
-        [TestCase("(form free1 :b :c non-free-2)", "(free1)")]
-        public void GetFreeArguments_HappyPath_ReturnsExpectedResult(string form, string expectedRepresentation)
-        {
-            // Arrange
-            
-            var tokens = _lexer.Tokenize(form.AsMemory());
-            var reader = new TinyLispPseudoReader();
-
-            var pseudoList = reader.Read(tokens).Single().AsPseudoList();
-
-            // Act
-            var argsPseudoList = pseudoList.GetFreeArguments();
-
-            // Assert
-            Assert.That(argsPseudoList.ToString(), Is.EqualTo(expectedRepresentation).IgnoreCase);
-        }
-
-        [Test]
-        [TestCase("(form :a non-free :b :c non-free-2)")]
-        [TestCase("(form :akka free1 :b :c non-free-2)")]
-        public void GetFreeArguments_NoFreeArgs_ThrowsTinyLispException(string form)
-        {
-            // Arrange
-            
-            var tokens = _lexer.Tokenize(form.AsMemory());
-            var reader = new TinyLispPseudoReader();
-
-            var pseudoList = reader.Read(tokens).Single().AsPseudoList();
-
-            // Act
-            var ex = Assert.Throws<TinyLispException>(() => pseudoList.GetFreeArguments());
-
-            // Assert
-            Assert.That(ex.Message, Does.StartWith("Free arguments not found."));
-        }
-
-        [Test]
-        [TestCase("(form :a non-free free1 free2 :b :c non-free-2 next-free)")]
-        [TestCase("(form free1 :b :c non-free-2 next-free-1 next-free-2)")]
-        public void GetFreeArguments_MoreThanOneFreeArgSet_ThrowsTinyLispException(string form)
-        {
-            // Arrange
-            
-            var tokens = _lexer.Tokenize(form.AsMemory());
-            var reader = new TinyLispPseudoReader();
-
-            var pseudoList = reader.Read(tokens).Single().AsPseudoList();
-
-            // Act
-            var ex = Assert.Throws<TinyLispException>(() => pseudoList.GetFreeArguments());
-
-            // Assert
-            Assert.That(ex.Message, Does.StartWith("More than one set of free arguments was found."));
-        }
+    [Test]
+    public void GetAllKeywordArguments_PseudoListIsNull_ThrowsArgumentNullException()
+    {
+        // Arrange
+        PseudoList pseudoList = null;
+
+        // Act
+        var ex = Assert.Throws<ArgumentNullException>(() => pseudoList.GetAllKeywordArguments(":key"));
+
+        // Assert
+        Assert.That(ex.ParamName, Is.EqualTo("element"));
+    }
+
+    [Test]
+    public void GetAllKeywordArguments_FirstArgumentIsNotPseudoList_ThrowsArgumentException()
+    {
+        // Arrange
+        var symbol = Symbol.Create("hello");
+
+        // Act
+        var ex = Assert.Throws<ArgumentException>(() => symbol.GetAllKeywordArguments(":key"));
+
+        // Assert
+        Assert.That(ex.Message,
+            Does.StartWith("'element' is expected to be of type 'TauCode.Parsing.TinyLisp.Data.PseudoList'."));
+        Assert.That(ex.ParamName, Is.EqualTo("element"));
+    }
+
+    [Test]
+    public void GetAllKeywordArguments_ArgumentIsNull_ThrowsArgumentNullException()
+    {
+        // Arrange
+        var formText = "(foo one two :key one two \"three\" :your-key \"some string\")";
+
+        var tokens = _lexer.Tokenize(formText.AsMemory());
+        var reader = new TinyLispPseudoReader();
+
+        var pseudoList = reader.Read(tokens).Single().AsPseudoList();
+
+        // Act
+        var ex = Assert.Throws<ArgumentNullException>(() => pseudoList.GetAllKeywordArguments(null));
+
+        // Assert
+        Assert.That(ex.ParamName, Is.EqualTo("argumentName"));
+    }
+
+    [Test]
+    [TestCase("non-keyword")]
+    [TestCase("\"some-string\"")]
+    public void GetAllKeywordArguments_ArgumentIsNotKeyword_ThrowsArgumentException(string badKeywordName)
+    {
+        // Arrange
+        var formText = "(foo one two :key one two \"three\" :your-key \"some string\")";
+
+        var tokens = _lexer.Tokenize(formText.AsMemory());
+        var reader = new TinyLispPseudoReader();
+
+        var pseudoList = reader.Read(tokens).Single().AsPseudoList();
+
+        // Act
+        var ex = Assert.Throws<ArgumentException>(() => pseudoList.GetAllKeywordArguments(badKeywordName));
+
+        // Assert
+        Assert.That(ex.Message, Does.StartWith($"'{badKeywordName}' is not a valid keyword."));
+        Assert.That(ex.ParamName, Is.EqualTo("argumentName"));
+    }
+
+    [Test]
+    public void GetSingleArgumentAsBool_ItemNotFound_ReturnsNull()
+    {
+        // Arrange
+        var formText = "(foo one two :key one two \"three\" :your-key \"some string\")";
+
+        var tokens = _lexer.Tokenize(formText.AsMemory());
+        var reader = new TinyLispPseudoReader();
+
+        var pseudoList = reader.Read(tokens).Single().AsPseudoList();
+
+        // Act
+        var res = pseudoList.GetSingleArgumentAsBool(":non-existing-key");
+
+        // Assert
+        Assert.That(res, Is.Null);
+    }
+
+    [Test]
+    public void GetSingleArgumentAsBool_ItemIsNil_ReturnsFalse()
+    {
+        // Arrange
+        var formText = "(foo one two :key nil one two \"three\" :your-key \"some string\")";
+
+        var tokens = _lexer.Tokenize(formText.AsMemory());
+        var reader = new TinyLispPseudoReader();
+
+        var pseudoList = reader.Read(tokens).Single().AsPseudoList();
+
+        // Act
+        var res = pseudoList.GetSingleArgumentAsBool(":key");
+
+        // Assert
+        Assert.That(res, Is.False);
+    }
+
+    [Test]
+    public void GetSingleArgumentAsBool_ItemIsTrue_ReturnsFalse()
+    {
+        // Arrange
+        var formText = "(foo one two :key t one two \"three\" :your-key \"some string\")";
+
+        var tokens = _lexer.Tokenize(formText.AsMemory());
+        var reader = new TinyLispPseudoReader();
+
+        var pseudoList = reader.Read(tokens).Single().AsPseudoList();
+
+        // Act
+        var res = pseudoList.GetSingleArgumentAsBool(":key");
+
+        // Assert
+        Assert.That(res, Is.True);
+    }
+
+    [Test]
+    [TestCase("some-symbol")]
+    [TestCase("\"a string\"")]
+    public void GetSingleArgumentAsBool_ItemIsOfInvalidType_ThrowsTinyLispException(string badItem)
+    {
+        // Arrange
+        var formText = $"(foo one two :key {badItem} one two \"three\" :your-key \"some string\")";
+
+        var tokens = _lexer.Tokenize(formText.AsMemory());
+        var reader = new TinyLispPseudoReader();
+        var pseudoList = reader.Read(tokens).Single().AsPseudoList();
+
+        // Act
+        var ex = Assert.Throws<TinyLispException>(() => pseudoList.GetSingleArgumentAsBool(":key"));
+
+        // Assert
+        var wrongItem = reader.Read(_lexer.Tokenize(badItem.AsMemory())).Single().ToString();
+        Assert.That(
+            ex.Message,
+            Does.StartWith($"Keyword ':key' was found, but it appeared to be '{wrongItem}' instead of NIL or T."));
+    }
+
+    [Test]
+    [TestCase("(form :a non-free free1 free2 :b :c non-free-2 next-free)", "((free1 free2) (next-free))")]
+    [TestCase("(form free1 :b :c non-free-2 next-free-1 next-free-2)", "((free1) (next-free-1 next-free-2))")]
+    [TestCase("(form free1 :b :c non-free-2)", "((free1))")]
+    public void GetMultipleFreeArgumentSets_HappyPath_ReturnsExpectedResult(string form, string expectedRepresentation)
+    {
+        // Arrange
+
+        var tokens = _lexer.Tokenize(form.AsMemory());
+        var reader = new TinyLispPseudoReader();
+
+        var pseudoList = reader.Read(tokens).Single().AsPseudoList();
+
+        // Act
+        var list = pseudoList.GetMultipleFreeArgumentSets();
+        var listToPseudoList = new PseudoList(list);
+
+        // Assert
+        Assert.That(listToPseudoList.ToString(), Is.EqualTo(expectedRepresentation).IgnoreCase);
+    }
+
+    [Test]
+    public void GetMultipleFreeArgumentSets_ArgumentIsNull_ThrowsArgumentNullException()
+    {
+        // Arrange
+        PseudoList pseudoList = null;
+
+        // Act
+        var ex = Assert.Throws<ArgumentNullException>(() => pseudoList.GetMultipleFreeArgumentSets());
+
+        // Assert
+        Assert.That(ex.ParamName, Is.EqualTo("element"));
+    }
+
+    [Test]
+    public void GetMultipleFreeArgumentSets_ArgumentIsNotPseudoList_ThrowsArgumentException()
+    {
+        // Arrange
+        var element = Nil.Instance;
+
+        // Act
+        var ex = Assert.Throws<ArgumentException>(() => element.GetMultipleFreeArgumentSets());
+
+        // Assert
+        Assert.That(ex.Message, Does.StartWith("'element' is expected to be of type 'TauCode.Parsing.TinyLisp.Data.PseudoList'."));
+        Assert.That(ex.ParamName, Is.EqualTo("element"));
+    }
+
+    [Test]
+    [TestCase("(form :a non-free :b :c non-free-2 next-free)", "(next-free)")]
+    [TestCase("(form free1 :b :c non-free-2)", "(free1)")]
+    public void GetFreeArguments_HappyPath_ReturnsExpectedResult(string form, string expectedRepresentation)
+    {
+        // Arrange
+
+        var tokens = _lexer.Tokenize(form.AsMemory());
+        var reader = new TinyLispPseudoReader();
+
+        var pseudoList = reader.Read(tokens).Single().AsPseudoList();
+
+        // Act
+        var argsPseudoList = pseudoList.GetFreeArguments();
+
+        // Assert
+        Assert.That(argsPseudoList.ToString(), Is.EqualTo(expectedRepresentation).IgnoreCase);
+    }
+
+    [Test]
+    [TestCase("(form :a non-free :b :c non-free-2)")]
+    [TestCase("(form :akka free1 :b :c non-free-2)")]
+    public void GetFreeArguments_NoFreeArgs_ThrowsTinyLispException(string form)
+    {
+        // Arrange
+
+        var tokens = _lexer.Tokenize(form.AsMemory());
+        var reader = new TinyLispPseudoReader();
+
+        var pseudoList = reader.Read(tokens).Single().AsPseudoList();
+
+        // Act
+        var ex = Assert.Throws<TinyLispException>(() => pseudoList.GetFreeArguments());
+
+        // Assert
+        Assert.That(ex.Message, Does.StartWith("Free arguments not found."));
+    }
+
+    [Test]
+    [TestCase("(form :a non-free free1 free2 :b :c non-free-2 next-free)")]
+    [TestCase("(form free1 :b :c non-free-2 next-free-1 next-free-2)")]
+    public void GetFreeArguments_MoreThanOneFreeArgSet_ThrowsTinyLispException(string form)
+    {
+        // Arrange
+
+        var tokens = _lexer.Tokenize(form.AsMemory());
+        var reader = new TinyLispPseudoReader();
+
+        var pseudoList = reader.Read(tokens).Single().AsPseudoList();
+
+        // Act
+        var ex = Assert.Throws<TinyLispException>(() => pseudoList.GetFreeArguments());
+
+        // Assert
+        Assert.That(ex.Message, Does.StartWith("More than one set of free arguments was found."));
     }
 }

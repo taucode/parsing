@@ -14,7 +14,6 @@ namespace TauCode.Parsing.TinyLisp.TokenProducers
 
             if (punctuation.HasValue)
             {
-                context.Position++;
                 return new LispPunctuationToken(
                     start,
                     1,

@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using TauCode.Parsing.Exceptions;
 using TauCode.Parsing.TinyLisp.Data;
 using TauCode.Parsing.TinyLisp.Tokens;
 using TauCode.Parsing.Tokens;
@@ -9,7 +8,7 @@ namespace TauCode.Parsing.TinyLisp
 {
     public class TinyLispPseudoReader : ITinyLispPseudoReader
     {
-        public PseudoList Read(IReadOnlyList<ILexicalToken> tokens)
+        public PseudoList Read(IList<ILexicalToken> tokens)
         {
             var list = new PseudoList();
             var index = 0;
@@ -18,7 +17,7 @@ namespace TauCode.Parsing.TinyLisp
             return list;
         }
 
-        private void ReadPseudoListContent(PseudoList list, IReadOnlyList<ILexicalToken> tokens, ref int index, int depth)
+        private void ReadPseudoListContent(PseudoList list, IList<ILexicalToken> tokens, ref int index, int depth)
         {
             while (true)
             {

@@ -6,39 +6,41 @@ namespace TauCode.Parsing.Nodes
     public class ExactWordNode : ActionNode
     {
         public ExactWordNode(
-            Action<ActionNode, ILexicalToken, IParsingResult> action,
+            Action<ActionNode, ParsingContext> action,
             string word,
-            bool isCaseSensitive)
+            bool ignoreCase)
             : base(action)
         {
             this.Word = word ?? throw new ArgumentNullException(nameof(word));
-            this.IsCaseSensitive = isCaseSensitive;
+            this.IgnoreCase = ignoreCase;
         }
 
         public ExactWordNode(
             string word,
-            bool isCaseSensitive)
-            : this(null, word, isCaseSensitive)
-        {   
+            bool ignoreCase)
+            : this(null, word, ignoreCase)
+        {
         }
 
         public string Word { get; }
 
-        public bool IsCaseSensitive { get; }
+        public bool IgnoreCase { get; }
 
-        protected override bool AcceptsTokenImpl(ILexicalToken token, IParsingResult parsingResult)
+        protected override bool AcceptsImpl(ParsingContext parsingContext)
         {
+            var token = parsingContext.GetCurrentToken();
+
             switch (token)
             {
                 case WordToken wordToken:
-                {
-                    var comparisonResult = string.Compare(
-                        wordToken.Text,
-                        this.Word,
-                        this.IsCaseSensitive ? StringComparison.Ordinal : StringComparison.OrdinalIgnoreCase);
+                    {
+                        var comparisonResult = string.Compare(
+                            wordToken.Text,
+                            this.Word,
+                            this.IgnoreCase ? StringComparison.OrdinalIgnoreCase : StringComparison.Ordinal);
 
-                    return comparisonResult == 0;
-                }
+                        return comparisonResult == 0;
+                    }
                 default:
                     return false;
             }

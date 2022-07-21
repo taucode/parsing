@@ -5,7 +5,7 @@ namespace TauCode.Parsing.Nodes
     public class StringNode : ActionNode
     {
         public StringNode(
-            Action<ActionNode, ILexicalToken, IParsingResult> action)
+            Action<ActionNode, ParsingContext> action)
             : base(action)
         {
         }
@@ -14,7 +14,7 @@ namespace TauCode.Parsing.Nodes
         {
         }
 
-        protected override bool AcceptsTokenImpl(ILexicalToken token, IParsingResult parsingResult)
+        protected override bool AcceptsImpl(ParsingContext parsingContext)
         {
             throw new NotImplementedException();
         }

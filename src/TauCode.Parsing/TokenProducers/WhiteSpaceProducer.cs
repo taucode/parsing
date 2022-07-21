@@ -2,9 +2,20 @@
 
 namespace TauCode.Parsing.TokenProducers
 {
-    public class WhiteSpaceProducer : ILexicalTokenProducer
+    public class WhiteSpaceProducer : LexicalTokenProducerBase, IEmptyLexicalTokenProducer
     {
-        public ILexicalToken Produce(LexingContext context)
+        protected override ILexicalToken ProduceImpl(LexingContext context)
+        {
+            var skipped = this.Skip(context);
+            if (skipped > 0)
+            {
+                return new EmptyToken(context.Position, skipped);
+            }
+
+            return null;
+        }
+
+        public int Skip(LexingContext context)
         {
             var start = context.Position;
             var input = context.Input.Span;
@@ -13,17 +24,17 @@ namespace TauCode.Parsing.TokenProducers
             var c = input[start];
             if (!c.IsInlineWhiteSpaceOrCaretControl())
             {
-                return null;
+                return 0;
             }
 
             var pos = start;
+            var goOn = true;
 
-            while (true)
+            while (goOn)
             {
                 if (pos == length)
                 {
-                    context.Position += pos - start;
-                    return EmptyToken.Instance;
+                    break;
                 }
 
                 c = input[pos];
@@ -39,11 +50,13 @@ namespace TauCode.Parsing.TokenProducers
                         break;
 
                     default:
-                        var delta = pos - start;
-                        context.Position += delta;
-                        return EmptyToken.Instance;
+                        goOn = false;
+                        break;
                 }
             }
+
+            var delta = pos - start;
+            return delta;
         }
     }
 }

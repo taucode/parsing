@@ -2,9 +2,9 @@
 {
     public interface IArcMold : IScriptElementMold
     {
-        IVertexMold Tail { get; set; }
+        ILinkableMold Tail { get; set; }
         string TailPath { get; set; }
-        IVertexMold Head { get; set; }
+        ILinkableMold Head { get; set; }
         string HeadPath { get; set; }
     }
 }

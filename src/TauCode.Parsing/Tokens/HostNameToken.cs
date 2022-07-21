@@ -1,8 +1,8 @@
-﻿using TauCode.Data;
+﻿using TauCode.Data.Text;
 
 namespace TauCode.Parsing.Tokens
 {
-    public class HostNameToken : TextToken
+    public class HostNameToken : ValueTokenBase<HostName>
     {
         public HostNameToken(
             int position,
@@ -11,11 +11,9 @@ namespace TauCode.Parsing.Tokens
             : base(
                 position,
                 consumedLength,
+                hostName,
                 hostName.ToString())
         {
-            this.HostName = hostName;
         }
-
-        public HostName HostName { get; }
     }
 }

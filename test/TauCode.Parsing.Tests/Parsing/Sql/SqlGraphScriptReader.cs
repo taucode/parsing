@@ -1,8 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using TauCode.Parsing.Graphs.Reading;
 using TauCode.Parsing.Graphs.Reading.Impl;
 using TauCode.Parsing.Tests.Parsing.Sql.ScriptElementReaders;
@@ -18,9 +14,9 @@ public class SqlGraphScriptReader : GraphScriptReader
 
     public SqlGraphScriptReader()
     {
-        _vertexReader = new VertexElementReader(this);
-        _alternativesGroupReader = new AlternativesGroupReader(this);
-        _optionalGroupReader = new OptionalElementReader(this);
+        _vertexReader = new VertexReader(this);
+        _alternativesGroupReader = new AlternativesReader(this);
+        _optionalGroupReader = new OptionalReader(this);
     }
 
     public override IScriptElementReader ResolveElementReader(Atom car)

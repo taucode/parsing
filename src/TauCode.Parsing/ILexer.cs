@@ -7,7 +7,7 @@ namespace TauCode.Parsing
     {
         IEnumerable<ILexicalTokenProducer> Producers { get; set; }
         bool IgnoreEmptyTokens { get; set; }
-        IReadOnlyList<ILexicalToken> Tokenize(ReadOnlyMemory<char> input);
+        IList<ILexicalToken> Tokenize(ReadOnlyMemory<char> input);
         Action<LexingContext, ILexicalTokenProducer> OnBeforeTokenProduced { get; set; }
         Action<LexingContext, ILexicalToken> OnAfterTokenProduced { get; set; }
     }

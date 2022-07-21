@@ -1,19 +1,9 @@
-﻿using System;
-using TauCode.Parsing.TinyLisp.Data;
+﻿using TauCode.Parsing.TinyLisp.Data;
 
 namespace TauCode.Parsing.Graphs.Molding.Impl
 {
     public class ArcMold : ScriptElementMoldBase, IArcMold
     {
-        #region Fields
-
-        private IVertexMold _tail;
-        private string _tailPath;
-        private IVertexMold _head;
-        private string _headPath;
-
-        #endregion
-
         #region ctor
 
         public ArcMold(IGroupMold owner, Atom car)
@@ -30,54 +20,25 @@ namespace TauCode.Parsing.Graphs.Molding.Impl
 
         #region Overridden
 
-        protected override void ValidateAndFinalizeImpl()
+        public override void ProcessKeywords()
         {
-            throw new NotImplementedException("todo: check heads and tails");
+            base.ProcessKeywords();
+
+            this.TailPath = this.GetKeywordValue<string>(":TAIL-PATH");
+            this.HeadPath = this.GetKeywordValue<string>(":HEAD-PATH");
         }
 
         #endregion
 
         #region IArcMold Members
 
-        public IVertexMold Tail
-        {
-            get => _tail;
-            set
-            {
-                this.CheckNotFinalized();
-                _tail = value;
-            }
-        }
+        public ILinkableMold Tail { get; set; }
 
-        public string TailPath
-        {
-            get => _tailPath;
-            set
-            {
-                this.CheckNotFinalized();
-                _tailPath = value;
-            }
-        }
+        public string TailPath { get; set; }
 
-        public IVertexMold Head
-        {
-            get => _head;
-            set
-            {
-                this.CheckNotFinalized();
-                _head = value;
-            }
-        }
+        public ILinkableMold Head { get; set; }
 
-        public string HeadPath
-        {
-            get => _headPath;
-            set
-            {
-                this.CheckNotFinalized();
-                _headPath = value;
-            }
-        }
+        public string HeadPath { get; set; }
 
         #endregion
     }

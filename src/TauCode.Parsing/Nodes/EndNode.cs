@@ -8,16 +8,22 @@ namespace TauCode.Parsing.Nodes
         {   
         }
 
-        protected override bool AcceptsTokenImpl(ILexicalToken token, IParsingResult parsingResult)
+        protected override bool AcceptsImpl(ParsingContext parsingContext)
         {
-            throw new ParsingException($"Idle node's '{nameof(AcceptsToken)}' method should never be called.");
+            throw new ParsingException($"Idle node's '{nameof(Accepts)}' method should never be called.");
         }
 
-        protected override void ActImpl(ILexicalToken token, IParsingResult parsingResult)
+        protected override void ActImpl(ParsingContext parsingContext)
         {
             throw new ParsingException($"Idle node's '{nameof(Act)}' method should never be called.");
         }
 
         protected override string GetDataTag() => null;
+
+        public override ILexicalTokenConverter TokenConverter
+        {
+            get => throw new ParsingException($"End node's '{nameof(TokenConverter)}' property should never be get.");
+            set => throw new ParsingException($"End node's '{nameof(TokenConverter)}' property should never be set.");
+        }
     }
 }

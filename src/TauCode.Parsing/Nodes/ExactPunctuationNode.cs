@@ -6,7 +6,7 @@ namespace TauCode.Parsing.Nodes
     public class ExactPunctuationNode : ActionNode
     {
         public ExactPunctuationNode(
-            Action<ActionNode, ILexicalToken, IParsingResult> action,
+            Action<ActionNode, ParsingContext> action,
             char punctuation)
             : base(action)
         {
@@ -20,8 +20,10 @@ namespace TauCode.Parsing.Nodes
 
         public char Punctuation { get; }
 
-        protected override bool AcceptsTokenImpl(ILexicalToken token, IParsingResult parsingResult)
+        protected override bool AcceptsImpl(ParsingContext parsingContext)
         {
+            var token = parsingContext.GetCurrentToken();
+
             if (token is PunctuationToken punctuationToken)
             {
                 return this.Punctuation == punctuationToken.Value;

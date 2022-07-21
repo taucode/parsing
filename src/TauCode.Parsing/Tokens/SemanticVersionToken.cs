@@ -1,21 +1,19 @@
-﻿using TauCode.Data;
+﻿using TauCode.Data.Text;
 
 namespace TauCode.Parsing.Tokens
 {
-    public class SemanticVersionToken : TextToken
+    public class SemanticVersionToken : ValueTokenBase<SemanticVersion>
     {
         public SemanticVersionToken(
             int position,
             int consumedLength,
-            SemanticVersion semanticVersion)
+            SemanticVersion value)
             : base(
                 position,
                 consumedLength,
-                semanticVersion.ToString())
+                value,
+                value.ToString())
         {
-            this.SemanticVersion = semanticVersion;
         }
-
-        public SemanticVersion SemanticVersion { get; }
     }
 }

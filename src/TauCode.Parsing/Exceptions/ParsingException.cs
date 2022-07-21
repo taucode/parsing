@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Runtime.Serialization;
+using System.Linq;
 using System.Text;
 
 namespace TauCode.Parsing.Exceptions
@@ -32,30 +32,40 @@ namespace TauCode.Parsing.Exceptions
 
         public ILexicalToken Token { get; }
 
-        private static string BuildMessageWithNodesAndToken(string message, IEnumerable<IParsingNode> nodes, ILexicalToken token)
+        private static string BuildMessageWithNodesAndToken(string message, IReadOnlyCollection<IParsingNode> nodes, ILexicalToken token)
         {
             var sb = new StringBuilder();
             sb.Append(message);
 
             if (nodes != null)
             {
+                var nodeList = nodes.ToList();
+
                 sb.AppendLine();
                 sb.AppendLine("Node(s):");
-                foreach (var node in nodes)
+
+                for (var i = 0; i < nodes.Count(); i++)
                 {
+                    var node = nodeList[i];
                     if (node == null)
                     {
                         throw new ArgumentException($"'{nameof(nodes)}' cannot contain nulls.");
                     }
 
-                    sb.AppendLine(node.GetTag());
+                    sb.Append(node.GetTag());
+                    if (i < nodes.Count - 1)
+                    {
+                        sb.AppendLine();
+                    }
                 }
             }
 
             if (token != null)
             {
+                sb.AppendLine();
+
                 sb.Append("Token: ");
-                sb.Append($"[{token}]");
+                sb.Append($"[{token}] [{token.GetType().FullName}]");
                 sb.Append($" Position: {token.Position}");
             }
 

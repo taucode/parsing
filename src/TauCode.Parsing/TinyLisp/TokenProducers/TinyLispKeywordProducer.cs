@@ -52,7 +52,6 @@ namespace TauCode.Parsing.TinyLisp.TokenProducers
                     delta,
                     keywordNameSpan.ToString());
 
-                context.Position += delta;
                 return token;
             }
             else

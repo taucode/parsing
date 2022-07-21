@@ -4,12 +4,16 @@ namespace TauCode.Parsing
 {
     public class ParsingContext
     {
-        public ParsingContext(IReadOnlyList<ILexicalToken> tokens)
+        public ParsingContext(IList<ILexicalToken> tokens, IParsingResult parsingResult)
         {
+            // todo checks
+
             this.Tokens = tokens;
+            this.ParsingResult = parsingResult;
         }
 
-        public readonly IReadOnlyList<ILexicalToken> Tokens;
+        public readonly IList<ILexicalToken> Tokens;
         public int Position;
+        public IParsingResult ParsingResult { get; }
     }
 }

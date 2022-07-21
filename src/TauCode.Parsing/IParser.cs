@@ -1,12 +1,13 @@
-﻿using System.Collections.Generic;
-using Serilog;
+﻿using Serilog;
+using System.Collections.Generic;
 
 namespace TauCode.Parsing
 {
     public interface IParser
     {
+        bool AllowsMultipleExecutions { get; set; }
         ILogger Logger { get; set; }
         IParsingNode Root { get; set; }
-        void Parse(IReadOnlyList<ILexicalToken> tokens, IParsingResult result);
+        void Parse(IList<ILexicalToken> tokens, IParsingResult result);
     }
 }

@@ -1,4 +1,6 @@
-﻿using TauCode.Parsing.TinyLisp.Data;
+﻿using System;
+using System.Collections.Generic;
+using TauCode.Parsing.TinyLisp.Data;
 
 namespace TauCode.Parsing.Graphs.Molding.Impl
 {
@@ -6,8 +8,8 @@ namespace TauCode.Parsing.Graphs.Molding.Impl
     {
         #region Fields
 
-        private bool _isEntrance;
-        private bool _isExit;
+        private readonly List<IArcMold> _outgoingArcs;
+        private readonly List<IArcMold> _incomingArcs;
 
         #endregion
 
@@ -15,16 +17,10 @@ namespace TauCode.Parsing.Graphs.Molding.Impl
 
         protected LinkableMoldBase(IGroupMold owner, Atom car)
             : base(owner, car)
-        {   
+        {
+            _outgoingArcs = new List<IArcMold>();
+            _incomingArcs = new List<IArcMold>();
         }
-
-        #endregion
-
-        #region Protected
-
-        protected abstract IVertexMold GetEntranceVertexImpl();
-
-        protected abstract IVertexMold GetExitVertexImpl();
 
         #endregion
 
@@ -34,8 +30,8 @@ namespace TauCode.Parsing.Graphs.Molding.Impl
         {
             base.ProcessKeywords();
 
-            this.IsEntrance = this.GetKeywordValueAsBool(":IS-ENTRANCE");
-            this.IsExit = this.GetKeywordValueAsBool(":IS-EXIT");
+            this.IsEntrance = this.GetKeywordValue(":IS-ENTRANCE", false);
+            this.IsExit = this.GetKeywordValue(":IS-EXIT", false);
         }
 
         #endregion
@@ -44,40 +40,72 @@ namespace TauCode.Parsing.Graphs.Molding.Impl
 
         public abstract string GetFullPath();
 
-        public bool IsEntrance
+        public bool IsEntrance { get; set; }
+
+        public bool IsExit { get; set; }
+
+        public IArcMold AddLinkTo(ILinkableMold head)
         {
-            get => _isEntrance;
-            set
+            if (head == null)
             {
-                this.CheckNotFinalized();
-                _isEntrance = value;
+                throw new ArgumentNullException(nameof(head));
             }
-        }
 
-        public bool IsExit
-        {
-            get => _isExit;
-            set
+            var arcMold = new ArcMold(this.Owner)
             {
-                this.CheckNotFinalized();
-                _isExit = value;
+                Tail = this,
+                Head = head,
+            };
+
+            _outgoingArcs.Add(arcMold);
+            return arcMold;
+        }
+
+        public IArcMold AddLinkTo(string headPath)
+        {
+            if (headPath == null)
+            {
+                throw new ArgumentNullException(nameof(headPath));
             }
+
+            var arcMold = new ArcMold(this.Owner)
+            {
+                Tail = this,
+                HeadPath = headPath,
+            };
+
+            _outgoingArcs.Add(arcMold);
+
+            return arcMold;
         }
 
-        public IVertexMold GetEntranceVertex()
+        public IArcMold AddLinkFrom(ILinkableMold tail)
         {
-            this.CheckFinalized();
-
-            return this.GetEntranceVertexImpl();
+            throw new System.NotImplementedException();
         }
 
-        public IVertexMold GetExitVertex()
+        public IArcMold AddLinkFrom(string tailPath)
         {
-            this.CheckFinalized();
+            if (tailPath == null)
+            {
+                throw new ArgumentNullException(nameof(tailPath));
+            }
 
-            return this.GetExitVertexImpl();
+            var arcMold = new ArcMold(this.Owner)
+            {
+                TailPath = tailPath,
+                Head = this,
+            };
+
+            _incomingArcs.Add(arcMold);
+
+            return arcMold;
         }
-        
+
+        public IReadOnlyList<IArcMold> OutgoingArcs => _outgoingArcs;
+
+        public IReadOnlyList<IArcMold> IncomingArcs => _incomingArcs;
+
         #endregion
     }
 }

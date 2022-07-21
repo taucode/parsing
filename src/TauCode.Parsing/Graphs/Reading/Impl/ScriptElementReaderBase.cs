@@ -34,7 +34,7 @@ namespace TauCode.Parsing.Graphs.Reading.Impl
             this.ReadContent(scriptElementMold, element);
             this.CustomizeContent(scriptElementMold, element);
 
-            scriptElementMold.ValidateAndFinalize();
+            //scriptElementMold.ValidateAndFinalize();
 
             return scriptElementMold;
         }

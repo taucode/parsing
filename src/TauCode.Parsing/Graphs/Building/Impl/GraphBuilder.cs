@@ -1,9 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
 using TauCode.Data.Graphs;
+using TauCode.Parsing.Exceptions;
 using TauCode.Parsing.Graphs.Molding;
-using TauCode.Parsing.Graphs.Molding.Impl;
 
 namespace TauCode.Parsing.Graphs.Building.Impl
 {
@@ -30,14 +29,23 @@ namespace TauCode.Parsing.Graphs.Building.Impl
 
         public IGraph Build(IGroupMold group)
         {
+            var groupMolds = new List<IGroupMold>();
             var vertexMolds = new List<IVertexMold>();
-            var groupRefMolds = new List<IGroupRefMold>();
+            var refMolds = new List<IRefMold>();
             var arcMolds = new List<IArcMold>();
-            this.WriteContent(group, vertexMolds, groupRefMolds, arcMolds);
+            WriteContent(group, groupMolds, vertexMolds, refMolds, arcMolds);
 
             var graph = this.CreateGraph();
 
+            //if (refMolds.Any())
+            //{
+            //    throw new NotImplementedException(); // deal with refs later...
+            //}
+
             var vertexMappings = new Dictionary<IVertexMold, IVertex>();
+            //var groups = groupMolds
+            //    .Where(x => x.GetFullPath() != null)
+            //    .ToDictionary(x => x.GetFullPath(), x => x);
 
             foreach (var vertexMold in vertexMolds)
             {
@@ -45,7 +53,7 @@ namespace TauCode.Parsing.Graphs.Building.Impl
 
                 if (vertex == null)
                 {
-                    throw new NotImplementedException(); // WTF???
+                    throw new BuildingException("Vertex factory returned null as vertex.");
                 }
 
                 graph.Add(vertex);
@@ -61,23 +69,30 @@ namespace TauCode.Parsing.Graphs.Building.Impl
 
                 if (arcMold.Tail != null && arcMold.Head != null)
                 {
-                    tail = ResolveVertex(arcMold.Tail, vertexMappings);
-                    head = ResolveVertex(arcMold.Head, vertexMappings);
+                    tail = ResolveVertex(arcMold.Tail.GetExitVertexOrThrow(), vertexMappings);
+                    head = ResolveVertex(arcMold.Head.GetEntranceVertexOrThrow(), vertexMappings);
                 }
                 else if (arcMold.TailPath != null && arcMold.HeadPath != null)
                 {
-                    throw new NotImplementedException();
+                    var tailMold = arcMold.ResolvePath(arcMold.TailPath).GetExitVertexOrThrow();
+                    var headMold = arcMold.ResolvePath(arcMold.HeadPath).GetEntranceVertexOrThrow();
+
+                    tail = ResolveVertex(tailMold, vertexMappings);
+                    head = ResolveVertex(headMold, vertexMappings);
                 }
                 else if (arcMold.Tail != null && arcMold.HeadPath != null)
                 {
-                    tail = ResolveVertex(arcMold.Tail, vertexMappings);
+                    tail = ResolveVertex(arcMold.Tail.GetExitVertexOrThrow(), vertexMappings);
                     var headMold = arcMold.Tail.ResolvePath(arcMold.HeadPath);
-                    var headEntrance = headMold.GetEntranceVertex();
+                    var headEntrance = headMold.GetEntranceVertexOrThrow();
                     head = ResolveVertex(headEntrance, vertexMappings);
                 }
                 else if (arcMold.TailPath != null && arcMold.Head != null)
                 {
-                    throw new NotImplementedException();
+                    head = ResolveVertex(arcMold.Head.GetEntranceVertexOrThrow(), vertexMappings);
+                    var tailMold = arcMold.Head.ResolvePath(arcMold.TailPath);
+                    var tailExit = tailMold.GetExitVertexOrThrow();
+                    tail = ResolveVertex(tailExit, vertexMappings);
                 }
                 else
                 {
@@ -107,43 +122,21 @@ namespace TauCode.Parsing.Graphs.Building.Impl
             IVertexMold vertexMold,
             Dictionary<IVertexMold, IVertex> vertexMappings)
         {
-            if (vertexMold is GroupRefEntranceVertexResolver groupRefEntranceVertexResolver)
-            {
-                var groupRef = groupRefEntranceVertexResolver.Keeper;
-                var groupPath = groupRef.ReferencedGroupPath;
-
-                var referencedGroup = groupRef.Owner.ResolvePath(groupPath);
-                var referencedGroupEntrance = referencedGroup.GetEntranceVertex();
-
-                // todo: will get stack overflow in case of cycle in group referencing
-                // todo: use ReSharper 'convert recursion to iteration'
-                return ResolveVertex(referencedGroupEntrance, vertexMappings);
-            }
-            else if (vertexMold is GroupRefExitVertexResolver groupRefExitVertexResolver)
-            {
-                var groupRef = groupRefExitVertexResolver.Keeper;
-                var groupPath = groupRef.ReferencedGroupPath;
-
-                var referencedGroup = groupRef.Owner.ResolvePath(groupPath);
-                var referencedGroupExit = referencedGroup.GetExitVertex();
-
-
-                // todo: will get stack overflow in case of cycle in group referencing
-                // todo: use ReSharper 'convert recursion to iteration'
-                return ResolveVertex(referencedGroupExit, vertexMappings);
-            }
-            else
-            {
-                return vertexMappings[vertexMold];
-            }
+            return vertexMappings[vertexMold];
         }
 
-        private void WriteContent(
+        private static void WriteContent(
             IGroupMold group,
+            List<IGroupMold> groupMolds, // todo: need at all?
             List<IVertexMold> vertexMolds,
-            List<IGroupRefMold> groupRefMolds,
+            List<IRefMold> refMolds,
             List<IArcMold> arcMolds)
         {
+            groupMolds.Add(group);
+
+            arcMolds.AddRange(group.OutgoingArcs);
+            arcMolds.AddRange(group.IncomingArcs);
+
             foreach (var scriptElementMold in group.AllElements)
             {
                 if (scriptElementMold is IVertexMold vertexMold)
@@ -153,19 +146,24 @@ namespace TauCode.Parsing.Graphs.Building.Impl
                     arcMolds.AddRange(vertexMold.OutgoingArcs);
                     arcMolds.AddRange(vertexMold.IncomingArcs);
                 }
-                else if (scriptElementMold is IGroupRefMold groupRefMold)
+                else if (scriptElementMold is IRefMold refMold)
                 {
-                    groupRefMolds.Add(groupRefMold);
+                    refMolds.Add(refMold);
 
-                    arcMolds.AddRange(groupRefMold.GetEntranceVertex().OutgoingArcs);
-                    arcMolds.AddRange(groupRefMold.GetEntranceVertex().IncomingArcs);
-
-                    arcMolds.AddRange(groupRefMold.GetExitVertex().OutgoingArcs);
-                    arcMolds.AddRange(groupRefMold.GetExitVertex().IncomingArcs);
+                    arcMolds.AddRange(refMold.OutgoingArcs);
+                    arcMolds.AddRange(refMold.IncomingArcs);
                 }
                 else if (scriptElementMold is IGroupMold innerGroupMold)
                 {
-                    this.WriteContent(innerGroupMold, vertexMolds, groupRefMolds, arcMolds);
+                    WriteContent(innerGroupMold, groupMolds, vertexMolds, refMolds, arcMolds);
+                }
+                else if (scriptElementMold is IArcMold arcMold)
+                {
+                    arcMolds.Add(arcMold);
+                }
+                else
+                {
+                    throw new NotImplementedException("error");
                 }
             }
         }

@@ -30,7 +30,7 @@ namespace TauCode.Parsing
 
         public int Position { get; }
         public int ConsumedLength { get; }
-        public IDictionary<string, string> Properties { get; set; }
+        public virtual IDictionary<string, string> Properties { get; set; }
 
         #endregion
     }

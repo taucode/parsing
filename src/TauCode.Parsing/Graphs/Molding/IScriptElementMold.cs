@@ -18,7 +18,7 @@ namespace TauCode.Parsing.Graphs.Molding
 
         void ProcessKeywords();
 
-        bool IsFinalized { get; }
-        void ValidateAndFinalize();
+        //bool IsFinalized { get; }
+        //void ValidateAndFinalize();
     }
 }

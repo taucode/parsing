@@ -1,23 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-
-namespace TauCode.Parsing.Tokens
+﻿namespace TauCode.Parsing.Tokens
 {
-    public sealed class EmptyToken : IEmptyLexicalToken
+    public sealed class EmptyToken : LexicalTokenBase, IEmptyLexicalToken
     {
-        public static readonly EmptyToken Instance = new EmptyToken();
-
-        private EmptyToken()
-        {   
-        }
-
-        public int Position => 0;
-        public int ConsumedLength => 0;
-
-        public IDictionary<string, string> Properties
+        public EmptyToken(int position, int consumedLength)
+            : base(position, consumedLength)
         {
-            get => null;
-            set => throw new NotSupportedException();
         }
     }
 }

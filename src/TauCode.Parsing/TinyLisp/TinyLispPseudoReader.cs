@@ -1,7 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using TauCode.Parsing.Exceptions;
-using TauCode.Parsing.TextClasses;
 using TauCode.Parsing.TinyLisp.Data;
 using TauCode.Parsing.TinyLisp.Tokens;
 using TauCode.Parsing.Tokens;
@@ -10,7 +8,7 @@ namespace TauCode.Parsing.TinyLisp
 {
     public class TinyLispPseudoReader : ITinyLispPseudoReader
     {
-        public PseudoList Read(IList<IToken> tokens)
+        public PseudoList Read(IList<ILexicalToken> tokens)
         {
             var list = new PseudoList();
             var index = 0;
@@ -19,7 +17,7 @@ namespace TauCode.Parsing.TinyLisp
             return list;
         }
 
-        private void ReadPseudoListContent(PseudoList list, IList<IToken> tokens, ref int index, int depth)
+        private void ReadPseudoListContent(PseudoList list, IList<ILexicalToken> tokens, ref int index, int depth)
         {
             while (true)
             {
@@ -27,7 +25,9 @@ namespace TauCode.Parsing.TinyLisp
                 {
                     if (depth > 0)
                     {
-                        throw new TinyLispException("Unclosed form.");
+                        throw TinyLispHelper.CreateException(
+                            TinyLispErrorTag.UnclosedForm,
+                            tokens[^1].Position + tokens[^1].ConsumedLength);
                     }
                     else
                     {
@@ -43,7 +43,9 @@ namespace TauCode.Parsing.TinyLisp
                         case Punctuation.RightParenthesis:
                             if (depth == 0)
                             {
-                                throw new TinyLispException("Unexpected ')'.");
+                                throw TinyLispHelper.CreateException(
+                                    TinyLispErrorTag.UnexpectedRightParenthesis,
+                                    punctuationToken.Position);
                             }
                             else
                             {
@@ -55,7 +57,7 @@ namespace TauCode.Parsing.TinyLisp
                             index++;
                             var innerList = new PseudoList();
                             this.ReadPseudoListContent(innerList, tokens, ref index, depth + 1);
-                            list.AddElement(innerList);
+                            list.Add(innerList);
                             break;
 
                         default:
@@ -65,24 +67,27 @@ namespace TauCode.Parsing.TinyLisp
                 else if (token is KeywordToken keywordToken)
                 {
                     var element = Symbol.Create(keywordToken.Keyword);
-                    list.AddElement(element);
+                    list.Add(element);
                     index++;
                 }
                 else if (token is LispSymbolToken symbolToken)
                 {
                     var element = Symbol.Create(symbolToken.SymbolName);
-                    list.AddElement(element);
+                    list.Add(element);
                     index++;
                 }
-                else if (token is TextToken textToken && textToken.Class is StringTextClass)
+                else if (token is StringToken stringToken)
                 {
-                    var element = new StringAtom(textToken.Text);
-                    list.AddElement(element);
+                    var element = new StringAtom(stringToken.Text);
+                    list.Add(element);
                     index++;
                 }
                 else
                 {
-                    throw new TinyLispException($"Could not read token of type '{token.GetType().FullName}'.");
+                    throw TinyLispHelper.CreateException(
+                        TinyLispErrorTag.CannotReadToken,
+                        null,
+                        token.GetType().FullName);
                 }
             }
         }

@@ -1,26 +1,17 @@
-﻿using System;
-using TauCode.Parsing.Lexing;
-
-namespace TauCode.Parsing.Tokens
+﻿namespace TauCode.Parsing.Tokens
 {
-    public class PunctuationToken : TokenBase
+    public class PunctuationToken : ValueTokenBase<char>
     {
         public PunctuationToken(
-            char c,
-            Position position,
-            int consumedLength)
-            : base(position, consumedLength)
+            int position,
+            int consumedLength,
+            char value)
+            : base(
+                position,
+                consumedLength,
+                value,
+                value.ToString())
         {
-            if (!LexingHelper.IsStandardPunctuationChar(c))
-            {
-                throw new ArgumentOutOfRangeException(nameof(c));
-            }
-
-            this.Value = c;
         }
-
-        public char Value { get; }
-
-        public override string ToString() => this.Value.ToString();
     }
 }

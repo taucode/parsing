@@ -1,52 +1,29 @@
-﻿using System;
+﻿using TauCode.Parsing.Exceptions;
 
 namespace TauCode.Parsing.Nodes
 {
-    public sealed class EndNode : NodeImpl
+    public sealed class EndNode : ParsingNodeBase
     {
-        #region Static
-
-        public static EndNode Instance { get; } = new EndNode();
-
-        #endregion
-
-        #region Constructor
-
-        private EndNode()
-            : base(null, "<End>")
-        {
+        public EndNode()
+        {   
         }
 
-        #endregion
-
-        #region Overridden
-
-        protected override bool AcceptsTokenImpl(IToken token, IResultAccumulator resultAccumulator)
+        protected override bool AcceptsImpl(ParsingContext parsingContext)
         {
-            throw new InvalidOperationException($"Cannot call '{nameof(AcceptsToken)}' for end node.");
+            throw new ParsingException($"Idle node's '{nameof(Accepts)}' method should never be called.");
         }
 
-        protected override void ActImpl(IToken token, IResultAccumulator resultAccumulator)
+        protected override void ActImpl(ParsingContext parsingContext)
         {
-            throw new InvalidOperationException($"Cannot call '{nameof(Act)}' for end node.");
+            throw new ParsingException($"Idle node's '{nameof(Act)}' method should never be called.");
         }
 
-        public override void EstablishLink(INode node)
-        {
-            throw new InvalidOperationException("Cannot add link to end node.");
-        }
+        protected override string GetDataTag() => null;
 
-        public override void ClaimLink(string nodeName)
+        public override ILexicalTokenConverter TokenConverter
         {
-            throw new InvalidOperationException("Cannot add link to end node.");
+            get => throw new ParsingException($"End node's '{nameof(TokenConverter)}' property should never be get.");
+            set => throw new ParsingException($"End node's '{nameof(TokenConverter)}' property should never be set.");
         }
-
-        public override Func<IToken, IResultAccumulator, bool> AdditionalChecker
-        {
-            get => null;
-            set => throw new InvalidOperationException($"Cannot set '{nameof(AdditionalChecker)}' for end node.");
-        }
-
-        #endregion
     }
 }

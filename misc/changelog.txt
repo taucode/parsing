@@ -27,3 +27,11 @@
 2021-04-29
 ==========
     1. Adding utility for parsing emails, hosts, usernames, urls, etc.
+
+2022-06-14
+==========
+    1. Completely refactored.
+
+2022-07-21
+==========
+    1. Deploying the huge changes; still lot of todos and NotImplEx.

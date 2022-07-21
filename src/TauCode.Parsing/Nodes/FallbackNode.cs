@@ -3,37 +3,25 @@ using TauCode.Parsing.Exceptions;
 
 namespace TauCode.Parsing.Nodes
 {
-    public sealed class FallbackNode : NodeImpl
+    public sealed class FallbackNode : ParsingNodeBase
     {
-        public FallbackNode(
-            Func<FallbackNode, IToken, IResultAccumulator, bool> fallbackPredicate,
-            INodeFamily family,
-            string name)
-            : base(family, name)
+        public Func<ParsingContext, string> ExceptionMessageCreator { get; set; }
+
+        private static string CreateDefaultMessage(ParsingContext parsingContext)
         {
-            this.FallbackPredicate = fallbackPredicate ?? throw new ArgumentNullException(nameof(fallbackPredicate));
+            var token = parsingContext.GetCurrentToken();
+            return $"Unexpected token: '{token}'.";
         }
 
-        public Func<FallbackNode, IToken, IResultAccumulator, bool> FallbackPredicate { get; }
+        protected override bool AcceptsImpl(ParsingContext parsingContext) => true;
 
-        protected override bool AcceptsTokenImpl(IToken token, IResultAccumulator resultAccumulator)
+        protected override void ActImpl(ParsingContext parsingContext)
         {
-            return this.FallbackPredicate(this, token, resultAccumulator);
+            var messageCreator = this.ExceptionMessageCreator ?? CreateDefaultMessage;
+            var message = messageCreator(parsingContext);
+            throw new ParsingException(message);
         }
 
-        protected override void ActImpl(IToken token, IResultAccumulator resultAccumulator)
-        {
-            throw new FallbackNodeAcceptedTokenException(this, token, resultAccumulator);
-        }
-
-        public override void ClaimLink(string nodeName)
-        {
-            throw new InvalidOperationException($"Cannot call '{nameof(ClaimLink)}' for fallback node.");
-        }
-
-        public override void EstablishLink(INode node)
-        {
-            throw new InvalidOperationException($"Cannot call '{nameof(EstablishLink)}' for fallback node.");
-        }
+        protected override string GetDataTag() => null;
     }
 }

@@ -23,7 +23,7 @@ namespace TauCode.Parsing.TinyLisp.Data
             return false;
         }
 
-        public override int GetHashCode() => this.Value.GetHashCode();
+        protected override int GetHashCodeImpl() => this.Value.GetHashCode();
 
         public override string ToString() => $"\"{Value}\"";
     }

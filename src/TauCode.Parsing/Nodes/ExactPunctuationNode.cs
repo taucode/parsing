@@ -1,5 +1,4 @@
 ﻿using System;
-using TauCode.Parsing.Lexing;
 using TauCode.Parsing.Tokens;
 
 namespace TauCode.Parsing.Nodes
@@ -7,29 +6,32 @@ namespace TauCode.Parsing.Nodes
     public class ExactPunctuationNode : ActionNode
     {
         public ExactPunctuationNode(
-            char c,
-            Action<ActionNode, IToken, IResultAccumulator> action,
-            INodeFamily family,
-            string name)
-            : base(action, family, name)
+            Action<ActionNode, ParsingContext> action,
+            char punctuation)
+            : base(action)
         {
-            if (!LexingHelper.IsStandardPunctuationChar(c))
+            this.Punctuation = punctuation;
+        }
+
+        public ExactPunctuationNode(char punctuation)
+            : this(null, punctuation)
+        {
+        }
+
+        public char Punctuation { get; }
+
+        protected override bool AcceptsImpl(ParsingContext parsingContext)
+        {
+            var token = parsingContext.GetCurrentToken();
+
+            if (token is PunctuationToken punctuationToken)
             {
-                throw new ArgumentOutOfRangeException(nameof(c));
+                return this.Punctuation == punctuationToken.Value;
             }
 
-            this.Value = c;
+            return false;
         }
 
-        public char Value { get; }
-
-        protected override bool AcceptsTokenImpl(IToken token, IResultAccumulator resultAccumulator)
-        {
-            var result =
-                token is PunctuationToken punctuationToken &&
-                punctuationToken.Value.Equals(this.Value);
-
-            return result;
-        }
+        protected override string GetDataTag() => this.Punctuation.ToString();
     }
 }

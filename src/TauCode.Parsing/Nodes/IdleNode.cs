@@ -1,30 +1,25 @@
-﻿using System;
+﻿using TauCode.Parsing.Exceptions;
 
 namespace TauCode.Parsing.Nodes
 {
-    public sealed class IdleNode : NodeImpl
+    public sealed class IdleNode : ParsingNodeBase
     {
-        #region Constructor
-
-        public IdleNode(INodeFamily family, string name)
-            : base(family, name)
+        protected override bool AcceptsImpl(ParsingContext parsingContext)
         {
+            throw new ParsingException($"Idle node's '{nameof(Accepts)}' method should never be called.");
         }
 
-        #endregion
-
-        #region Overridden
-
-        protected override bool AcceptsTokenImpl(IToken token, IResultAccumulator resultAccumulator)
+        protected override void ActImpl(ParsingContext parsingContext)
         {
-            throw new InvalidOperationException($"'{nameof(AcceptsToken)}' should not be called for '{typeof(IdleNode).Name}'.");
+            throw new ParsingException($"Idle node's '{nameof(Act)}' method should never be called.");
         }
 
-        protected override void ActImpl(IToken token, IResultAccumulator resultAccumulator)
-        {
-            throw new InvalidOperationException($"'{nameof(Act)}' should not be called for '{typeof(IdleNode).Name}'.");
-        }
+        protected override string GetDataTag() => null;
 
-        #endregion
+        public override ILexicalTokenConverter TokenConverter
+        {
+            get => throw new ParsingException($"Idle node's '{nameof(TokenConverter)}' property should never be get.");
+            set => throw new ParsingException($"Idle node's '{nameof(TokenConverter)}' property should never be set.");
+        }
     }
 }

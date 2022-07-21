@@ -8,29 +8,50 @@ namespace TauCode.Parsing.TinyLisp
 {
     public static class TinyLispExtensions
     {
+        public static IList<Tuple<int, Keyword, Element>> GetAllKeywordArguments(
+            this Element element)
+        {
+            var pseudoList = CheckElementIsPseudoList(element, nameof(element), true);
+
+            var tuples = new List<Tuple<int, Keyword, Element>>();
+
+            for (var i = 0; i < pseudoList.Count; i++)
+            {
+                var listElement = pseudoList[i];
+                if (listElement is Keyword keyword)
+                {
+                    if (i == pseudoList.Count - 1)
+                    {
+                        throw new TinyLispException("Keyword is at the end of the list.");
+                    }
+
+                    var nextElement = pseudoList[i + 1];
+                    if (nextElement is Keyword nextKeyword)
+                    {
+                        throw new TinyLispException("Two keywords in a row.");
+                    }
+
+                    var tuple = Tuple.Create(i, keyword, nextElement);
+                    tuples.Add(tuple);
+
+                    i++; // sic. skip keyword's argument and move on.
+                }
+            }
+
+            return tuples;
+        }
+
         public static Element GetSingleKeywordArgument(
-            this Element shouldBePseudoList,
+            this Element element,
             string argumentName,
             bool absenceIsAllowed = false)
         {
-            if (shouldBePseudoList == null)
-            {
-                throw new ArgumentNullException(nameof(shouldBePseudoList));
-            }
-
-            var list = shouldBePseudoList as PseudoList;
-
-            if (list == null)
-            {
-                throw new ArgumentException(
-                    $"Argument is not of type '{typeof(PseudoList).FullName}'.",
-                    nameof(shouldBePseudoList));
-            }
-
             if (argumentName == null)
             {
                 throw new ArgumentNullException(nameof(argumentName));
             }
+
+            var pseudoList = CheckElementIsPseudoList(element, nameof(element), true);
 
             if (!TinyLispHelper.IsValidSymbolName(argumentName, true))
             {
@@ -39,7 +60,7 @@ namespace TauCode.Parsing.TinyLisp
 
             var wantedKeyword = Symbol.Create(argumentName);
             int wantedIndex;
-            var index = list.FindFirstIndex(wantedKeyword);
+            var index = pseudoList.FindFirstIndex(wantedKeyword);
 
             if (index < 0)
             {
@@ -57,57 +78,48 @@ namespace TauCode.Parsing.TinyLisp
                 wantedIndex = index + 1;
             }
 
-            if (wantedIndex == list.Count)
+            if (wantedIndex == pseudoList.Count)
             {
-                throw new TinyLispException($"Keyword '{argumentName}' was found, but at the end of the list.");
+                throw new TinyLispException(
+                    $"Keyword '{argumentName}' was found, but at the end of the list.");
             }
 
-            var wantedElement = list[wantedIndex];
+            var wantedElement = pseudoList[wantedIndex];
             if (wantedElement is Keyword)
             {
-                throw new TinyLispException($"Keyword '{argumentName}' was found, but next element is a keyword too.");
+                throw new TinyLispException(
+                    $"Keyword '{argumentName}' was found, but next element is a keyword too.");
             }
 
             return wantedElement;
         }
 
         public static TElement GetSingleKeywordArgument<TElement>(
-            this Element shouldBePseudoList,
+            this Element element,
             string argumentName,
             bool absenceIsAllowed = false) where TElement : Element
         {
-            var element = shouldBePseudoList.GetSingleKeywordArgument(argumentName, absenceIsAllowed);
-            if (element == null)
+            var argument = element.GetSingleKeywordArgument(argumentName, absenceIsAllowed);
+            if (argument == null)
             {
                 return null;
             }
 
-            if (element is TElement expectedElement)
+            if (argument is TElement expectedElement)
             {
                 return expectedElement;
             }
 
-            throw new TinyLispException($"Argument for '{argumentName}' was found, but it appears to be of type '{element.GetType().FullName}' instead of expected type '{typeof(TElement).FullName}'.");
+            throw new TinyLispException(
+                $"Argument for '{argumentName}' was found, but it appears to be of type '{argument.GetType().FullName}' instead of expected type '{typeof(TElement).FullName}'.");
         }
 
         public static PseudoList GetAllKeywordArguments(
-            this Element shouldBePseudoList,
+            this Element element,
             string argumentName,
             bool absenceIsAllowed = false)
         {
-            if (shouldBePseudoList == null)
-            {
-                throw new ArgumentNullException(nameof(shouldBePseudoList));
-            }
-
-            var list = shouldBePseudoList as PseudoList;
-
-            if (list == null)
-            {
-                throw new ArgumentException(
-                    $"Argument is not of type '{typeof(PseudoList).FullName}'.",
-                    nameof(shouldBePseudoList));
-            }
+            var pseudoList = CheckElementIsPseudoList(element, nameof(element), true);
 
             if (argumentName == null)
             {
@@ -120,7 +132,7 @@ namespace TauCode.Parsing.TinyLisp
             }
 
             var wantedKeyword = Symbol.Create(argumentName);
-            var index = list.FindFirstIndex(wantedKeyword);
+            var index = pseudoList.FindFirstIndex(wantedKeyword);
 
             if (index == -1)
             {
@@ -139,13 +151,13 @@ namespace TauCode.Parsing.TinyLisp
 
             while (true)
             {
-                if (index == list.Count)
+                if (index == pseudoList.Count)
                 {
                     break;
                 }
 
-                var element = list[index];
-                if (element is Keyword)
+                var listElement = pseudoList[index];
+                if (listElement is Keyword)
                 {
                     break;
                 }
@@ -159,36 +171,39 @@ namespace TauCode.Parsing.TinyLisp
 
             for (var i = startIndex; i <= lastIndex; i++)
             {
-                result.AddElement(list[i]);
+                result.Add(pseudoList[i]);
             }
 
             return result;
         }
 
-        public static bool? GetSingleArgumentAsBool(this Element shouldBePseudoList, string argumentName)
+        public static bool? GetSingleArgumentAsBool(this Element element, string argumentName)
         {
-            var element = shouldBePseudoList.GetSingleKeywordArgument(argumentName, true);
-            if (element == null)
+            var pseudoList = CheckElementIsPseudoList(element, nameof(element), true);
+
+            var argument = pseudoList.GetSingleKeywordArgument(argumentName, true);
+            if (argument == null)
             {
                 return null;
             }
 
-            if (element == True.Instance)
+            if (argument == True.Instance)
             {
                 return true;
             }
 
-            if (element == Nil.Instance)
+            if (argument == Nil.Instance)
             {
                 return false;
             }
 
-            throw new TinyLispException($"Keyword '{argumentName}' was found, but it appeared to be '{element}' instead of NIL or T.");
+            throw new TinyLispException(
+                $"Keyword '{argumentName}' was found, but it appeared to be '{argument}' instead of NIL or T.");
         }
 
-        public static PseudoList GetFreeArguments(this Element shouldBePseudoList)
+        public static PseudoList GetFreeArguments(this Element element)
         {
-            var freeArgumentSets = shouldBePseudoList.GetMultipleFreeArgumentSets();
+            var freeArgumentSets = element.GetMultipleFreeArgumentSets();
             if (freeArgumentSets.Count == 0)
             {
                 throw new TinyLispException("Free arguments not found.");
@@ -202,28 +217,9 @@ namespace TauCode.Parsing.TinyLisp
             return freeArgumentSets[0];
         }
 
-        public static IList<PseudoList> GetMultipleFreeArgumentSets(this Element shouldBePseudoList)
+        public static IList<PseudoList> GetMultipleFreeArgumentSets(this Element element)
         {
-            if (shouldBePseudoList == null)
-            {
-                throw new ArgumentNullException(nameof(shouldBePseudoList));
-            }
-
-            var pseudoList = shouldBePseudoList as PseudoList;
-
-            if (pseudoList == null)
-            {
-                throw new ArgumentException(
-                    $"Argument is not of type '{typeof(PseudoList).FullName}'.",
-                    nameof(shouldBePseudoList));
-            }
-
-            if (pseudoList.Count == 0)
-            {
-                throw new ArgumentException(
-                    $"PseudoList is empty.",
-                    nameof(shouldBePseudoList));
-            }
+            var pseudoList = CheckElementIsPseudoList(element, nameof(element), true);
 
             var index = 1;
             var result = new List<PseudoList>();
@@ -256,7 +252,7 @@ namespace TauCode.Parsing.TinyLisp
                             var freeArgsPseudoList = new PseudoList();
                             for (var i = firstArgIndex; i <= lastArgIndex; i++)
                             {
-                                freeArgsPseudoList.AddElement(pseudoList[i]);
+                                freeArgsPseudoList.Add(pseudoList[i]);
                             }
 
                             result.Add(freeArgsPseudoList);
@@ -266,8 +262,8 @@ namespace TauCode.Parsing.TinyLisp
                     break;
                 }
 
-                var element = pseudoList[index];
-                if (element is Keyword)
+                var listElement = pseudoList[index];
+                if (listElement is Keyword)
                 {
                     // bumped into keyword
                     if (startIndex == -1)
@@ -283,9 +279,9 @@ namespace TauCode.Parsing.TinyLisp
                         if (
                             delta == 0 ||
                             (delta == 1 && startedWithKeyword)
-                            )
+                        )
                         {
-                            // won't consider if free.
+                            // won't consider it free.
                             // reset the entire procedure.
                             startedWithKeyword = true;
                             startIndex = -1;
@@ -306,7 +302,7 @@ namespace TauCode.Parsing.TinyLisp
                             var freeArgsPseudoList = new PseudoList();
                             for (var i = firstArgIndex; i <= lastArgIndex; i++)
                             {
-                                freeArgsPseudoList.AddElement(pseudoList[i]);
+                                freeArgsPseudoList.Add(pseudoList[i]);
                             }
 
                             result.Add(freeArgsPseudoList);
@@ -338,41 +334,28 @@ namespace TauCode.Parsing.TinyLisp
             return result;
         }
 
-        public static string GetCarSymbolName(this Element shouldBePseudoList)
+        public static Element GetCar(this Element element)
         {
-            if (shouldBePseudoList == null)
-            {
-                throw new ArgumentNullException(nameof(shouldBePseudoList));
-            }
+            var pseudoList = CheckElementIsPseudoList(element, nameof(element), true);
 
-            var pseudoList = shouldBePseudoList as PseudoList;
-            if (pseudoList == null)
-            {
-                throw new ArgumentException(
-                    $"Argument is not of type '{typeof(PseudoList).FullName}'.",
-                    nameof(shouldBePseudoList));
-            }
-
-            if (pseudoList.Count == 0)
-            {
-                throw new ArgumentException(
-                    $"PseudoList is empty.",
-                    nameof(shouldBePseudoList));
-            }
-
-            var element = pseudoList[0];
-            if (element is Symbol symbol)
-            {
-                return symbol.Name;
-            }
-            else
-            {
-                throw new ArgumentException("CAR of PseudoList is not a symbol.", nameof(shouldBePseudoList));
-            }
+            return pseudoList[0];
         }
 
-        public static PseudoList AsPseudoList(this Element shouldBePseudoList) =>
-            shouldBePseudoList.AsElement<PseudoList>();
+        public static TElement GetCar<TElement>(this Element element) where TElement : Element
+        {
+            var car = element.GetCar();
+            if (car is TElement castElement)
+            {
+                return castElement;
+            }
+
+            throw new ArgumentException(
+                $"Argument is expected to be of type '{typeof(TElement).FullName}', but was of type '{element.GetType().FullName}'.",
+                nameof(element));
+        }
+
+        public static PseudoList AsPseudoList(this Element element) =>
+            element.AsElement<PseudoList>();
 
         public static TElement AsElement<TElement>(this Element element) where TElement : Element
         {
@@ -387,8 +370,45 @@ namespace TauCode.Parsing.TinyLisp
             }
 
             throw new ArgumentException(
-                $"Argument is expected to be of type '{typeof(PseudoList).FullName}', but was of type '{element.GetType().FullName}'.",
+                $"Argument is expected to be of type '{typeof(TElement).FullName}', but was of type '{element.GetType().FullName}'.",
                 nameof(element));
+        }
+
+        public static bool ToBool(this Element element)
+        {
+            // todo checks
+            if (element is True)
+            {
+                return true;
+            }
+            else if (element is Nil)
+            {
+                return false;
+            }
+
+            throw new NotImplementedException();
+        }
+
+        private static PseudoList CheckElementIsPseudoList(Element element, string argumentName, bool mustBeNotEmpty)
+        {
+            if (element == null)
+            {
+                throw new ArgumentNullException(argumentName);
+            }
+
+            if (element is PseudoList pseudoList)
+            {
+                if (mustBeNotEmpty && pseudoList.Count == 0)
+                {
+                    throw new TinyLispException("Pseudo list is empty.");
+                }
+
+                return pseudoList;
+            }
+
+            throw new ArgumentException(
+                $"'{argumentName}' is expected to be of type '{typeof(PseudoList).FullName}'.",
+                argumentName);
         }
     }
 }

@@ -1,0 +1,57 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net6.0</TargetFramework>
+    <IsPackable>false</IsPackable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Remove="Graphs\Resources\001\graph-001.v4.lisp" />
+    <None Remove="Graphs\Resources\001\graph-001.v5.lisp" />
+    <None Remove="Graphs\Resources\001\graph-001.v6.lisp" />
+    <None Remove="Graphs\Resources\001\graph-001.v7.lisp" />
+    <None Remove="Graphs\Resources\001\graph-001.v8.lisp" />
+    <None Remove="Graphs\Resources\001\graph-001.v9.lisp" />
+    <None Remove="Graphs\Resources\002\graph-002.lisp" />
+    <None Remove="Graphs\Resources\003\graph-003.lisp" />
+    <None Remove="Graphs\Resources\graph-001.txt" />
+    <None Remove="Graphs\Resources\graph-001.v1.lisp" />
+    <None Remove="Graphs\Resources\graph-001.v2.lisp" />
+    <None Remove="Graphs\Resources\graph-001.v3.lisp" />
+    <None Remove="Parsing\Sql\Resources\sql-grammar.lisp" />
+    <None Remove="TokenProducers\TokenProducerTests.Sample001.txt" />
+    <None Remove="TokenProducers\TokenProducerTests.Sample002.txt" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="Graphs\Resources\001\graph-001.v9.lisp" />
+    <EmbeddedResource Include="Graphs\Resources\001\graph-001.v8.lisp" />
+    <EmbeddedResource Include="Graphs\Resources\001\graph-001.v7.lisp" />
+    <EmbeddedResource Include="Graphs\Resources\001\graph-001.v6.lisp" />
+    <EmbeddedResource Include="Graphs\Resources\001\graph-001.v5.lisp" />
+    <EmbeddedResource Include="Graphs\Resources\001\graph-001.v4.lisp" />
+    <EmbeddedResource Include="Graphs\Resources\001\graph-001.v3.lisp" />
+    <EmbeddedResource Include="Graphs\Resources\001\graph-001.v2.lisp" />
+    <EmbeddedResource Include="Graphs\Resources\001\graph-001.v1.lisp" />
+    <EmbeddedResource Include="Graphs\Resources\001\graph-001.txt" />
+    <EmbeddedResource Include="Graphs\Resources\002\graph-002.lisp" />
+    <EmbeddedResource Include="Graphs\Resources\003\graph-003.lisp" />
+    <EmbeddedResource Include="Parsing\Sql\Resources\sql-grammar.lisp" />
+    <EmbeddedResource Include="TokenProducers\TokenProducerTests.Sample002.txt" />
+    <EmbeddedResource Include="TokenProducers\TokenProducerTests.Sample001.txt" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.1.0" />
+    <PackageReference Include="NUnit" Version="3.13.3" />
+    <PackageReference Include="NUnit3TestAdapter" Version="4.2.1" />
+    <PackageReference Include="NUnit.Analyzers" Version="3.3.0" />
+    <PackageReference Include="coverlet.collector" Version="3.1.2" />
+    <PackageReference Include="Serilog.Sinks.TextWriter" Version="2.1.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\TauCode.Parsing\TauCode.Parsing.csproj" />
+  </ItemGroup>
+
+</Project>

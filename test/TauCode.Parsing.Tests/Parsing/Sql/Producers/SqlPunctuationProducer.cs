@@ -1,26 +1,20 @@
 ﻿using TauCode.Extensions;
-using TauCode.Parsing.Lexing;
 using TauCode.Parsing.Tokens;
 
 namespace TauCode.Parsing.Tests.Parsing.Sql.Producers
 {
-    public class SqlPunctuationProducer : ITokenProducer
+    public class SqlPunctuationProducer : ILexicalTokenProducer
     {
-        public LexingContext Context { get; set; }
-
-        public IToken Produce()
+        public ILexicalToken Produce(LexingContext context)
         {
-            var context = this.Context;
-            var text = context.Text;
+            var text = context.Input.Span;
 
-            var c = text[context.Index];
+            var c = text[context.Position]; // todo: can throw
 
             if (c.IsIn('(', ')', ','))
             {
-                var index = context.Index;
-                var position = new Position(context.Line, context.Column);
-                context.AdvanceByChar();
-                return new PunctuationToken(this.Context.Text[index], position, 1);
+                var index = context.Position;
+                return new PunctuationToken(index, 1, text[index]);
             }
 
             return null;

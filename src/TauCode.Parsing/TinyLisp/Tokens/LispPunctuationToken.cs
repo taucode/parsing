@@ -8,10 +8,10 @@ namespace TauCode.Parsing.TinyLisp.Tokens
     public class LispPunctuationToken : EnumToken<Punctuation>
     {
         public LispPunctuationToken(
-            Punctuation value,
-            Position position,
-            int consumedLength)
-            : base(value, position, consumedLength)
+            int position,
+            int consumedLength,
+            Punctuation value)
+            : base(position, consumedLength, value)
         {
             if (consumedLength != 1)
             {

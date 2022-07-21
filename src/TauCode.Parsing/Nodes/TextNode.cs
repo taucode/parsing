@@ -1,55 +1,41 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using TauCode.Parsing.Tokens;
+using System.Text;
 
 namespace TauCode.Parsing.Nodes
 {
-    public class TextNode : TextNodeBase
+    public class TextNode : ActionNode
     {
         public TextNode(
-            IEnumerable<ITextClass> textClasses,
-            Action<ActionNode, IToken, IResultAccumulator> action,
-            INodeFamily family,
-            string name)
-            : base(
-                textClasses,
-                action,
-                family,
-                name)
+            IEnumerable<Type> tokenTypes)
         {
+            // todo checks
+
+            this.TokenTypes = new HashSet<Type>(tokenTypes);
         }
 
-        public TextNode(
-            ITextClass textClass,
-            Action<ActionNode, IToken, IResultAccumulator> action,
-            INodeFamily family,
-            string name)
-            : base(
-                textClass,
-                action,
-                family,
-                name)
-        {
-        }
+        public HashSet<Type> TokenTypes { get; }
 
-        protected override bool AcceptsTokenImpl(IToken token, IResultAccumulator resultAccumulator)
+        protected override bool AcceptsImpl(ParsingContext parsingContext)
         {
-            if (token is TextToken textToken)
+            var token = parsingContext.GetCurrentToken();
+
+            if (this.TokenTypes.Contains(token.GetType()))
             {
-                var text = textToken.Text;
-
-                var textTokenClass = textToken.Class;
-                if (
-                    this.TextClassesImpl.Contains(textTokenClass) ||
-                    this.TextClassesImpl.Any(x => x.TryConvertFrom(text, textTokenClass) != null)
-                )
-                {
-                    return true;
-                }
+                return true;
             }
 
-            return false;
+            if (this.TokenConverter == null)
+            {
+                return false;
+            }
+
+            return this.TokenTypes
+                .Select(tokenType => this.TokenConverter.Convert(token, tokenType, parsingContext.ParsingResult))
+                .Any(convertedToken => convertedToken != null);
         }
+
+        protected override string GetDataTag() => null;
     }
 }

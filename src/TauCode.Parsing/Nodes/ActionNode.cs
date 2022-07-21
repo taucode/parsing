@@ -2,35 +2,25 @@
 
 namespace TauCode.Parsing.Nodes
 {
-    public abstract class ActionNode : NodeImpl
+    public abstract class ActionNode : ParsingNodeBase
     {
-        #region Constructor
-
         protected ActionNode(
-            Action<ActionNode, IToken, IResultAccumulator> action,
-            INodeFamily family,
-            string name)
-            : base(family, name)
+            Action<ActionNode, ParsingContext> action)
         {
-            this.Action = action; // can be null
+            this.Action = action;
         }
 
-        #endregion
-
-        #region Overridden
-
-        protected override void ActImpl(IToken token, IResultAccumulator resultAccumulator)
+        protected ActionNode()
         {
-            this.Action?.Invoke(this, token, resultAccumulator);
-            resultAccumulator.Modify();
         }
 
-        #endregion
+        public Action<ActionNode, ParsingContext> Action { get; set; }
 
-        #region Public
+        protected override void ActImpl(ParsingContext parsingContext)
+        {
+            // todo: check this.Action is set.
 
-        public Action<ActionNode, IToken, IResultAccumulator> Action { get; set; }
-
-        #endregion
+            this.Action(this, parsingContext);
+        }
     }
 }

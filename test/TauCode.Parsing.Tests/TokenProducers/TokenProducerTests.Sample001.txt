@@ -1,0 +1,3 @@
+﻿1   9223372036854775807    9223372036854775808           79228162514264337593543950335      79228162514264337593543950336    https://a.me         c:\temp\v1      -1.2      -1.2e0
+    (long.MaxValue)        (not long =>  decimal)        decimal.MaxValue                   not decimal => file path
+0   4                      27                            57                                 92                               125                  146             162       172

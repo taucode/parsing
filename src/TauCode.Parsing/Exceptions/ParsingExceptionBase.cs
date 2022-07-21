@@ -1,22 +1,21 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Runtime.Serialization;
+using System.Text;
 
 namespace TauCode.Parsing.Exceptions
 {
-    /// <summary>
-    /// Base class for all parsing-related exceptions.
-    /// It is marked as non-abstract since using abstract exceptions is a malpractice in .NET.
-    /// However, its constructors are marked protected to avoid instantiation of this ("semantically" abstract) class directly.
-    /// </summary>
-    [Serializable]
-    public class ParsingExceptionBase : Exception
+    public abstract class ParsingExceptionBase : Exception
     {
-        protected ParsingExceptionBase(string message)
-            : base(message)
+        protected ParsingExceptionBase()
         {
         }
 
-        public ParsingExceptionBase(string message, Exception innerException)
-            : base(message, innerException)
+        protected ParsingExceptionBase(string message) : base(message)
+        {
+        }
+
+        protected ParsingExceptionBase(string message, Exception inner) : base(message, inner)
         {
         }
     }

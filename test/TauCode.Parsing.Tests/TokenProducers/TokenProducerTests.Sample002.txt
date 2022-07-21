@@ -1,0 +1,2 @@
+﻿true      White         korba@mail.net  ::      1.0.2-rc3           "'\ud83d\udc08'\r\n"        --some-key      some-term
+0         10            24              40      48                  68                          96              112

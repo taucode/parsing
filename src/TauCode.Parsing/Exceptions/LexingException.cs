@@ -1,22 +1,32 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Runtime.Serialization;
+using System.Text;
 
 namespace TauCode.Parsing.Exceptions
 {
     [Serializable]
-    public class LexingException : ParsingExceptionBase
+    public class LexingException : Exception
     {
-        public LexingException(string message, Position? position)
+        public LexingException()
+        {
+        }
+
+        public LexingException(string message)
             : base(message)
         {
-            this.Position = position;
         }
 
-        public LexingException(string message, Exception innerException, Position? position)
-            : base(message, innerException)
+        public LexingException(string message, int? index)
+            : base(message)
         {
-            this.Position = position;
+            this.Index = index;
         }
 
-        public Position? Position { get; }
+        public LexingException(string message, Exception inner) : base(message, inner)
+        {
+        }
+
+        public int? Index { get; }
     }
 }

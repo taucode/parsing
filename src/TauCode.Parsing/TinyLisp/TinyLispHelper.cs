@@ -2,11 +2,12 @@
 using System.Collections.Generic;
 using System.Linq;
 using TauCode.Extensions;
+using TauCode.Parsing.Exceptions;
 using TauCode.Parsing.TinyLisp.Tokens;
 
 namespace TauCode.Parsing.TinyLisp
 {
-    public static class TinyLispHelper
+    internal static class TinyLispHelper
     {
         internal static readonly HashSet<char> PunctuationChars = new HashSet<char>(new char[] { '(', ')', '\'', '`', '.', ',' });
 
@@ -132,7 +133,7 @@ namespace TauCode.Parsing.TinyLisp
 
         public static Punctuation CharToPunctuation(char c)
         {
-            var punctuation = PunctuationsByChar.GetOrDefault(c);
+            var punctuation = PunctuationsByChar.GetDictionaryValueOrDefault(c);
             if (punctuation == default)
             {
                 throw new ArgumentOutOfRangeException(nameof(c), $"'{c}' is not a known punctuation character.");
@@ -144,7 +145,7 @@ namespace TauCode.Parsing.TinyLisp
         public static char PunctuationToChar(this Punctuation punctuation)
         {
 
-            var c = CharsByPunctuation.GetOrDefault(punctuation);
+            var c = CharsByPunctuation.GetDictionaryValueOrDefault(punctuation);
             if (c == default)
             {
                 throw new ArgumentOutOfRangeException(nameof(c), $"'{punctuation}' is not a known punctuation.");
@@ -155,13 +156,46 @@ namespace TauCode.Parsing.TinyLisp
 
         public static Punctuation? TryCharToPunctuation(char c)
         {
-            var punctuation = PunctuationsByChar.GetOrDefault(c);
+            var punctuation = PunctuationsByChar.GetDictionaryValueOrDefault(c);
             if (punctuation == default)
             {
                 return null;
             }
 
             return punctuation;
+        }
+
+        internal static TinyLispException CreateException(TinyLispErrorTag errorTag, int? index, params object[] formattingParams)
+        {
+            var message = GetErrorMessage(errorTag);
+
+            if (formattingParams.Length > 0)
+            {
+                message = string.Format(message, formattingParams);
+            }
+
+            if (index.HasValue)
+            {
+                message += $"{Environment.NewLine}Index in text: {index.Value}.";
+            }
+
+            var ex = new TinyLispException(message, index);
+            return ex;
+        }
+
+        private static string GetErrorMessage(TinyLispErrorTag errorTag)
+        {
+            return errorTag switch
+            {
+                // Tiny Lisp
+                TinyLispErrorTag.BadKeyword => "Bad keyword.",
+                TinyLispErrorTag.BadSymbolName => "Bad symbol name.",
+                TinyLispErrorTag.UnclosedForm => "Unclosed form.",
+                TinyLispErrorTag.UnexpectedRightParenthesis => "Unexpected ')'.",
+                TinyLispErrorTag.CannotReadToken => "Cannot read token.",
+
+                _ => "Unknown error"
+            };
         }
     }
 }

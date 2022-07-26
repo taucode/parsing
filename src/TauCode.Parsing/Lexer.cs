@@ -93,7 +93,16 @@ namespace TauCode.Parsing
                 }
                 else
                 {
-                    throw LexingHelper.CreateException(LexingErrorTag.CannotTokenize, context.Position);
+                    var message = "Cannot tokenize.\r\n";
+
+                    var textPartLength = Math.Min(context.Input.Length - context.Position, 1000);
+
+                    var textPart = context.Input.Slice(context.Position, textPartLength);
+                    message += $"Text: {textPart}";
+
+                    var k = 3;
+
+                    throw new LexingException(message, context.Position);
                 }
             }
 

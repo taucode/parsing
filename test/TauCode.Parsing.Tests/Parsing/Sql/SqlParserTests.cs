@@ -11,7 +11,6 @@ using TauCode.Parsing.Graphs.Reading;
 using TauCode.Parsing.Nodes;
 using TauCode.Parsing.Tests.Parsing.Sql.Data;
 using TauCode.Parsing.Tests.Parsing.Sql.Producers;
-using TauCode.Parsing.TinyLisp;
 using TauCode.Parsing.TokenProducers;
 using TauCode.Parsing.Tokens;
 
@@ -20,7 +19,6 @@ namespace TauCode.Parsing.Tests.Parsing.Sql;
 [TestFixture]
 public class SqlParserTests
 {
-    private ILexer _tinyLispLexer;
     private ILexer _sqlLexer;
     private ILogger _logger;
     private StringWriter _writer;
@@ -28,7 +26,6 @@ public class SqlParserTests
     [SetUp]
     public void SetUp()
     {
-        _tinyLispLexer = new TinyLispLexer();
         _sqlLexer = new Lexer
         {
             Producers = new ILexicalTokenProducer[]
@@ -442,16 +439,7 @@ public class SqlParserTests
         // Act
         var result = new SqlParsingResult();
 
-        try
-        {
-            parser.Parse(sqlTokens, result);
-        }
-        catch (Exception e)
-        {
-            // todo
-            var log = _writer.ToString();
-            throw;
-        }
+        parser.Parse(sqlTokens, result);
 
         var sqlResults = result.Clauses;
 
@@ -627,6 +615,7 @@ public class SqlParserTests
     }
 
     // todo: wordToken cannot start with digit
+    // todo clean
 
     private static string GetSqlNameFromToken(ILexicalToken token)
     {

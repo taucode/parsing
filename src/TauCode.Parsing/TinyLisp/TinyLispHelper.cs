@@ -9,7 +9,8 @@ namespace TauCode.Parsing.TinyLisp
 {
     internal static class TinyLispHelper
     {
-        internal static readonly HashSet<char> PunctuationChars = new HashSet<char>(new char[] { '(', ')', '\'', '`', '.', ',' });
+        internal static readonly HashSet<char> PunctuationChars =
+            new HashSet<char>(new char[] { '(', ')', '\'', '`', '.', ',' });
 
         private static readonly HashSet<char> AcceptableSymbolNamePunctuationChars = new HashSet<char>(new[]
         {
@@ -55,9 +56,9 @@ namespace TauCode.Parsing.TinyLisp
                 .ToDictionary(x => x.Value, x => x.Key);
         }
 
-        internal static bool IsAcceptableSymbolNamePunctuationChar(this char c) => AcceptableSymbolNamePunctuationChars.Contains(c);
+        internal static bool IsAcceptableSymbolNamePunctuationChar(this char c) =>
+            AcceptableSymbolNamePunctuationChars.Contains(c);
 
-        
         public static bool IsAcceptableSymbolNameChar(char c) =>
             char.IsDigit(c) ||
             char.IsLetter(c) ||
@@ -165,7 +166,10 @@ namespace TauCode.Parsing.TinyLisp
             return punctuation;
         }
 
-        internal static TinyLispException CreateException(TinyLispErrorTag errorTag, int? index, params object[] formattingParams)
+        internal static TinyLispException CreateException(
+            TinyLispErrorTag errorTag,
+            int? index,
+            params object[] formattingParams)
         {
             var message = GetErrorMessage(errorTag);
 

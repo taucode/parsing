@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Text;
+using TauCode.Parsing.Exceptions;
 
 namespace TauCode.Parsing.Nodes
 {
@@ -18,7 +20,20 @@ namespace TauCode.Parsing.Nodes
 
         protected override void ActImpl(ParsingContext parsingContext)
         {
-            // todo: check this.Action is set.
+            if (this.Action == null)
+            {
+                var sb = new StringBuilder();
+                sb.Append($"Node's '{nameof(Action)}' is not set. ");
+                sb.Append($"Node type: '{this.GetType().FullName}'.");
+                if (this.Name != null)
+                {
+                    sb.Append($" Node name: '{this.Name}'.");
+                }
+
+                var message = sb.ToString();
+
+                throw new ParsingException(message);
+            }
 
             this.Action(this, parsingContext);
         }

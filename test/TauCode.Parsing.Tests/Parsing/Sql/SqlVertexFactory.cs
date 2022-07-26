@@ -5,7 +5,6 @@ using TauCode.Data.Graphs;
 using TauCode.Parsing.Graphs.Building;
 using TauCode.Parsing.Graphs.Molding;
 using TauCode.Parsing.Nodes;
-using TauCode.Parsing.Tests.Parsing.Sql.Nodes;
 using TauCode.Parsing.TinyLisp.Data;
 
 namespace TauCode.Parsing.Tests.Parsing.Sql;
@@ -41,7 +40,7 @@ public class SqlVertexFactory : IVertexFactory
                     break;
 
                 case "IDENTIFIER":
-                    result = new SqlIdentifierNode();
+                    result = new SqlIdentifierNode(SqlHelper.IsReservedWord);
                     break;
 
                 case "INTEGER":

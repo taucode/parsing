@@ -1,4 +1,5 @@
 ﻿using System;
+using TauCode.Parsing.Tokens;
 
 namespace TauCode.Parsing.Nodes
 {
@@ -16,7 +17,8 @@ namespace TauCode.Parsing.Nodes
 
         protected override bool AcceptsImpl(ParsingContext parsingContext)
         {
-            throw new NotImplementedException();
+            var token = parsingContext.GetCurrentToken();
+            return token is StringToken;
         }
 
         protected override string GetDataTag() => null;

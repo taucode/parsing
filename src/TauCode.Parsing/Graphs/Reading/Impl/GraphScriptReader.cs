@@ -6,6 +6,7 @@ using TauCode.Parsing.Graphs.Molding;
 using TauCode.Parsing.TinyLisp;
 using TauCode.Parsing.TinyLisp.Data;
 
+// todo clean
 namespace TauCode.Parsing.Graphs.Reading.Impl
 {
     public class GraphScriptReader : IGraphScriptReader
@@ -75,9 +76,6 @@ namespace TauCode.Parsing.Graphs.Reading.Impl
 
                     case "REF":
                         return _refReader;
-
-                    //case "GROUP-REF":
-                    //    return _groupRefReader;
 
                     case "ARC":
                         return _arcReader;

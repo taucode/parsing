@@ -10,11 +10,11 @@ namespace TauCode.Parsing
             string text)
             : base(position, consumedLength)
         {
-            Text = text ?? throw new ArgumentNullException(nameof(text));
+            this.Text = text ?? throw new ArgumentNullException(nameof(text));
         }
 
         public string Text { get; }
 
-        public override string ToString() => Text;
+        public override string ToString() => this.Text;
     }
 }

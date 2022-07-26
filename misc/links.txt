@@ -30,3 +30,9 @@
     25. http://www.devsanon.com/c/c-7-2-introducing-ref-struct/
 
     26. https://stackoverflow.com/questions/35374207/how-to-determine-if-ipv6-address-is-private
+
+2022-07-26
+==========
+    1. https://askleo.com/why_are_email_addresses_sometimes_in_anglebrackets/
+    2. https://devblogs.microsoft.com/csharpfaq/what-character-escape-sequences-are-available/
+

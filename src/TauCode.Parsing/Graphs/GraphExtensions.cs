@@ -137,7 +137,7 @@ namespace TauCode.Parsing.Graphs
 
                     if (child == null)
                     {
-                        throw new NotImplementedException();
+                        throw new GraphException($"Name part not found: '{part}'.");
                     }
 
                     if (child is IVertexMold vertexMold)

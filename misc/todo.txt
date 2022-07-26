@@ -89,3 +89,5 @@ x   2. IToken: add property:
 2022-07-21
 ==========
     1. Remove redundant misc files not related to this solution (test-ipv6-regex.pl etc)
+    2. remove TauCode.Parsing.NewTests.csproj
+    3. Lexing exception (tokenize failed) shows beginning of the text which failed.

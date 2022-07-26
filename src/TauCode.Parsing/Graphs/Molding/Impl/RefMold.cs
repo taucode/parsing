@@ -1,4 +1,5 @@
-﻿using TauCode.Parsing.Exceptions;
+﻿using System.Collections.Generic;
+using TauCode.Parsing.Exceptions;
 using TauCode.Parsing.TinyLisp.Data;
 
 namespace TauCode.Parsing.Graphs.Molding.Impl
@@ -25,6 +26,24 @@ namespace TauCode.Parsing.Graphs.Molding.Impl
             base.ProcessKeywords();
 
             this.ReferencedPath = this.GetKeywordValue<string>(":PATH");
+
+            var linksTo = this.GetKeywordValue<List<string>>(":LINKS-TO", null);
+            if (linksTo != null)
+            {
+                foreach (var link in linksTo)
+                {
+                    this.AddLinkTo(link);
+                }
+            }
+
+            var linksFrom = this.GetKeywordValue<List<string>>(":LINKS-FROM", null);
+            if (linksFrom != null)
+            {
+                foreach (var link in linksFrom)
+                {
+                    this.AddLinkFrom(link);
+                }
+            }
         }
 
         public override string GetFullPath()
@@ -53,6 +72,7 @@ namespace TauCode.Parsing.Graphs.Molding.Impl
             return _cachedFullPath;
         }
 
+        // todo not used
         private ILinkableMold GetReference()
         {
             if (_reference == null)

@@ -43,6 +43,7 @@ public class SqlParsingResult : IParsingResult
     }
 
     public int Version { get; private set; }
+
     public void IncreaseVersion()
     {
         this.Version++;

@@ -1,5 +1,4 @@
-﻿using System;
-using TauCode.Parsing.Graphs.Molding;
+﻿using TauCode.Parsing.Graphs.Molding;
 using TauCode.Parsing.Graphs.Molding.Impl;
 using TauCode.Parsing.Graphs.Reading;
 using TauCode.Parsing.Graphs.Reading.Impl;

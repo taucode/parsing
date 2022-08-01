@@ -1,14 +1,13 @@
-﻿using System.Collections.Generic;
-using System.Text;
+﻿using System.Text;
 
 namespace TauCode.Parsing.Tests.Parsing.Sql.Data;
 
 public class ForeignKeyInfo
 {
-    public string Name { get; set; }
-    public string ReferencedTableName { get; set; }
-    public List<string> ColumnNames { get; set; } = new List<string>();
-    public List<string> ReferencedColumnNames { get; set; } = new List<string>();
+    public string Name { get; set; } = default!; // set by app
+    public string ReferencedTableName { get; set; } = default!; // set by app
+    public List<string> ColumnNames { get; set; } = new();
+    public List<string> ReferencedColumnNames { get; set; } = new();
 
     public override string ToString()
     {

@@ -1,62 +1,61 @@
 ﻿using TauCode.Parsing.Tokens;
 
-namespace TauCode.Parsing.TokenProducers
+namespace TauCode.Parsing.TokenProducers;
+
+public class WhiteSpaceProducer : LexicalTokenProducerBase, IEmptyLexicalTokenProducer
 {
-    public class WhiteSpaceProducer : LexicalTokenProducerBase, IEmptyLexicalTokenProducer
+    protected override ILexicalToken? ProduceImpl(LexingContext context)
     {
-        protected override ILexicalToken ProduceImpl(LexingContext context)
+        var skipped = this.Skip(context);
+        if (skipped > 0)
         {
-            var skipped = this.Skip(context);
-            if (skipped > 0)
-            {
-                return new EmptyToken(context.Position, skipped);
-            }
-
-            return null;
+            return new EmptyToken(context.Position, skipped);
         }
 
-        public int Skip(LexingContext context)
-        {
-            var start = context.Position;
-            var input = context.Input.Span;
-            var length = input.Length;
+        return null;
+    }
 
-            var c = input[start];
-            if (!c.IsInlineWhiteSpaceOrCaretControl())
+    public int Skip(LexingContext context)
+    {
+        var start = context.Position;
+        var input = context.Input.Span;
+        var length = input.Length;
+
+        var c = input[start];
+        if (!c.IsInlineWhiteSpaceOrCaretControl())
+        {
+            return 0;
+        }
+
+        var pos = start;
+        var goOn = true;
+
+        while (goOn)
+        {
+            if (pos == length)
             {
-                return 0;
+                break;
             }
 
-            var pos = start;
-            var goOn = true;
-
-            while (goOn)
+            c = input[pos];
+            switch (c)
             {
-                if (pos == length)
-                {
+                case '\t':
+                case ' ':
+                case '\v':
+                case '\f':
+                case '\r':
+                case '\n':
+                    pos++;
                     break;
-                }
 
-                c = input[pos];
-                switch (c)
-                {
-                    case '\t':
-                    case ' ':
-                    case '\v':
-                    case '\f':
-                    case '\r':
-                    case '\n':
-                        pos++;
-                        break;
-
-                    default:
-                        goOn = false;
-                        break;
-                }
+                default:
+                    goOn = false;
+                    break;
             }
-
-            var delta = pos - start;
-            return delta;
         }
+
+        var delta = pos - start;
+        return delta;
     }
 }

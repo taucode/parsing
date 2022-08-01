@@ -1,7 +1,6 @@
-﻿namespace TauCode.Parsing
+﻿namespace TauCode.Parsing;
+
+public interface IEmptyLexicalTokenProducer : ILexicalTokenProducer
 {
-    public interface IEmptyLexicalTokenProducer : ILexicalTokenProducer
-    {
-        int Skip(LexingContext context);
-    }
+    int Skip(LexingContext context);
 }

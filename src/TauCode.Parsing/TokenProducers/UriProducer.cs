@@ -2,29 +2,28 @@
 using TauCode.Data.Text.TextDataExtractors;
 using TauCode.Parsing.Tokens;
 
-namespace TauCode.Parsing.TokenProducers
+namespace TauCode.Parsing.TokenProducers;
+
+public class UriProducer : LexicalTokenProducerBase
 {
-    public class UriProducer : LexicalTokenProducerBase
+    private readonly UriExtractor _extractor;
+
+    public UriProducer(TerminatingDelegate? terminator = null)
     {
-        private readonly UriExtractor _extractor;
+        _extractor = new UriExtractor(terminator);
+    }
 
-        public UriProducer(TerminatingDelegate terminator = null)
+    protected override ILexicalToken? ProduceImpl(LexingContext context)
+    {
+        var start = context.Position;
+        var span = context.Input.Span[context.Position..];
+
+        var extractionResult = _extractor.TryExtract(span, out var value);
+        if (extractionResult.ErrorCode.HasValue)
         {
-            _extractor = new UriExtractor(terminator);
+            return null;
         }
 
-        protected override ILexicalToken ProduceImpl(LexingContext context)
-        {
-            var start = context.Position;
-            var span = context.Input.Span[context.Position..];
-
-            var extractionResult = _extractor.TryExtract(span, out var value);
-            if (extractionResult.ErrorCode.HasValue)
-            {
-                return null;
-            }
-
-            return new UriToken(start, extractionResult.CharsConsumed, value);
-        }
+        return new UriToken(start, extractionResult.CharsConsumed, value!);
     }
 }

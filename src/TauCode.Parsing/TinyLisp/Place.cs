@@ -1,11 +1,10 @@
-﻿using System;
-using TauCode.Parsing.TinyLisp.Data;
+﻿using TauCode.Parsing.TinyLisp.Data;
 
 namespace TauCode.Parsing.TinyLisp
 {
     public class Place
     {
-        private Element _value;
+        private Element _value = null!; // set by 'SetValue'
 
         public Place(Element value)
         {

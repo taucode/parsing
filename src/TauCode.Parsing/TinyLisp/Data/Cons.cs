@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace TauCode.Parsing.TinyLisp.Data
+﻿namespace TauCode.Parsing.TinyLisp.Data
 {
     public class Cons : Element
     {
@@ -23,7 +21,7 @@ namespace TauCode.Parsing.TinyLisp.Data
             _cdr = new Place(cdrValue);
         }
 
-        public override bool Equals(Element other) => ReferenceEquals(this, other);
+        public override bool Equals(Element? other) => ReferenceEquals(this, other);
 
         public Place Car => _car;
         public Place Cdr => _cdr;

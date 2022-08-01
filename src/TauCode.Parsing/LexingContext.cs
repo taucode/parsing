@@ -1,15 +1,12 @@
-﻿using System;
+﻿namespace TauCode.Parsing;
 
-namespace TauCode.Parsing
+public class LexingContext
 {
-    public class LexingContext
+    public LexingContext(ReadOnlyMemory<char> input)
     {
-        public LexingContext(ReadOnlyMemory<char> input)
-        {
-            this.Input = input;
-        }
-
-        public readonly ReadOnlyMemory<char> Input;
-        public int Position;
+        this.Input = input;
     }
+
+    public readonly ReadOnlyMemory<char> Input;
+    public int Position;
 }

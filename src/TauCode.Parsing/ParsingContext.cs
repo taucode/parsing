@@ -1,19 +1,16 @@
-﻿using System.Collections.Generic;
+﻿namespace TauCode.Parsing;
 
-namespace TauCode.Parsing
+public class ParsingContext
 {
-    public class ParsingContext
+    public ParsingContext(IList<ILexicalToken> tokens, IParsingResult parsingResult)
     {
-        public ParsingContext(IList<ILexicalToken> tokens, IParsingResult parsingResult)
-        {
-            // todo checks
+        // todo checks
 
-            this.Tokens = tokens;
-            this.ParsingResult = parsingResult;
-        }
-
-        public readonly IList<ILexicalToken> Tokens;
-        public int Position;
-        public IParsingResult ParsingResult { get; }
+        this.Tokens = tokens;
+        this.ParsingResult = parsingResult;
     }
+
+    public readonly IList<ILexicalToken> Tokens;
+    public int Position;
+    public IParsingResult ParsingResult { get; }
 }

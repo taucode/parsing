@@ -12,7 +12,7 @@ namespace TauCode.Parsing.Tokens
                 position,
                 consumedLength,
                 emailAddress,
-                emailAddress.ToString())
+                emailAddress.ToString()!)
         {
         }
     }

@@ -1,14 +1,13 @@
-﻿using System.Collections.Generic;
-using System.Text;
+﻿using System.Text;
 
 namespace TauCode.Parsing.Tests.Parsing.Sql.Data;
 
 public class IndexInfo
 {
-    public string Name { get; set; }
+    public string Name { get; set; } = default!; // set by app
     public bool IsUnique { get; set; }
-    public string TableName { get; set; }
-    public List<IndexColumnInfo> Columns { get; set; } = new List<IndexColumnInfo>();
+    public string TableName { get; set; } = default!; // set by app
+    public List<IndexColumnInfo> Columns { get; set; } = new();
 
     public override string ToString()
     {

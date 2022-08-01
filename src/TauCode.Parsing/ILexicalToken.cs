@@ -1,19 +1,16 @@
-﻿using System.Collections.Generic;
+﻿namespace TauCode.Parsing;
 
-namespace TauCode.Parsing
+public interface ILexicalToken
 {
-    public interface ILexicalToken
-    {
-        /// <summary>
-        /// Position within the original text.
-        /// </summary>
-        int Position { get; }
+    /// <summary>
+    /// Position within the original text.
+    /// </summary>
+    int Position { get; }
 
-        /// <summary>
-        /// Length of original text consumed by the given token.
-        /// </summary>
-        int ConsumedLength { get; }
+    /// <summary>
+    /// Length of original text consumed by the given token.
+    /// </summary>
+    int ConsumedLength { get; }
 
-        IDictionary<string, string> Properties { get; set; }
-    }
+    IDictionary<string, string>? Properties { get; set; }
 }

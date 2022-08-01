@@ -2,30 +2,29 @@
 using TauCode.Data.Text.TextDataExtractors;
 using TauCode.Parsing.Tokens;
 
-namespace TauCode.Parsing.TokenProducers
+namespace TauCode.Parsing.TokenProducers;
+
+public class JsonStringProducer : LexicalTokenProducerBase
 {
-    public class JsonStringProducer : LexicalTokenProducerBase
+    private readonly JsonStringExtractor _extractor;
+
+    public JsonStringProducer(TerminatingDelegate? terminator = null)
     {
-        private readonly JsonStringExtractor _extractor;
+        _extractor = new JsonStringExtractor(terminator);
+    }
 
-        public JsonStringProducer(TerminatingDelegate terminator = null)
+    protected override ILexicalToken? ProduceImpl(LexingContext context)
+    {
+        var start = context.Position;
+
+        var span = context.Input.Span[context.Position..];
+        var extractionResult = _extractor.TryExtract(span, out var value);
+        if (extractionResult.ErrorCode.HasValue)
         {
-            _extractor = new JsonStringExtractor(terminator);
+            return null;
         }
 
-        protected override ILexicalToken ProduceImpl(LexingContext context)
-        {
-            var start = context.Position;
+        return new StringToken(start, extractionResult.CharsConsumed, value!, "JSON");
 
-            var span = context.Input.Span[context.Position..];
-            var extractionResult = _extractor.TryExtract(span, out var value);
-            if (extractionResult.ErrorCode.HasValue)
-            {
-                return null;
-            }
-
-            return new StringToken(start, extractionResult.CharsConsumed, value, "JSON");
-
-        }
     }
 }

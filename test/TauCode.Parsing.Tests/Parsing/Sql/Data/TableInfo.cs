@@ -1,15 +1,14 @@
-﻿using System.Collections.Generic;
-using System.Text;
+﻿using System.Text;
 
 namespace TauCode.Parsing.Tests.Parsing.Sql.Data;
 
 public class TableInfo
 {
-    public string Name { get; set; }
-    public List<ColumnInfo> Columns { get; } = new List<ColumnInfo>();
-    public PrimaryKeyInfo PrimaryKey { get; set; }
-    public List<ForeignKeyInfo> ForeignKeys { get; set; } = new List<ForeignKeyInfo>();
-    public string LastConstraintName { get; set; }
+    public string Name { get; set; } = default!; // set by app
+    public List<ColumnInfo> Columns { get; } = new();
+    public PrimaryKeyInfo? PrimaryKey { get; set; }
+    public List<ForeignKeyInfo> ForeignKeys { get; set; } = new();
+    public string LastConstraintName { get; set; } = default!; // set by app
 
     public override string ToString()
     {

@@ -4,7 +4,7 @@ namespace TauCode.Parsing.TinyLisp.TokenProducers
 {
     public class TinyLispPunctuationProducer : ILexicalTokenProducer
     {
-        public ILexicalToken Produce(LexingContext context)
+        public ILexicalToken? Produce(LexingContext context)
         {
             var text = context.Input.Span;
             var start = context.Position;

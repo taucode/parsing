@@ -12,7 +12,7 @@ namespace TauCode.Parsing.Tokens
                 position,
                 consumedLength,
                 value,
-                value.ToString())
+                value.ToString()!)
         {
         }
     }

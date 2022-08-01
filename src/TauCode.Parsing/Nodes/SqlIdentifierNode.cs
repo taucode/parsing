@@ -1,52 +1,50 @@
-﻿using System;
-using TauCode.Parsing.Tokens;
+﻿using TauCode.Parsing.Tokens;
 
-namespace TauCode.Parsing.Nodes
+namespace TauCode.Parsing.Nodes;
+
+public class SqlIdentifierNode : IdentifierNode
 {
-    public class SqlIdentifierNode : IdentifierNode
+    public SqlIdentifierNode(
+        Action<ActionNode, ParsingContext> action,
+        Func<string, bool> isReservedWordPredicate)
+        : base(action)
     {
-        public SqlIdentifierNode(
-            Action<ActionNode, ParsingContext> action,
-            Func<string, bool> isReservedWordPredicate)
-            : base(action)
+        this.IsReservedWordPredicate = isReservedWordPredicate ?? throw new ArgumentNullException(nameof(isReservedWordPredicate));
+    }
+
+    public SqlIdentifierNode(
+        Func<string, bool> isReservedWordPredicate)
+    {
+        this.IsReservedWordPredicate = isReservedWordPredicate ?? throw new ArgumentNullException(nameof(isReservedWordPredicate));
+    }
+
+    public Func<string, bool> IsReservedWordPredicate { get; }
+
+
+    protected override bool AcceptsImpl(ParsingContext parsingContext)
+    {
+        var token = parsingContext.GetCurrentToken();
+
+        if (token is SqlIdentifierToken)
         {
-            this.IsReservedWordPredicate = isReservedWordPredicate ?? throw new ArgumentNullException(nameof(isReservedWordPredicate));
+            return true;
         }
 
-        public SqlIdentifierNode(
-            Func<string, bool> isReservedWordPredicate)
+        if (token is IdentifierToken)
         {
-            this.IsReservedWordPredicate = isReservedWordPredicate ?? throw new ArgumentNullException(nameof(isReservedWordPredicate));
+            return base.AcceptsImpl(parsingContext);
         }
 
-        public Func<string, bool> IsReservedWordPredicate { get; }
-
-
-        protected override bool AcceptsImpl(ParsingContext parsingContext)
+        if (token is WordToken wordToken)
         {
-            var token = parsingContext.GetCurrentToken();
-
-            if (token is SqlIdentifierToken)
+            if (this.IsReservedWordPredicate(wordToken.Text))
             {
-                return true;
+                return false;
             }
 
-            if (token is IdentifierToken)
-            {
-                return base.AcceptsImpl(parsingContext);
-            }
-
-            if (token is WordToken wordToken)
-            {
-                if (this.IsReservedWordPredicate(wordToken.Text))
-                {
-                    return false;
-                }
-
-                return true;
-            }
-
-            return false;
+            return true;
         }
+
+        return false;
     }
 }

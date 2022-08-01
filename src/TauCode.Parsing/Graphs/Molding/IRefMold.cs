@@ -1,7 +1,6 @@
-﻿namespace TauCode.Parsing.Graphs.Molding
+﻿namespace TauCode.Parsing.Graphs.Molding;
+
+public interface IRefMold : ILinkableMold
 {
-    public interface IRefMold : ILinkableMold
-    {
-        string ReferencedPath { get; set; }
-    }
+    string? ReferencedPath { get; set; }
 }

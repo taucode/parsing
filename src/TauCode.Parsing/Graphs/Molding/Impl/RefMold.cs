@@ -1,92 +1,83 @@
-﻿using System.Collections.Generic;
-using TauCode.Parsing.Exceptions;
-using TauCode.Parsing.TinyLisp.Data;
+﻿using TauCode.Parsing.TinyLisp.Data;
 
-namespace TauCode.Parsing.Graphs.Molding.Impl
+namespace TauCode.Parsing.Graphs.Molding.Impl;
+
+public class RefMold : LinkableMoldBase, IRefMold
 {
-    // todo regions
-    public class RefMold : LinkableMoldBase, IRefMold
+    #region Fields
+
+    private bool _fullPathIsCached;
+    private string? _cachedFullPath;
+
+    #endregion
+
+    #region ctor
+
+    public RefMold(IGroupMold owner, Atom car)
+        : base(owner, car)
     {
-        #region Fields
+    }
 
-        private bool _fullPathIsCached;
-        private string _cachedFullPath;
+    #endregion
 
-        private ILinkableMold _reference;
+    #region IRefMold Members
 
-        #endregion
+    public string? ReferencedPath { get; set; }
 
-        public RefMold(IGroupMold owner, Atom car)
-            : base(owner, car)
+    #endregion
+
+    #region Overridden
+
+    public override void ProcessKeywords()
+    {
+        base.ProcessKeywords();
+
+        this.ReferencedPath = this.GetKeywordValue<string>(":PATH");
+
+        var linksTo = this.GetKeywordValue<List<string>>(":LINKS-TO", null);
+        if (linksTo != null)
         {
-        }
-
-        public override void ProcessKeywords()
-        {
-            base.ProcessKeywords();
-
-            this.ReferencedPath = this.GetKeywordValue<string>(":PATH");
-
-            var linksTo = this.GetKeywordValue<List<string>>(":LINKS-TO", null);
-            if (linksTo != null)
+            foreach (var link in linksTo)
             {
-                foreach (var link in linksTo)
-                {
-                    this.AddLinkTo(link);
-                }
-            }
-
-            var linksFrom = this.GetKeywordValue<List<string>>(":LINKS-FROM", null);
-            if (linksFrom != null)
-            {
-                foreach (var link in linksFrom)
-                {
-                    this.AddLinkFrom(link);
-                }
+                this.AddLinkTo(link);
             }
         }
 
-        public override string GetFullPath()
+        var linksFrom = this.GetKeywordValue<List<string>>(":LINKS-FROM", null);
+        if (linksFrom != null)
         {
-            // todo: copy-pasted from VertexMold.
-            if (_fullPathIsCached)
+            foreach (var link in linksFrom)
             {
-                return _cachedFullPath;
+                this.AddLinkFrom(link);
             }
+        }
+    }
 
-            string fullPath;
-
-            var ownerFullPath = this.Owner.GetFullPath();
-            if (ownerFullPath == null)
-            {
-                fullPath = null;
-            }
-            else
-            {
-                fullPath = $"{ownerFullPath}/{this.Name}";
-            }
-
-            _cachedFullPath = fullPath;
-            _fullPathIsCached = true;
-
+    public override string? GetFullPath()
+    {
+        // todo: copy-pasted from VertexMold.
+        if (_fullPathIsCached)
+        {
             return _cachedFullPath;
         }
 
-        // todo not used
-        private ILinkableMold GetReference()
-        {
-            if (_reference == null)
-            {
-                _reference = this.ResolvePath(this.ReferencedPath);
-                if (_reference == null)
-                {
-                    throw new GraphException($"Could not resolve reference: '{this.ReferencedPath}'.");
-                }
-            }
+        string? fullPath;
 
-            return _reference;
+        var ownerFullPath = this.Owner!.GetFullPath();
+        if (ownerFullPath == null)
+        {
+            fullPath = null!;
+        }
+        else
+        {
+            fullPath = $"{ownerFullPath}/{this.Name}";
         }
 
-        public string ReferencedPath { get; set; }
+        _cachedFullPath = fullPath!;
+        _fullPathIsCached = true;
+
+        return _cachedFullPath!;
     }
+
+    #endregion
 }

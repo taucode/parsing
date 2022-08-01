@@ -1,11 +1,10 @@
-﻿using System.Collections.Generic;
-using System.Text;
+﻿using System.Text;
 
 namespace TauCode.Parsing.Tests.Parsing.Sql.Data;
 
 public class PrimaryKeyInfo
 {
-    public string Name { get; set; }
+    public string Name { get; set; } = default!; // set by app
     public List<IndexColumnInfo> Columns { get; set; } = new List<IndexColumnInfo>();
 
     public override string ToString()

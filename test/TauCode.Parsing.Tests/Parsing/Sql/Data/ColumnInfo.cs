@@ -4,13 +4,13 @@ namespace TauCode.Parsing.Tests.Parsing.Sql.Data;
 
 public class ColumnInfo
 {
-    public string Name { get; set; }
-    public string TypeName { get; set; }
+    public string Name { get; set; } = default!; // set by app
+    public string TypeName { get; set; } = default!; // set by app
     public int? Precision { get; set; }
     public int? Scale { get; set; }
     public bool IsNullable { get; set; } = true;
     public bool IsPrimaryKey { get; set; }
-    public string Default { get; set; }
+    public string Default { get; set; } = default!; // set by app
 
     public override string ToString()
     {
@@ -31,7 +31,7 @@ public class ColumnInfo
             sb.Append(" PRIMARY KEY");
         }
 
-        if (this.Default != null)
+        if (this.Default != null!)
         {
             sb.Append($" DEFAULT {this.Default}");
         }

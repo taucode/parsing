@@ -1,5 +1,4 @@
 ﻿using NUnit.Framework;
-using System;
 using TauCode.Parsing.TinyLisp.Data;
 
 namespace TauCode.Parsing.Tests.TinyLisp;
@@ -47,10 +46,10 @@ public class SymbolTests
         // Arrange
 
         // Act
-        var ex = Assert.Throws<ArgumentNullException>(() => Symbol.Create(null));
+        var ex = Assert.Throws<ArgumentNullException>(() => Symbol.Create(null!));
 
         // Assert
-        Assert.That(ex.ParamName, Is.EqualTo("name"));
+        Assert.That(ex!.ParamName, Is.EqualTo("name"));
     }
 
     [Test]

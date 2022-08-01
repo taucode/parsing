@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using TauCode.Parsing.Tests.Parsing.Sql.Data;
+﻿using TauCode.Parsing.Tests.Parsing.Sql.Data;
 
 namespace TauCode.Parsing.Tests.Parsing.Sql;
 
@@ -19,7 +16,7 @@ public class SqlParsingResult : IParsingResult
         var last = this.Clauses.Last();
         if ((string)last != "CREATE")
         {
-            throw new NotImplementedException();
+            throw new Exception("Corrupted result.");
         }
 
         this.Clauses[^1] = new TableInfo();
@@ -30,7 +27,7 @@ public class SqlParsingResult : IParsingResult
         var last = this.Clauses.Last();
         if ((string)last != "CREATE")
         {
-            throw new NotImplementedException();
+            throw new Exception("Corrupted result.");
         }
 
         this.Clauses[^1] = new IndexInfo();

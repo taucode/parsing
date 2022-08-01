@@ -2,29 +2,28 @@
 using TauCode.Data.Text.TextDataExtractors;
 using TauCode.Parsing.Tokens;
 
-namespace TauCode.Parsing.TokenProducers
+namespace TauCode.Parsing.TokenProducers;
+
+public class WordProducer : LexicalTokenProducerBase
 {
-    public class WordProducer : LexicalTokenProducerBase
+    private readonly WordExtractor _extractor;
+
+    public WordProducer(TerminatingDelegate? terminator = null)
     {
-        private readonly WordExtractor _extractor;
+        _extractor = new WordExtractor(terminator);
+    }
 
-        public WordProducer(TerminatingDelegate terminator = null)
+    protected override ILexicalToken? ProduceImpl(LexingContext context)
+    {
+        var start = context.Position;
+        var span = context.Input.Span[context.Position..];
+
+        var extractionResult = _extractor.TryExtract(span, out var value);
+        if (extractionResult.ErrorCode.HasValue)
         {
-            _extractor = new WordExtractor(terminator);
+            return null;
         }
 
-        protected override ILexicalToken ProduceImpl(LexingContext context)
-        {
-            var start = context.Position;
-            var span = context.Input.Span[context.Position..];
-
-            var extractionResult = _extractor.TryExtract(span, out var value);
-            if (extractionResult.ErrorCode.HasValue)
-            {
-                return null;
-            }
-
-            return new WordToken(start, extractionResult.CharsConsumed, value);
-        }
+        return new WordToken(start, extractionResult.CharsConsumed, value!);
     }
 }

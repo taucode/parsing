@@ -1,8 +1,7 @@
-﻿namespace TauCode.Parsing
+﻿namespace TauCode.Parsing;
+
+public interface IParsingResult
 {
-    public interface IParsingResult
-    {
-        int Version { get; }
-        void IncreaseVersion();
-    }
+    int Version { get; }
+    void IncreaseVersion();
 }

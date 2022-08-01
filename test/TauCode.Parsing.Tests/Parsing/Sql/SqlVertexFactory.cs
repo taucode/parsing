@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using TauCode.Data.Graphs;
+﻿using TauCode.Data.Graphs;
 using TauCode.Parsing.Graphs.Building;
 using TauCode.Parsing.Graphs.Molding;
 using TauCode.Parsing.Nodes;
@@ -52,7 +49,7 @@ public class SqlVertexFactory : IVertexFactory
                     break;
 
                 case "MULTI-WORD":
-                    result = new MultiWordNode((List<string>)vertexMold.GetKeywordValue(":VALUES"), true);
+                    result = new MultiWordNode((List<string>)vertexMold.GetKeywordValue(":VALUES")!, true);
                     break;
 
                 default:

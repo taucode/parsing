@@ -1,5 +1,4 @@
-﻿using System;
-using TauCode.Parsing.Graphs.Reading;
+﻿using TauCode.Parsing.Graphs.Reading;
 using TauCode.Parsing.Graphs.Reading.Impl;
 using TauCode.Parsing.Tests.Parsing.Sql.ScriptElementReaders;
 using TauCode.Parsing.TinyLisp.Data;

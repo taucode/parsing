@@ -1,24 +1,19 @@
-﻿using System.Collections.Generic;
-using TauCode.Parsing.TinyLisp.Data;
+﻿using TauCode.Parsing.TinyLisp.Data;
 
-namespace TauCode.Parsing.Graphs.Molding
+namespace TauCode.Parsing.Graphs.Molding;
+
+public interface IScriptElementMold
 {
-    public interface IScriptElementMold
-    {
-        IGroupMold Owner { get; }
-        Atom Car { get; }
-        string Name { get; set; }
+    IGroupMold? Owner { get; }
+    Atom Car { get; }
+    string? Name { get; set; }
 
-        Element LispElement { get; }
+    Element LispElement { get; }
 
-        void SetKeywordValue(string keyword, object value);
-        object GetKeywordValue(string keyword);
-        IReadOnlyCollection<string> Keywords { get; }
-        bool RemoveKeyword(string keyword);
+    void SetKeywordValue(string keyword, object value);
+    object? GetKeywordValue(string keyword);
+    IReadOnlyCollection<string> Keywords { get; }
+    bool RemoveKeyword(string keyword);
 
-        void ProcessKeywords();
-
-        //bool IsFinalized { get; }
-        //void ValidateAndFinalize();
-    }
+    void ProcessKeywords();
 }

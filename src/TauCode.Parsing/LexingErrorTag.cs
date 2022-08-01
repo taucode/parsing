@@ -1,10 +1,9 @@
-﻿namespace TauCode.Parsing
+﻿namespace TauCode.Parsing;
+
+internal enum LexingErrorTag
 {
-    internal enum LexingErrorTag
-    {
-        UnclosedString = 1,
-        NewLineInString,
-        BadEscape,
-        CannotTokenize,
-    }
+    UnclosedString = 1,
+    NewLineInString,
+    BadEscape,
+    CannotTokenize,
 }

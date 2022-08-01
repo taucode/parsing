@@ -1,5 +1,4 @@
 ﻿using NUnit.Framework;
-using System;
 using TauCode.Data.Text;
 using TauCode.Extensions;
 using TauCode.Parsing.TokenProducers;

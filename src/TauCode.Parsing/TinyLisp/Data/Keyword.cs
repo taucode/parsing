@@ -1,10 +1,9 @@
-﻿namespace TauCode.Parsing.TinyLisp.Data
+﻿namespace TauCode.Parsing.TinyLisp.Data;
+
+public sealed class Keyword : Symbol
 {
-    public sealed class Keyword : Symbol
+    internal Keyword(string name)
+        : base(name)
     {
-        internal Keyword(string name)
-            : base(name)
-        {
-        }
     }
 }

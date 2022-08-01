@@ -5,7 +5,7 @@ namespace TauCode.Parsing.TinyLisp.TokenProducers
 {
     public class TinyLispSymbolProducer : ILexicalTokenProducer
     {
-        public ILexicalToken Produce(LexingContext context)
+        public ILexicalToken? Produce(LexingContext context)
         {
             var text = context.Input.Span;
             var length = text.Length;

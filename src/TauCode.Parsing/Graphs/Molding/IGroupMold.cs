@@ -1,11 +1,8 @@
-﻿using System.Collections.Generic;
+﻿namespace TauCode.Parsing.Graphs.Molding;
 
-namespace TauCode.Parsing.Graphs.Molding
+public interface IGroupMold : ILinkableMold
 {
-    public interface IGroupMold : ILinkableMold
-    {
-        IReadOnlyList<IScriptElementMold> AllElements { get; }
-        IReadOnlyList<ILinkableMold> Linkables { get; }
-        void Add(IScriptElementMold scriptElementMold);
-    }
+    IReadOnlyList<IScriptElementMold> AllElements { get; }
+    IReadOnlyList<ILinkableMold> Linkables { get; }
+    void Add(IScriptElementMold scriptElementMold);
 }

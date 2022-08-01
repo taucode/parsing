@@ -10,7 +10,7 @@
                 position,
                 consumedLength,
                 value,
-                value.ToString())
+                value.ToString()!)
         {
         }
     }

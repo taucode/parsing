@@ -1,8 +1,5 @@
 ﻿using NUnit.Framework;
 using Serilog;
-using System;
-using System.IO;
-using System.Linq;
 using TauCode.Data.Text;
 using TauCode.Extensions;
 using TauCode.Parsing.Graphs.Building;
@@ -234,7 +231,7 @@ public class SqlParserTests
             {
                 ColumnName = GetSqlNameFromToken(token),
             };
-            primaryKey.Columns.Add(indexColumn);
+            primaryKey!.Columns.Add(indexColumn);
 
             parsingResult.IncreaseVersion();
         };
@@ -248,7 +245,7 @@ public class SqlParserTests
             var sqlParsingResult = (SqlParsingResult)parsingResult;
             var tableInfo = sqlParsingResult.GetLastClause<TableInfo>();
             var primaryKey = tableInfo.PrimaryKey;
-            var indexColumn = primaryKey.Columns.Last();
+            var indexColumn = primaryKey!.Columns.Last();
 
             indexColumn.SortDirection = Enum.Parse<SortDirection>(
                 ((TextTokenBase)token).Text.ToLowerInvariant(),
@@ -474,7 +471,7 @@ public class SqlParserTests
         Assert.That(column.IsNullable, Is.True);
 
         var tablePrimaryKey = createTableResult.PrimaryKey;
-        Assert.That(tablePrimaryKey.Name, Is.EqualTo("my_tab_pk"));
+        Assert.That(tablePrimaryKey!.Name, Is.EqualTo("my_tab_pk"));
         var pkColumns = tablePrimaryKey.Columns;
         Assert.That(pkColumns, Has.Count.EqualTo(3));
 
@@ -526,7 +523,7 @@ public class SqlParserTests
         Assert.That(column.IsNullable, Is.True);
 
         tablePrimaryKey = createTableResult.PrimaryKey;
-        Assert.That(tablePrimaryKey.Name, Is.EqualTo("pk_otherTable"));
+        Assert.That(tablePrimaryKey!.Name, Is.EqualTo("pk_otherTable"));
         pkColumns = tablePrimaryKey.Columns;
         Assert.That(pkColumns, Has.Count.EqualTo(1));
 

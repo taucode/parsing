@@ -1,118 +1,112 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using TauCode.Parsing.Exceptions;
+﻿using TauCode.Parsing.Exceptions;
 
-namespace TauCode.Parsing
+namespace TauCode.Parsing;
+
+public class Lexer : ILexer
 {
-    public class Lexer : ILexer
+    #region ILexer Members
+
+    public IEnumerable<ILexicalTokenProducer>? Producers { get; set; }
+
+    public bool IgnoreEmptyTokens { get; set; } = true;
+
+    public virtual IList<ILexicalToken> Tokenize(ReadOnlyMemory<char> input)
     {
-        #region ILexer Members
-
-        public IEnumerable<ILexicalTokenProducer> Producers { get; set; }
-
-        public bool IgnoreEmptyTokens { get; set; } = true;
-
-        public virtual IList<ILexicalToken> Tokenize(ReadOnlyMemory<char> input)
+        var gotProducers = this.Producers?.Any() ?? false;
+        if (!gotProducers)
         {
-            var gotProducers = this.Producers?.Any() ?? false;
-            if (!gotProducers)
+            throw new InvalidOperationException(
+                $"'{nameof(Producers)}' must be initialized with non-empty collection.");
+        }
+
+        var context = new LexingContext(input);
+        var tokens = new List<ILexicalToken>();
+
+        var length = input.Length;
+        while (context.Position < length)
+        {
+            var gotToken = false;
+            var gotEmptySpaceSkipped = false;
+
+            foreach (var producer in this.Producers!)
             {
-                throw new InvalidOperationException(
-                    $"'{nameof(Producers)}' must be initialized with non-empty collection.");
-            }
+                this.OnBeforeTokenProduced?.Invoke(context, producer);
 
-            var context = new LexingContext(input);
-            var tokens = new List<ILexicalToken>();
+                var positionBeforeProduce = context.Position;
 
-            var length = input.Length;
-            while (context.Position < length)
-            {
-                var gotToken = false;
-                var gotEmptySpaceSkipped = false;
-
-                foreach (var producer in this.Producers)
+                if (this.IgnoreEmptyTokens && producer is IEmptyLexicalTokenProducer emptyLexicalTokenProducer)
                 {
-                    this.OnBeforeTokenProduced?.Invoke(context, producer);
-
-                    var positionBeforeProduce = context.Position;
-
-                    if (this.IgnoreEmptyTokens && producer is IEmptyLexicalTokenProducer emptyLexicalTokenProducer)
+                    var emptySpaceSkipped = emptyLexicalTokenProducer.Skip(context); // todo: ut that empty token producer doesn't 
+                    if (emptySpaceSkipped > 0)
                     {
-                        var emptySpaceSkipped = emptyLexicalTokenProducer.Skip(context); // todo: ut that empty token producer doesn't 
-                        if (emptySpaceSkipped > 0)
+                        if (context.Position + emptySpaceSkipped > context.Input.Length)
                         {
-                            if (context.Position + emptySpaceSkipped > context.Input.Length)
-                            {
-                                throw new LexingException($"Empty token producer has skipped too much input. Type: '{producer.GetType().FullName}'.");
-                            }
-                            else
-                            {
-                                context.Position += emptySpaceSkipped;
-                                gotEmptySpaceSkipped = true;
-                                break;
-                            }
+                            throw new LexingException($"Empty token producer has skipped too much input. Type: '{producer.GetType().FullName}'.");
                         }
-                    }
-
-                    var token = producer.Produce(context);
-                    if (positionBeforeProduce != context.Position)
-                    {
-                        throw new LexingException($"Token producer has changed context position. Type: '{producer.GetType().FullName}'.");
-                    }
-
-                    if (token == null)
-                    {
-                        // this producer failed.
-                    }
-                    else
-                    {
-                        if (context.Position + token.ConsumedLength > context.Input.Length)
+                        else
                         {
-                            throw new LexingException($"Token producer has consumed too much input. Type: '{producer.GetType().FullName}'.");
+                            context.Position += emptySpaceSkipped;
+                            gotEmptySpaceSkipped = true;
+                            break;
                         }
-
-                        this.OnAfterTokenProduced?.Invoke(context, token);
-                        gotToken = true;
-
-                        var ignoreToken = token is IEmptyLexicalToken && this.IgnoreEmptyTokens;
-                        if (!ignoreToken)
-                        {
-                            tokens.Add(token);
-                        }
-
-                        context.Position += token.ConsumedLength;
-
-                        break;
                     }
                 }
 
-                if (gotToken || gotEmptySpaceSkipped)
+                var token = producer.Produce(context);
+                if (positionBeforeProduce != context.Position)
                 {
-                    // do nothing
+                    throw new LexingException($"Token producer has changed context position. Type: '{producer.GetType().FullName}'.");
+                }
+
+                if (token == null)
+                {
+                    // this producer failed.
                 }
                 else
                 {
-                    var message = "Cannot tokenize.\r\n";
+                    if (context.Position + token.ConsumedLength > context.Input.Length)
+                    {
+                        throw new LexingException($"Token producer has consumed too much input. Type: '{producer.GetType().FullName}'.");
+                    }
 
-                    var textPartLength = Math.Min(context.Input.Length - context.Position, 1000);
+                    this.OnAfterTokenProduced?.Invoke(context, token);
+                    gotToken = true;
 
-                    var textPart = context.Input.Slice(context.Position, textPartLength);
-                    message += $"Text: {textPart}";
+                    var ignoreToken = token is IEmptyLexicalToken && this.IgnoreEmptyTokens;
+                    if (!ignoreToken)
+                    {
+                        tokens.Add(token);
+                    }
 
-                    var k = 3;
+                    context.Position += token.ConsumedLength;
 
-                    throw new LexingException(message, context.Position);
+                    break;
                 }
             }
 
-            return tokens;
+            if (gotToken || gotEmptySpaceSkipped)
+            {
+                // do nothing
+            }
+            else
+            {
+                var message = "Cannot tokenize.\r\n";
+
+                var textPartLength = Math.Min(context.Input.Length - context.Position, 1000);
+
+                var textPart = context.Input.Slice(context.Position, textPartLength);
+                message += $"Text: {textPart}";
+
+                throw new LexingException(message, context.Position);
+            }
         }
 
-        public Action<LexingContext, ILexicalTokenProducer> OnBeforeTokenProduced { get; set; }
-
-        public Action<LexingContext, ILexicalToken> OnAfterTokenProduced { get; set; }
-
-        #endregion
+        return tokens;
     }
+
+    public Action<LexingContext, ILexicalTokenProducer>? OnBeforeTokenProduced { get; set; }
+
+    public Action<LexingContext, ILexicalToken>? OnAfterTokenProduced { get; set; }
+
+    #endregion
 }

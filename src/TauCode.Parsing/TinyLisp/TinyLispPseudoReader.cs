@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using TauCode.Parsing.TinyLisp.Data;
+﻿using TauCode.Parsing.TinyLisp.Data;
 using TauCode.Parsing.TinyLisp.Tokens;
 using TauCode.Parsing.Tokens;
 
@@ -87,7 +85,7 @@ namespace TauCode.Parsing.TinyLisp
                     throw TinyLispHelper.CreateException(
                         TinyLispErrorTag.CannotReadToken,
                         null,
-                        token.GetType().FullName);
+                        token.GetType().FullName!);
                 }
             }
         }

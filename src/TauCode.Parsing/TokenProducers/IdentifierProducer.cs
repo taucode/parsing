@@ -1,33 +1,31 @@
-﻿using System;
-using TauCode.Data.Text;
+﻿using TauCode.Data.Text;
 using TauCode.Data.Text.TextDataExtractors;
 using TauCode.Parsing.Tokens;
 
-namespace TauCode.Parsing.TokenProducers
+namespace TauCode.Parsing.TokenProducers;
+
+public class IdentifierProducer : LexicalTokenProducerBase
 {
-    public class IdentifierProducer : LexicalTokenProducerBase
+    private readonly IdentifierExtractor _extractor;
+
+    public IdentifierProducer(
+        Func<string, bool> reservedWordPredicate,
+        TerminatingDelegate? terminator = null)
     {
-        private readonly IdentifierExtractor _extractor;
+        _extractor = new IdentifierExtractor(reservedWordPredicate, terminator);
+    }
 
-        public IdentifierProducer(
-            Func<string, bool> reservedWordPredicate,
-            TerminatingDelegate terminator = null)
+    protected override ILexicalToken? ProduceImpl(LexingContext context)
+    {
+        var start = context.Position;
+        var span = context.Input.Span[context.Position..];
+
+        var extractionResult = _extractor.TryExtract(span, out var value);
+        if (extractionResult.ErrorCode.HasValue)
         {
-            _extractor = new IdentifierExtractor(reservedWordPredicate, terminator);
+            return null;
         }
 
-        protected override ILexicalToken ProduceImpl(LexingContext context)
-        {
-            var start = context.Position;
-            var span = context.Input.Span[context.Position..];
-
-            var extractionResult = _extractor.TryExtract(span, out var value);
-            if (extractionResult.ErrorCode.HasValue)
-            {
-                return null;
-            }
-
-            return new IdentifierToken(start, extractionResult.CharsConsumed, value);
-        }
+        return new IdentifierToken(start, extractionResult.CharsConsumed, value!);
     }
 }

@@ -2,6 +2,6 @@
 
 public class IndexColumnInfo
 {
-    public string ColumnName { get; set; }
+    public string ColumnName { get; set; } = default!; // set by app
     public SortDirection SortDirection { get; set; } = SortDirection.Asc;
 }

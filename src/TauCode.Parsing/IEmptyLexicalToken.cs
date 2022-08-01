@@ -1,6 +1,5 @@
-namespace TauCode.Parsing
+namespace TauCode.Parsing;
+
+public interface IEmptyLexicalToken : ILexicalToken
 {
-    public interface IEmptyLexicalToken : ILexicalToken
-    {
-    }
 }

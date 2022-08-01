@@ -1,10 +1,9 @@
 ﻿using TauCode.Data.Graphs;
 using TauCode.Parsing.Graphs.Molding;
 
-namespace TauCode.Parsing.Graphs.Building
+namespace TauCode.Parsing.Graphs.Building;
+
+public interface IArcFactory
 {
-    public interface IArcFactory
-    {
-        IArc Create(IArcMold arcMold);
-    }
+    IArc Create(IArcMold arcMold);
 }

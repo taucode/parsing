@@ -1,12 +1,9 @@
-﻿using System;
+﻿namespace TauCode.Parsing;
 
-namespace TauCode.Parsing
+public interface ILexicalTokenConverter
 {
-    public interface ILexicalTokenConverter
-    {
-        ILexicalToken Convert(ILexicalToken token, Type otherLexicalTokenType, IParsingResult parsingResult);
+    ILexicalToken Convert(ILexicalToken token, Type otherLexicalTokenType, IParsingResult parsingResult);
 
-        TOtherLexicalTokenType Convert<TOtherLexicalTokenType>(ILexicalToken token, IParsingResult parsingResult)
-            where TOtherLexicalTokenType : class, ILexicalToken;
-    }
+    TOtherLexicalTokenType Convert<TOtherLexicalTokenType>(ILexicalToken token, IParsingResult parsingResult)
+        where TOtherLexicalTokenType : class, ILexicalToken;
 }

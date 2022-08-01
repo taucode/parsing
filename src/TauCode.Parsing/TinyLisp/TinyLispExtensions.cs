@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using TauCode.Extensions;
+﻿using TauCode.Extensions;
 using TauCode.Parsing.Exceptions;
 using TauCode.Parsing.TinyLisp.Data;
 
@@ -41,7 +39,7 @@ namespace TauCode.Parsing.TinyLisp
             return tuples;
         }
 
-        public static Element GetSingleKeywordArgument(
+        public static Element? GetSingleKeywordArgument(
             this Element element,
             string argumentName,
             bool absenceIsAllowed = false)
@@ -94,7 +92,7 @@ namespace TauCode.Parsing.TinyLisp
             return wantedElement;
         }
 
-        public static TElement GetSingleKeywordArgument<TElement>(
+        public static TElement? GetSingleKeywordArgument<TElement>(
             this Element element,
             string argumentName,
             bool absenceIsAllowed = false) where TElement : Element
@@ -357,7 +355,7 @@ namespace TauCode.Parsing.TinyLisp
         public static PseudoList AsPseudoList(this Element element) =>
             element.AsElement<PseudoList>();
 
-        public static TElement AsElement<TElement>(this Element element) where TElement : Element
+        public static TElement AsElement<TElement>(this Element? element) where TElement : Element
         {
             if (element == null)
             {
@@ -386,12 +384,12 @@ namespace TauCode.Parsing.TinyLisp
                 return false;
             }
 
-            throw new NotImplementedException();
+            throw new ArgumentException("Element cannot be converted to 'bool'.");
         }
 
         private static PseudoList CheckElementIsPseudoList(Element element, string argumentName, bool mustBeNotEmpty)
         {
-            if (element == null)
+            if (element == null!)
             {
                 throw new ArgumentNullException(argumentName);
             }

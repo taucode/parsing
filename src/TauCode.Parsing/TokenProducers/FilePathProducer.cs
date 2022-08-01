@@ -2,29 +2,28 @@
 using TauCode.Data.Text.TextDataExtractors;
 using TauCode.Parsing.Tokens;
 
-namespace TauCode.Parsing.TokenProducers
+namespace TauCode.Parsing.TokenProducers;
+
+public class FilePathProducer : LexicalTokenProducerBase
 {
-    public class FilePathProducer : LexicalTokenProducerBase
+    private readonly FilePathExtractor _extractor;
+
+    public FilePathProducer(TerminatingDelegate? terminator = null)
     {
-        private readonly FilePathExtractor _extractor;
+        _extractor = new FilePathExtractor(terminator);
+    }
 
-        public FilePathProducer(TerminatingDelegate terminator = null)
+    protected override ILexicalToken? ProduceImpl(LexingContext context)
+    {
+        var start = context.Position;
+        var span = context.Input.Span[context.Position..];
+
+        var extractionResult = _extractor.TryExtract(span, out var value);
+        if (extractionResult.ErrorCode.HasValue)
         {
-            _extractor = new FilePathExtractor(terminator);
+            return null;
         }
 
-        protected override ILexicalToken ProduceImpl(LexingContext context)
-        {
-            var start = context.Position;
-            var span = context.Input.Span[context.Position..];
-
-            var extractionResult = _extractor.TryExtract(span, out var value);
-            if (extractionResult.ErrorCode.HasValue)
-            {
-                return null;
-            }
-
-            return new FilePathToken(start, extractionResult.CharsConsumed, value);
-        }
+        return new FilePathToken(start, extractionResult.CharsConsumed, value!);
     }
 }

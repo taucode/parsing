@@ -1,88 +1,85 @@
-﻿using System;
-using System.Collections.Generic;
-using TauCode.Parsing.TinyLisp.Data;
+﻿using TauCode.Parsing.TinyLisp.Data;
 
-namespace TauCode.Parsing.Graphs.Molding.Impl
+namespace TauCode.Parsing.Graphs.Molding.Impl;
+
+public class VertexMold : LinkableMoldBase, IVertexMold
 {
-    public class VertexMold : LinkableMoldBase, IVertexMold
+    #region Fields
+
+    private bool _fullPathIsCached;
+    private string? _cachedFullPath;
+
+    #endregion
+
+    #region ctor
+
+    public VertexMold(IGroupMold owner, Atom car)
+        : base(owner, car)
     {
-        #region Fields
-
-        private bool _fullPathIsCached;
-        private string _cachedFullPath;
-
-        #endregion
-
-        #region ctor
-
-        public VertexMold(IGroupMold owner, Atom car)
-            : base(owner, car)
+        if (this.Owner == null)
         {
-            if (this.Owner == null)
-            {
-                throw new NotImplementedException();
-            }
+            throw new ArgumentNullException(nameof(owner));
         }
+    }
 
-        #endregion
+    #endregion
 
-        #region Overridden
+    #region Overridden
 
-        public override string GetFullPath()
+    public override string? GetFullPath()
+    {
+        if (_fullPathIsCached)
         {
-            if (_fullPathIsCached)
-            {
-                return _cachedFullPath;
-            }
-
-            string fullPath;
-
-            var ownerFullPath = this.Owner.GetFullPath();
-            if (ownerFullPath == null)
-            {
-                fullPath = null;
-            }
-            else
-            {
-                fullPath = $"{ownerFullPath}/{this.Name}";
-            }
-
-            _cachedFullPath = fullPath;
-            _fullPathIsCached = true;
-
             return _cachedFullPath;
         }
 
-        public override void ProcessKeywords()
+        string? fullPath;
+
+        var ownerFullPath = this.Owner!.GetFullPath();
+        if (ownerFullPath == null)
         {
-            base.ProcessKeywords();
-            this.TypeAlias = this.GetKeywordValue<string>(":TYPE", null);
+            fullPath = null;
+        }
+        else
+        {
+            fullPath = $"{ownerFullPath}/{this.Name}";
+        }
 
-            var linksTo = this.GetKeywordValue<List<string>>(":LINKS-TO", null);
-            if (linksTo != null)
-            {
-                foreach (var link in linksTo)
-                {
-                    this.AddLinkTo(link);
-                }
-            }
+        _cachedFullPath = fullPath;
+        _fullPathIsCached = true;
 
-            var linksFrom = this.GetKeywordValue<List<string>>(":LINKS-FROM", null);
-            if (linksFrom != null)
+        return _cachedFullPath;
+    }
+
+    public override void ProcessKeywords()
+    {
+        base.ProcessKeywords();
+        this.TypeAlias = this.GetKeywordValue<string>(":TYPE", null);
+
+        var linksTo = this.GetKeywordValue<List<string>>(":LINKS-TO", null);
+        if (linksTo != null)
+        {
+            foreach (var link in linksTo)
             {
-                foreach (var link in linksFrom)
-                {
-                    this.AddLinkFrom(link);
-                }
+                this.AddLinkTo(link);
             }
         }
 
-        #endregion
-
-        #region IVertexMold Members
-
-        public virtual string TypeAlias { get; set; }
-
-        #endregion
+        var linksFrom = this.GetKeywordValue<List<string>>(":LINKS-FROM", null);
+        if (linksFrom != null)
+        {
+            foreach (var link in linksFrom)
+            {
+                this.AddLinkFrom(link);
+            }
+        }
     }
+
+    #endregion
+
+    #region IVertexMold Members
+
+    public virtual string? TypeAlias { get; set; }
+
+    #endregion
 }

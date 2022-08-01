@@ -1,6 +1,4 @@
 ﻿using NUnit.Framework;
-using System;
-using System.Linq;
 using TauCode.Parsing.Exceptions;
 using TauCode.Parsing.TinyLisp;
 using TauCode.Parsing.TinyLisp.Data;
@@ -22,13 +20,13 @@ public class TinyLispExtensionsTests
     public void AsPseudoList_ElementIsNull_ThrowsArgumentNullException()
     {
         // Arrange
-        Element element = null;
+        Element element = null!;
 
         // Act
         var ex = Assert.Throws<ArgumentNullException>(() => element.AsPseudoList());
 
         // Assert
-        Assert.That(ex.ParamName, Is.EqualTo("element"));
+        Assert.That(ex!.ParamName, Is.EqualTo("element"));
     }
 
     [Test]
@@ -50,10 +48,10 @@ public class TinyLispExtensionsTests
     public void GetSingleKeywordArgument_ElementIsNull_ThrowsArgumentNullException()
     {
         // Arrange
-        Element element = null;
+        Element? element = null;
 
         // Act
-        var ex = Assert.Throws<ArgumentNullException>(() => element.GetSingleKeywordArgument(":arg"));
+        var ex = Assert.Throws<ArgumentNullException>(() => element!.GetSingleKeywordArgument(":arg"));
 
         // Assert
         Assert.That(ex.ParamName, Is.EqualTo("element"));
@@ -81,10 +79,10 @@ public class TinyLispExtensionsTests
         Element element = new PseudoList();
 
         // Act
-        var ex = Assert.Throws<ArgumentNullException>(() => element.GetSingleKeywordArgument(null));
+        var ex = Assert.Throws<ArgumentNullException>(() => element.GetSingleKeywordArgument(null!));
 
         // Assert
-        Assert.That(ex.ParamName, Is.EqualTo("argumentName"));
+        Assert.That(ex!.ParamName, Is.EqualTo("argumentName"));
     }
 
     [Test]
@@ -322,13 +320,13 @@ public class TinyLispExtensionsTests
     public void GetAllKeywordArguments_PseudoListIsNull_ThrowsArgumentNullException()
     {
         // Arrange
-        PseudoList pseudoList = null;
+        PseudoList pseudoList = null!;
 
         // Act
         var ex = Assert.Throws<ArgumentNullException>(() => pseudoList.GetAllKeywordArguments(":key"));
 
         // Assert
-        Assert.That(ex.ParamName, Is.EqualTo("element"));
+        Assert.That(ex!.ParamName, Is.EqualTo("element"));
     }
 
     [Test]
@@ -358,10 +356,10 @@ public class TinyLispExtensionsTests
         var pseudoList = reader.Read(tokens).Single().AsPseudoList();
 
         // Act
-        var ex = Assert.Throws<ArgumentNullException>(() => pseudoList.GetAllKeywordArguments(null));
+        var ex = Assert.Throws<ArgumentNullException>(() => pseudoList.GetAllKeywordArguments(null!));
 
         // Assert
-        Assert.That(ex.ParamName, Is.EqualTo("argumentName"));
+        Assert.That(ex!.ParamName, Is.EqualTo("argumentName"));
     }
 
     [Test]
@@ -486,7 +484,7 @@ public class TinyLispExtensionsTests
     public void GetMultipleFreeArgumentSets_ArgumentIsNull_ThrowsArgumentNullException()
     {
         // Arrange
-        PseudoList pseudoList = null;
+        PseudoList pseudoList = null!;
 
         // Act
         var ex = Assert.Throws<ArgumentNullException>(() => pseudoList.GetMultipleFreeArgumentSets());

@@ -1,7 +1,6 @@
-﻿namespace TauCode.Parsing
+﻿namespace TauCode.Parsing;
+
+public interface IValueToken<T> : ITextToken
 {
-    public interface IValueToken<T> : ITextToken
-    {
-        T Value { get; }
-    }
+    T Value { get; }
 }

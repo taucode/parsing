@@ -1,7 +1,6 @@
-﻿namespace TauCode.Parsing
+﻿namespace TauCode.Parsing;
+
+public interface ITextToken : ILexicalToken
 {
-    public interface ITextToken : ILexicalToken
-    {
-        string Text { get; }
-    }
+    string Text { get; }
 }

@@ -1,6 +1,4 @@
 ﻿using NUnit.Framework;
-using System;
-using System.Collections.Generic;
 using TauCode.Parsing.TinyLisp.Data;
 
 namespace TauCode.Parsing.Tests.TinyLisp;
@@ -33,10 +31,10 @@ public class PseudoListTests
         // Arrange
 
         // Act
-        var ex = Assert.Throws<ArgumentNullException>(() => new PseudoList(null));
+        var ex = Assert.Throws<ArgumentNullException>(() => new PseudoList(null!));
 
         // Assert
-        Assert.That(ex.ParamName, Is.EqualTo("elements"));
+        Assert.That(ex!.ParamName, Is.EqualTo("elements"));
     }
 
     [Test]
@@ -47,7 +45,7 @@ public class PseudoListTests
         {
             Nil.Instance,
             True.Instance,
-            null,
+            null!,
             Symbol.Create("aha"),
             Symbol.Create(":key"),
         };
@@ -102,7 +100,7 @@ public class PseudoListTests
         var pseudoList = new PseudoList(elements);
 
         // Act
-        var ex = Assert.Throws<ArgumentNullException>(() => pseudoList.Add(null));
+        var ex = Assert.Throws<ArgumentNullException>(() => pseudoList.Add(null!));
 
         // Assert
         Assert.That(ex.ParamName, Is.EqualTo("element"));

@@ -2,29 +2,28 @@
 using TauCode.Data.Text.TextDataExtractors;
 using TauCode.Parsing.Tokens;
 
-namespace TauCode.Parsing.TokenProducers
+namespace TauCode.Parsing.TokenProducers;
+
+public class CLangStringProducer : LexicalTokenProducerBase
 {
-    public class CLangStringProducer : LexicalTokenProducerBase
+    private readonly CLangStringExtractor _extractor;
+
+    public CLangStringProducer(TerminatingDelegate? terminator = null)
     {
-        private readonly CLangStringExtractor _extractor;
+        _extractor = new CLangStringExtractor(terminator);
+    }
 
-        public CLangStringProducer(TerminatingDelegate terminator = null)
+    protected override ILexicalToken? ProduceImpl(LexingContext context)
+    {
+        var start = context.Position;
+
+        var span = context.Input.Span[context.Position..];
+        var extractionResult = _extractor.TryExtract(span, out var value);
+        if (extractionResult.ErrorCode.HasValue)
         {
-            _extractor = new CLangStringExtractor(terminator);
+            return null;
         }
 
-        protected override ILexicalToken ProduceImpl(LexingContext context)
-        {
-            var start = context.Position;
-
-            var span = context.Input.Span[context.Position..];
-            var extractionResult = _extractor.TryExtract(span, out var value);
-            if (extractionResult.ErrorCode.HasValue)
-            {
-                return null;
-            }
-
-            return new StringToken(start, extractionResult.CharsConsumed, value, "CLang");
-        }
+        return new StringToken(start, extractionResult.CharsConsumed, value!, "CLang");
     }
 }

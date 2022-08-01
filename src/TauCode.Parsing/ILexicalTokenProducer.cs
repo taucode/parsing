@@ -1,7 +1,6 @@
-﻿namespace TauCode.Parsing
+﻿namespace TauCode.Parsing;
+
+public interface ILexicalTokenProducer
 {
-    public interface ILexicalTokenProducer
-    {
-        ILexicalToken Produce(LexingContext context);
-    }
+    ILexicalToken? Produce(LexingContext context);
 }

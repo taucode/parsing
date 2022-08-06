@@ -104,6 +104,11 @@ public class Lexer : ILexer
         return tokens;
     }
 
+    public IList<ILexicalToken> Tokenize(string[] input)
+    {
+        throw new NotImplementedException();
+    }
+
     public Action<LexingContext, ILexicalTokenProducer>? OnBeforeTokenProduced { get; set; }
 
     public Action<LexingContext, ILexicalToken>? OnAfterTokenProduced { get; set; }

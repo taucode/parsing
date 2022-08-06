@@ -1,17 +1,16 @@
-﻿namespace TauCode.Parsing.Tokens
+﻿namespace TauCode.Parsing.Tokens;
+
+public class EnumToken<TEnum> : ValueTokenBase<TEnum> where TEnum : struct
 {
-    public class EnumToken<TEnum> : ValueTokenBase<TEnum> where TEnum : struct
+    public EnumToken(
+        int position,
+        int consumedLength,
+        TEnum value)
+        : base(
+            position,
+            consumedLength,
+            value,
+            value.ToString()!)
     {
-        public EnumToken(
-            int position,
-            int consumedLength,
-            TEnum value)
-            : base(
-                position,
-                consumedLength,
-                value,
-                value.ToString()!)
-        {
-        }
     }
 }

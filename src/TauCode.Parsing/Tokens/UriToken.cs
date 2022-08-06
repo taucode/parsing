@@ -1,19 +1,16 @@
-﻿using System;
+﻿namespace TauCode.Parsing.Tokens;
 
-namespace TauCode.Parsing.Tokens
+public class UriToken : ValueTokenBase<Uri>
 {
-    public class UriToken : ValueTokenBase<Uri>
+    public UriToken(
+        int position,
+        int consumedLength,
+        Uri uri)
+        : base(
+            position,
+            consumedLength,
+            uri,
+            uri.ToString())
     {
-        public UriToken(
-            int position,
-            int consumedLength,
-            Uri uri)
-            : base(
-                position,
-                consumedLength,
-                uri,
-                uri.ToString())
-        {
-        }
     }
 }

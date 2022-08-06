@@ -1,16 +1,15 @@
-﻿namespace TauCode.Parsing.Tokens
+﻿namespace TauCode.Parsing.Tokens;
+
+public class TermToken : TextTokenBase
 {
-    public class TermToken : TextTokenBase
+    public TermToken(
+        int position,
+        int consumedLength,
+        string text)
+        : base(
+            position,
+            consumedLength,
+            text)
     {
-        public TermToken(
-            int position,
-            int consumedLength,
-            string text)
-            : base(
-                position,
-                consumedLength,
-                text)
-        {
-        }
     }
 }

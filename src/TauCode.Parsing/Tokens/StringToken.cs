@@ -1,20 +1,19 @@
-﻿namespace TauCode.Parsing.Tokens
-{
-    public class StringToken : TextTokenBase
-    {
-        public StringToken(
-            int position,
-            int consumedLength,
-            string text,
-            string kind)
-            : base(
-                position,
-                consumedLength,
-                text)
-        {
-            this.Kind = kind;
-        }
+﻿namespace TauCode.Parsing.Tokens;
 
-        public string Kind { get; }
+public class StringToken : TextTokenBase
+{
+    public StringToken(
+        int position,
+        int consumedLength,
+        string text,
+        string kind)
+        : base(
+            position,
+            consumedLength,
+            text)
+    {
+        this.Kind = kind;
     }
+
+    public string Kind { get; }
 }

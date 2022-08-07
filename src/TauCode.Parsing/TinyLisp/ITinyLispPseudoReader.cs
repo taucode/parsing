@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using TauCode.Parsing.TinyLisp.Data;
+﻿using TauCode.Parsing.TinyLisp.Data;
 
 namespace TauCode.Parsing.TinyLisp
 {

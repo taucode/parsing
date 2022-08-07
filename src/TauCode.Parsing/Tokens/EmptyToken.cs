@@ -1,10 +1,9 @@
-﻿namespace TauCode.Parsing.Tokens
+﻿namespace TauCode.Parsing.Tokens;
+
+public sealed class EmptyToken : LexicalTokenBase, IEmptyLexicalToken
 {
-    public sealed class EmptyToken : LexicalTokenBase, IEmptyLexicalToken
+    public EmptyToken(int position, int consumedLength)
+        : base(position, consumedLength)
     {
-        public EmptyToken(int position, int consumedLength)
-            : base(position, consumedLength)
-        {
-        }
     }
 }

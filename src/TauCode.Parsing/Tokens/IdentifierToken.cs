@@ -1,16 +1,15 @@
-﻿namespace TauCode.Parsing.Tokens
+﻿namespace TauCode.Parsing.Tokens;
+
+public class IdentifierToken : TextTokenBase
 {
-    public class IdentifierToken : TextTokenBase
+    public IdentifierToken(
+        int position,
+        int consumedLength,
+        string text)
+        : base(
+            position,
+            consumedLength,
+            text)
     {
-        public IdentifierToken(
-            int position,
-            int consumedLength,
-            string text)
-            : base(
-                position,
-                consumedLength,
-                text)
-        {
-        }
     }
 }

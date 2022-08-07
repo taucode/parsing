@@ -3,21 +3,10 @@ using TauCode.Parsing.Graphs.Molding;
 using TauCode.Parsing.TinyLisp;
 using TauCode.Parsing.TinyLisp.Data;
 
-// todo clean
 namespace TauCode.Parsing.Graphs.Reading.Impl;
 
 public class GraphScriptReader : IGraphScriptReader
 {
-    #region Constants & Invariants
-
-    private static readonly HashSet<string> VertexKeywords = new HashSet<string>
-    {
-        ":NAME",
-        ":TYPE",
-    };
-
-    #endregion
-
     #region Fields
 
     private readonly ILexer _lexer;
@@ -27,7 +16,6 @@ public class GraphScriptReader : IGraphScriptReader
     private readonly IScriptElementReader _sequenceReader;
     private readonly IScriptElementReader _splitterReader;
     private readonly IScriptElementReader _vertexReader;
-    //private readonly IScriptElementReader _groupRefReader;
     private readonly IScriptElementReader _refReader;
     private readonly IScriptElementReader _arcReader;
 
@@ -45,7 +33,6 @@ public class GraphScriptReader : IGraphScriptReader
         _splitterReader = new SplitterReader(this);
         _vertexReader = new VertexReader(this);
         _refReader = new RefReader(this);
-        //_groupRefReader = new GroupRefReader(this);
         _arcReader = new ArcReader(this);
     }
 

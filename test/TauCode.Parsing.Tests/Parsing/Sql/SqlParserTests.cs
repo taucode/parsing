@@ -16,9 +16,9 @@ namespace TauCode.Parsing.Tests.Parsing.Sql;
 [TestFixture]
 public class SqlParserTests
 {
-    private ILexer _sqlLexer;
-    private ILogger _logger;
-    private StringWriter _writer;
+    private ILexer _sqlLexer = null!;
+    private ILogger _logger = null!;
+    private StringWriter _writer = null!;
 
     [SetUp]
     public void SetUp()
@@ -407,29 +407,29 @@ public class SqlParserTests
         #endregion
 
         var sql =
-            @"
-            CREATE Table my_tab(
-                id int NOT NULL,
-                name varchar(30) NOT NULL,
-                Salary decimal(12, 3) NULL,
-                CONSTRAINT [my_tab_pk] PRIMARY KEY(id Desc, [NAME] ASC, salary),
-                CONSTRAINT [fk_other] FOREIGN KEY([id]) references other_table(otherId),
-                CONSTRAINT fk_cool FOREIGN KEY([id], name) references [other_table](otherId, [birthday])
-            )
+@"
+CREATE Table my_tab(
+    id int NOT NULL,
+    name varchar(30) NOT NULL,
+    Salary decimal(12, 3) NULL,
+    CONSTRAINT [my_tab_pk] PRIMARY KEY(id Desc, [NAME] ASC, salary),
+    CONSTRAINT [fk_other] FOREIGN KEY([id]) references other_table(otherId),
+    CONSTRAINT fk_cool FOREIGN KEY([id], name) references [other_table](otherId, [birthday])
+)
 
-            CREATE TABLE [other_table](
-                [otherId] nvarchar(10),
-                [birthday] [datetime],
-                CONSTRAINT pk_otherTable PRIMARY KEY([otherId])
-            )
+CREATE TABLE [other_table](
+    [otherId] nvarchar(10),
+    [birthday] [datetime],
+    CONSTRAINT pk_otherTable PRIMARY KEY([otherId])
+)
 
-            CREATE UNIQUE INDEX [UX_name] ON my_tab(id Desc, name, Salary asc)
+CREATE UNIQUE INDEX [UX_name] ON my_tab(id Desc, name, Salary asc)
 
-            CREATE INDEX IX_id ON [my_tab](id)
+CREATE INDEX IX_id ON [my_tab](id)
 
-            CREATE INDEX [IX_Salary] ON my_tab([salary])
+CREATE INDEX [IX_Salary] ON my_tab([salary])
 
-            ";
+";
 
         var sqlTokens = _sqlLexer.Tokenize(sql.AsMemory());
 
@@ -612,7 +612,6 @@ public class SqlParserTests
     }
 
     // todo: wordToken cannot start with digit
-    // todo clean
 
     private static string GetSqlNameFromToken(ILexicalToken token)
     {
@@ -627,19 +626,4 @@ public class SqlParserTests
 
         throw new Exception("Not an SQL name token");
     }
-
-    //if (token is WordToken wordToken)
-    //{
-    //    tableName = wordToken.Text;
-    //}
-    //else if (token is SqlIdentifierToken sqlIdentifierToken)
-    //{
-    //    tableName = sqlIdentifierToken.Value.Value;
-    //}
-    //else
-    //{
-    //    throw new Exception();
-    //}
-
-
 }

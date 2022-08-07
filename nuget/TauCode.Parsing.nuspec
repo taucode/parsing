@@ -18,7 +18,7 @@
       <group targetFramework=".NETCoreApp6.0">
         <dependency id="Serilog" version="2.11.0" />
         <dependency id="TauCode.Data.Graphs" version="1.5.0" />
-        <dependency id="TauCode.Data.Text" version="1.5.0" />
+        <dependency id="TauCode.Data.Text" version="1.5.1" />
       </group>
     </dependencies>
   </metadata>

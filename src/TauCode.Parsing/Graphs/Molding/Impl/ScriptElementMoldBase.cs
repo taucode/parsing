@@ -3,7 +3,6 @@ using TauCode.Parsing.TinyLisp.Data;
 
 namespace TauCode.Parsing.Graphs.Molding.Impl;
 
-// todo clean
 public abstract class ScriptElementMoldBase : IScriptElementMold
 {
     #region Fields
@@ -81,8 +80,6 @@ public abstract class ScriptElementMoldBase : IScriptElementMold
 
     public bool RemoveKeyword(string keyword)
     {
-        //this.CheckNotFinalized();
-
         if (keyword == null)
         {
             throw new ArgumentNullException(nameof(keyword));
@@ -93,8 +90,6 @@ public abstract class ScriptElementMoldBase : IScriptElementMold
 
     public virtual void ProcessKeywords()
     {
-        //this.CheckNotFinalized();
-
         this.Name = this.GetKeywordValue<string>(":NAME", null);
     }
 

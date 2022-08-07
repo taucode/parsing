@@ -11,7 +11,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "misc", "misc", "{A304C22C-E
 	ProjectSection(SolutionItems) = preProject
 		misc\changelog.txt = misc\changelog.txt
 		misc\links.txt = misc\links.txt
-		misc\test-ipv6-regex.pl = misc\test-ipv6-regex.pl
 		misc\todo.txt = misc\todo.txt
 	EndProjectSection
 EndProject

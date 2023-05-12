@@ -1,4 +1,8 @@
-﻿2019-11-20
+﻿2023-05-12
+==========
+    1. Refactoring for Econera.Money.
+
+2019-11-20
 ==========
     Version: v3.0.1
     1. Release v3.0.1

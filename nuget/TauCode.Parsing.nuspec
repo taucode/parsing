@@ -2,28 +2,30 @@
 <package xmlns="http://schemas.microsoft.com/packaging/2013/05/nuspec.xsd">
   <metadata>
     <id>TauCode.Parsing</id>
-    <version>1.8.1-alpha.1.2023-05-12.12-01</version>
+    <version>2.0.1-alpha.1.2024-10-26.08-43</version>
     <authors>TauCode</authors>
     <owners>TauCode</owners>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <license type="file">LICENSE</license>
     <projectUrl>https://github.com/taucode/parsing</projectUrl>
     <repository type="git" url="https://github.com/taucode/parsing"/>
+    <readme>README.md</readme>
     <description>TauCode parsing library</description>
     <releaseNotes>
-      Developing release 1.8.1.
+      Developing release 2.0.1.
     </releaseNotes>
     <tags>taucode parsing</tags>
     <dependencies>
-      <group targetFramework=".NETCoreApp6.0">
-        <dependency id="Serilog" version="2.12.0" />
-        <dependency id="TauCode.Data.Graphs" version="1.8.1-alpha.1.2023-04-08.16-21" />
-        <dependency id="TauCode.Data.Text" version="1.8.1-alpha.1.2023-04-08.16-21" />
+      <group targetFramework="net8.0">
+        <dependency id="Serilog" version="4.1.0" />
+        <dependency id="TauCode.Data.Graphs" version="2.0.1" />
+        <dependency id="TauCode.Data.Text" version="2.0.1" />
       </group>
     </dependencies>
   </metadata>
   <files>
+    <file src="..\README.md" target="" />
     <file src="..\LICENSE*" target="" />
-    <file src="..\src\TauCode.Parsing\bin\Release\net6.0\TauCode.Parsing.dll" target="lib\net6.0" />
+    <file src="..\src\TauCode.Parsing\bin\Release\net8.0\TauCode.Parsing.dll" target="lib\net8.0" />
   </files>
 </package>

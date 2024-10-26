@@ -11,6 +11,8 @@ using TauCode.Parsing.Tests.Parsing.Sql.Producers;
 using TauCode.Parsing.TokenProducers;
 using TauCode.Parsing.Tokens;
 
+#pragma warning disable NUnit1032
+
 namespace TauCode.Parsing.Tests.Parsing.Sql;
 
 [TestFixture]
@@ -48,6 +50,12 @@ public class SqlParserTests
             .WriteTo
             .TextWriter(_writer)
             .CreateLogger();
+    }
+
+    [TearDown]
+    public void TearDown()
+    {        
+        _writer?.Dispose();
     }
 
     [Test]
@@ -493,14 +501,16 @@ CREATE INDEX [IX_Salary] ON my_tab([salary])
         var tableForeignKey = foreignKeys[0];
         Assert.That(tableForeignKey.Name, Is.EqualTo("fk_other"));
         Assert.That(tableForeignKey.ReferencedTableName, Is.EqualTo("other_table"));
-        CollectionAssert.AreEquivalent(tableForeignKey.ColumnNames, new[] { "id" });
-        CollectionAssert.AreEquivalent(tableForeignKey.ReferencedColumnNames, new[] { "otherId" });
 
+        Assert.That(tableForeignKey.ColumnNames, Is.EquivalentTo(new[] { "id" }));
+        Assert.That(tableForeignKey.ReferencedColumnNames, Is.EquivalentTo(new[] { "otherId" }));
+        
         tableForeignKey = foreignKeys[1];
         Assert.That(tableForeignKey.Name, Is.EqualTo("fk_cool"));
         Assert.That(tableForeignKey.ReferencedTableName, Is.EqualTo("other_table"));
-        CollectionAssert.AreEquivalent(tableForeignKey.ColumnNames, new[] { "id", "name" });
-        CollectionAssert.AreEquivalent(tableForeignKey.ReferencedColumnNames, new[] { "otherId", "birthday" });
+
+        Assert.That(tableForeignKey.ColumnNames, Is.EquivalentTo(new[] { "id", "name" }));
+        Assert.That(tableForeignKey.ReferencedColumnNames, Is.EquivalentTo(new[] { "otherId", "birthday" }));
 
         // create table: other_table
         createTableResult = (TableInfo)sqlResults[1];

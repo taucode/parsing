@@ -229,14 +229,15 @@ public class TinyLispExtensionsTests
         var args = pseudoList.GetAllKeywordArguments(":key");
 
         // Assert
-        CollectionAssert.AreEqual(
+        Assert.That(
+            args,
+            Is.EqualTo(
             new Element[]
             {
                 Symbol.Create("one"),
                 Symbol.Create("two"),
                 new StringAtom("three"),
-            },
-            args);
+            }));
     }
 
     [Test]

@@ -22,7 +22,7 @@ public class PseudoListTests
         var pseudoList = new PseudoList(elements);
 
         // Assert
-        CollectionAssert.AreEqual(pseudoList, elements);
+        Assert.That(pseudoList, Is.EqualTo(elements));
     }
 
     [Test]
@@ -82,7 +82,7 @@ public class PseudoListTests
             anotherSymbol
         };
 
-        CollectionAssert.AreEqual(expectedList, pseudoList);
+        Assert.That(expectedList, Is.EqualTo(pseudoList));
     }
 
     [Test]

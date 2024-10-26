@@ -1,9 +1,9 @@
 dotnet restore
 
-dotnet build --configuration Debug
-dotnet build --configuration Release
+dotnet build TauCode.Parsing.sln -c Debug
+dotnet build TauCode.Parsing.sln -c Release
 
-dotnet test -c Debug .\test\TauCode.Parsing.Tests\TauCode.Parsing.Tests.csproj
-dotnet test -c Release .\test\TauCode.Parsing.Tests\TauCode.Parsing.Tests.csproj
+dotnet test TauCode.Parsing.sln -c Debug
+dotnet test TauCode.Parsing.sln -c Release
 
 nuget pack nuget\TauCode.Parsing.nuspec

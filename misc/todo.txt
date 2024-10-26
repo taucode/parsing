@@ -1,4 +1,8 @@
-﻿2019-11-13
+﻿2023-05-12
+==========    
+    1. Re-order changelog and todo (newer is upper).
+
+2019-11-13
 ==========
 +   1. NodeWrapper -> NodeExtender
 +   2. Splitter -> IdleNode
